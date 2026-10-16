@@ -1,0 +1,2824 @@
+{
+  "schemaVersion": 2,
+  "name": "wizard",
+  "image": "sprite.png",
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "columns": 8,
+  "rows": 24,
+  "anchor": {
+    "x": 128,
+    "y": 217
+  },
+  "referenceSize": 200.0,
+  "animations": {
+    "Front_Walk": {
+      "view": "Front",
+      "state": "Walk",
+      "frameNames": [
+        "Front_Walk_00",
+        "Front_Walk_01",
+        "Front_Walk_02",
+        "Front_Walk_03",
+        "Front_Walk_04",
+        "Front_Walk_05",
+        "Front_Walk_06",
+        "Front_Walk_07",
+        "Front_Walk_08",
+        "Front_Walk_09",
+        "Front_Walk_10",
+        "Front_Walk_11",
+        "Front_Walk_12",
+        "Front_Walk_13",
+        "Front_Walk_14",
+        "Front_Walk_15",
+        "Front_Walk_16",
+        "Front_Walk_17",
+        "Front_Walk_18",
+        "Front_Walk_19",
+        "Front_Walk_20",
+        "Front_Walk_21",
+        "Front_Walk_22",
+        "Front_Walk_23"
+      ],
+      "durationMs": 1208.3333333333335,
+      "loop": true,
+      "sourceRangeSeconds": [
+        0.7083333333333334,
+        1.9166666666666667
+      ],
+      "cycleMatchScore": 522.5828857421875,
+      "sheet": "Front_Walk.png",
+      "preview": "Front_Walk.gif"
+    },
+    "Front_Attack": {
+      "view": "Front",
+      "state": "Attack",
+      "frameNames": [
+        "Front_Attack_00",
+        "Front_Attack_01",
+        "Front_Attack_02",
+        "Front_Attack_03",
+        "Front_Attack_04",
+        "Front_Attack_05",
+        "Front_Attack_06",
+        "Front_Attack_07",
+        "Front_Attack_08",
+        "Front_Attack_09",
+        "Front_Attack_10",
+        "Front_Attack_11",
+        "Front_Attack_12",
+        "Front_Attack_13",
+        "Front_Attack_14",
+        "Front_Attack_15",
+        "Front_Attack_16",
+        "Front_Attack_17",
+        "Front_Attack_18",
+        "Front_Attack_19",
+        "Front_Attack_20",
+        "Front_Attack_21",
+        "Front_Attack_22",
+        "Front_Attack_23"
+      ],
+      "durationMs": 6000,
+      "loop": false,
+      "sourceRangeSeconds": [
+        0,
+        6
+      ],
+      "cycleMatchScore": null,
+      "sheet": "Front_Attack.png",
+      "preview": "Front_Attack.gif"
+    },
+    "Front_Hit": {
+      "view": "Front",
+      "state": "Hit",
+      "frameNames": [
+        "Front_Hit_00",
+        "Front_Hit_01",
+        "Front_Hit_02",
+        "Front_Hit_03",
+        "Front_Hit_04",
+        "Front_Hit_05",
+        "Front_Hit_06",
+        "Front_Hit_07",
+        "Front_Hit_08",
+        "Front_Hit_09",
+        "Front_Hit_10",
+        "Front_Hit_11",
+        "Front_Hit_12",
+        "Front_Hit_13",
+        "Front_Hit_14",
+        "Front_Hit_15",
+        "Front_Hit_16",
+        "Front_Hit_17",
+        "Front_Hit_18",
+        "Front_Hit_19",
+        "Front_Hit_20",
+        "Front_Hit_21",
+        "Front_Hit_22",
+        "Front_Hit_23"
+      ],
+      "durationMs": 6000,
+      "loop": false,
+      "sourceRangeSeconds": [
+        0,
+        6
+      ],
+      "cycleMatchScore": null,
+      "sheet": "Front_Hit.png",
+      "preview": "Front_Hit.gif"
+    },
+    "Front_Downed": {
+      "view": "Front",
+      "state": "Downed",
+      "frameNames": [
+        "Front_Downed_00",
+        "Front_Downed_01",
+        "Front_Downed_02",
+        "Front_Downed_03",
+        "Front_Downed_04",
+        "Front_Downed_05",
+        "Front_Downed_06",
+        "Front_Downed_07",
+        "Front_Downed_08",
+        "Front_Downed_09",
+        "Front_Downed_10",
+        "Front_Downed_11",
+        "Front_Downed_12",
+        "Front_Downed_13",
+        "Front_Downed_14",
+        "Front_Downed_15",
+        "Front_Downed_16",
+        "Front_Downed_17",
+        "Front_Downed_18",
+        "Front_Downed_19",
+        "Front_Downed_20",
+        "Front_Downed_21",
+        "Front_Downed_22",
+        "Front_Downed_23"
+      ],
+      "durationMs": 6000,
+      "loop": false,
+      "sourceRangeSeconds": [
+        0,
+        6
+      ],
+      "cycleMatchScore": null,
+      "sheet": "Front_Downed.png",
+      "preview": "Front_Downed.gif"
+    },
+    "Back_Walk": {
+      "view": "Back",
+      "state": "Walk",
+      "frameNames": [
+        "Back_Walk_00",
+        "Back_Walk_01",
+        "Back_Walk_02",
+        "Back_Walk_03",
+        "Back_Walk_04",
+        "Back_Walk_05",
+        "Back_Walk_06",
+        "Back_Walk_07",
+        "Back_Walk_08",
+        "Back_Walk_09",
+        "Back_Walk_10",
+        "Back_Walk_11",
+        "Back_Walk_12",
+        "Back_Walk_13",
+        "Back_Walk_14",
+        "Back_Walk_15",
+        "Back_Walk_16",
+        "Back_Walk_17",
+        "Back_Walk_18",
+        "Back_Walk_19",
+        "Back_Walk_20",
+        "Back_Walk_21",
+        "Back_Walk_22",
+        "Back_Walk_23"
+      ],
+      "durationMs": 2166.666666666667,
+      "loop": true,
+      "sourceRangeSeconds": [
+        1.2916666666666667,
+        3.4583333333333335
+      ],
+      "cycleMatchScore": 129.0550994873047,
+      "sheet": "Back_Walk.png",
+      "preview": "Back_Walk.gif"
+    },
+    "Back_Attack": {
+      "view": "Back",
+      "state": "Attack",
+      "frameNames": [
+        "Back_Attack_00",
+        "Back_Attack_01",
+        "Back_Attack_02",
+        "Back_Attack_03",
+        "Back_Attack_04",
+        "Back_Attack_05",
+        "Back_Attack_06",
+        "Back_Attack_07",
+        "Back_Attack_08",
+        "Back_Attack_09",
+        "Back_Attack_10",
+        "Back_Attack_11",
+        "Back_Attack_12",
+        "Back_Attack_13",
+        "Back_Attack_14",
+        "Back_Attack_15",
+        "Back_Attack_16",
+        "Back_Attack_17",
+        "Back_Attack_18",
+        "Back_Attack_19",
+        "Back_Attack_20",
+        "Back_Attack_21",
+        "Back_Attack_22",
+        "Back_Attack_23"
+      ],
+      "durationMs": 6000,
+      "loop": false,
+      "sourceRangeSeconds": [
+        0,
+        6
+      ],
+      "cycleMatchScore": null,
+      "sheet": "Back_Attack.png",
+      "preview": "Back_Attack.gif"
+    },
+    "Back_Hit": {
+      "view": "Back",
+      "state": "Hit",
+      "frameNames": [
+        "Back_Hit_00",
+        "Back_Hit_01",
+        "Back_Hit_02",
+        "Back_Hit_03",
+        "Back_Hit_04",
+        "Back_Hit_05",
+        "Back_Hit_06",
+        "Back_Hit_07",
+        "Back_Hit_08",
+        "Back_Hit_09",
+        "Back_Hit_10",
+        "Back_Hit_11",
+        "Back_Hit_12",
+        "Back_Hit_13",
+        "Back_Hit_14",
+        "Back_Hit_15",
+        "Back_Hit_16",
+        "Back_Hit_17",
+        "Back_Hit_18",
+        "Back_Hit_19",
+        "Back_Hit_20",
+        "Back_Hit_21",
+        "Back_Hit_22",
+        "Back_Hit_23"
+      ],
+      "durationMs": 6000,
+      "loop": false,
+      "sourceRangeSeconds": [
+        0,
+        6
+      ],
+      "cycleMatchScore": null,
+      "sheet": "Back_Hit.png",
+      "preview": "Back_Hit.gif"
+    },
+    "Back_Downed": {
+      "view": "Back",
+      "state": "Downed",
+      "frameNames": [
+        "Back_Downed_00",
+        "Back_Downed_01",
+        "Back_Downed_02",
+        "Back_Downed_03",
+        "Back_Downed_04",
+        "Back_Downed_05",
+        "Back_Downed_06",
+        "Back_Downed_07",
+        "Back_Downed_08",
+        "Back_Downed_09",
+        "Back_Downed_10",
+        "Back_Downed_11",
+        "Back_Downed_12",
+        "Back_Downed_13",
+        "Back_Downed_14",
+        "Back_Downed_15",
+        "Back_Downed_16",
+        "Back_Downed_17",
+        "Back_Downed_18",
+        "Back_Downed_19",
+        "Back_Downed_20",
+        "Back_Downed_21",
+        "Back_Downed_22",
+        "Back_Downed_23"
+      ],
+      "durationMs": 6000,
+      "loop": false,
+      "sourceRangeSeconds": [
+        0,
+        6
+      ],
+      "cycleMatchScore": null,
+      "sheet": "Back_Downed.png",
+      "preview": "Back_Downed.gif"
+    }
+  },
+  "frames": {
+    "Front_Walk_00": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 17,
+      "sourceTimeSeconds": 0.7083333333333334
+    },
+    "Front_Walk_01": {
+      "frame": {
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 18,
+      "sourceTimeSeconds": 0.75
+    },
+    "Front_Walk_02": {
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Front_Walk_03": {
+      "frame": {
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 20,
+      "sourceTimeSeconds": 0.8333333333333334
+    },
+    "Front_Walk_04": {
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 21,
+      "sourceTimeSeconds": 0.875
+    },
+    "Front_Walk_05": {
+      "frame": {
+        "x": 1280,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 23,
+      "sourceTimeSeconds": 0.9583333333333334
+    },
+    "Front_Walk_06": {
+      "frame": {
+        "x": 1536,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 24,
+      "sourceTimeSeconds": 1.0
+    },
+    "Front_Walk_07": {
+      "frame": {
+        "x": 1792,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 25,
+      "sourceTimeSeconds": 1.0416666666666667
+    },
+    "Front_Walk_08": {
+      "frame": {
+        "x": 0,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 26,
+      "sourceTimeSeconds": 1.0833333333333333
+    },
+    "Front_Walk_09": {
+      "frame": {
+        "x": 256,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 27,
+      "sourceTimeSeconds": 1.125
+    },
+    "Front_Walk_10": {
+      "frame": {
+        "x": 512,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 29,
+      "sourceTimeSeconds": 1.2083333333333333
+    },
+    "Front_Walk_11": {
+      "frame": {
+        "x": 768,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 30,
+      "sourceTimeSeconds": 1.25
+    },
+    "Front_Walk_12": {
+      "frame": {
+        "x": 1024,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Front_Walk_13": {
+      "frame": {
+        "x": 1280,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 32,
+      "sourceTimeSeconds": 1.3333333333333333
+    },
+    "Front_Walk_14": {
+      "frame": {
+        "x": 1536,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 33,
+      "sourceTimeSeconds": 1.375
+    },
+    "Front_Walk_15": {
+      "frame": {
+        "x": 1792,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 35,
+      "sourceTimeSeconds": 1.4583333333333333
+    },
+    "Front_Walk_16": {
+      "frame": {
+        "x": 0,
+        "y": 512,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 36,
+      "sourceTimeSeconds": 1.5
+    },
+    "Front_Walk_17": {
+      "frame": {
+        "x": 256,
+        "y": 512,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Front_Walk_18": {
+      "frame": {
+        "x": 512,
+        "y": 512,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 38,
+      "sourceTimeSeconds": 1.5833333333333333
+    },
+    "Front_Walk_19": {
+      "frame": {
+        "x": 768,
+        "y": 512,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 39,
+      "sourceTimeSeconds": 1.625
+    },
+    "Front_Walk_20": {
+      "frame": {
+        "x": 1024,
+        "y": 512,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 41,
+      "sourceTimeSeconds": 1.7083333333333333
+    },
+    "Front_Walk_21": {
+      "frame": {
+        "x": 1280,
+        "y": 512,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 42,
+      "sourceTimeSeconds": 1.75
+    },
+    "Front_Walk_22": {
+      "frame": {
+        "x": 1536,
+        "y": 512,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 43,
+      "sourceTimeSeconds": 1.7916666666666667
+    },
+    "Front_Walk_23": {
+      "frame": {
+        "x": 1792,
+        "y": 512,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 50.34722222222223,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Front_Attack_00": {
+      "frame": {
+        "x": 0,
+        "y": 768,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Front_Attack_01": {
+      "frame": {
+        "x": 256,
+        "y": 768,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 6,
+      "sourceTimeSeconds": 0.25
+    },
+    "Front_Attack_02": {
+      "frame": {
+        "x": 512,
+        "y": 768,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 12,
+      "sourceTimeSeconds": 0.5
+    },
+    "Front_Attack_03": {
+      "frame": {
+        "x": 768,
+        "y": 768,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Front_Attack_04": {
+      "frame": {
+        "x": 1024,
+        "y": 768,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 25,
+      "sourceTimeSeconds": 1.0416666666666667
+    },
+    "Front_Attack_05": {
+      "frame": {
+        "x": 1280,
+        "y": 768,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Front_Attack_06": {
+      "frame": {
+        "x": 1536,
+        "y": 768,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Front_Attack_07": {
+      "frame": {
+        "x": 1792,
+        "y": 768,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Front_Attack_08": {
+      "frame": {
+        "x": 0,
+        "y": 1024,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 50,
+      "sourceTimeSeconds": 2.0833333333333335
+    },
+    "Front_Attack_09": {
+      "frame": {
+        "x": 256,
+        "y": 1024,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 56,
+      "sourceTimeSeconds": 2.3333333333333335
+    },
+    "Front_Attack_10": {
+      "frame": {
+        "x": 512,
+        "y": 1024,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 62,
+      "sourceTimeSeconds": 2.5833333333333335
+    },
+    "Front_Attack_11": {
+      "frame": {
+        "x": 768,
+        "y": 1024,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 68,
+      "sourceTimeSeconds": 2.8333333333333335
+    },
+    "Front_Attack_12": {
+      "frame": {
+        "x": 1024,
+        "y": 1024,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 75,
+      "sourceTimeSeconds": 3.125
+    },
+    "Front_Attack_13": {
+      "frame": {
+        "x": 1280,
+        "y": 1024,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Front_Attack_14": {
+      "frame": {
+        "x": 1536,
+        "y": 1024,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 87,
+      "sourceTimeSeconds": 3.625
+    },
+    "Front_Attack_15": {
+      "frame": {
+        "x": 1792,
+        "y": 1024,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 93,
+      "sourceTimeSeconds": 3.875
+    },
+    "Front_Attack_16": {
+      "frame": {
+        "x": 0,
+        "y": 1280,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 99,
+      "sourceTimeSeconds": 4.125
+    },
+    "Front_Attack_17": {
+      "frame": {
+        "x": 256,
+        "y": 1280,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 106,
+      "sourceTimeSeconds": 4.416666666666667
+    },
+    "Front_Attack_18": {
+      "frame": {
+        "x": 512,
+        "y": 1280,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 112,
+      "sourceTimeSeconds": 4.666666666666667
+    },
+    "Front_Attack_19": {
+      "frame": {
+        "x": 768,
+        "y": 1280,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 118,
+      "sourceTimeSeconds": 4.916666666666667
+    },
+    "Front_Attack_20": {
+      "frame": {
+        "x": 1024,
+        "y": 1280,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 124,
+      "sourceTimeSeconds": 5.166666666666667
+    },
+    "Front_Attack_21": {
+      "frame": {
+        "x": 1280,
+        "y": 1280,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 131,
+      "sourceTimeSeconds": 5.458333333333333
+    },
+    "Front_Attack_22": {
+      "frame": {
+        "x": 1536,
+        "y": 1280,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 137,
+      "sourceTimeSeconds": 5.708333333333333
+    },
+    "Front_Attack_23": {
+      "frame": {
+        "x": 1792,
+        "y": 1280,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 143,
+      "sourceTimeSeconds": 5.958333333333333
+    },
+    "Front_Hit_00": {
+      "frame": {
+        "x": 0,
+        "y": 1536,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Front_Hit_01": {
+      "frame": {
+        "x": 256,
+        "y": 1536,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 6,
+      "sourceTimeSeconds": 0.25
+    },
+    "Front_Hit_02": {
+      "frame": {
+        "x": 512,
+        "y": 1536,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 12,
+      "sourceTimeSeconds": 0.5
+    },
+    "Front_Hit_03": {
+      "frame": {
+        "x": 768,
+        "y": 1536,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Front_Hit_04": {
+      "frame": {
+        "x": 1024,
+        "y": 1536,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 25,
+      "sourceTimeSeconds": 1.0416666666666667
+    },
+    "Front_Hit_05": {
+      "frame": {
+        "x": 1280,
+        "y": 1536,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Front_Hit_06": {
+      "frame": {
+        "x": 1536,
+        "y": 1536,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Front_Hit_07": {
+      "frame": {
+        "x": 1792,
+        "y": 1536,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Front_Hit_08": {
+      "frame": {
+        "x": 0,
+        "y": 1792,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 50,
+      "sourceTimeSeconds": 2.0833333333333335
+    },
+    "Front_Hit_09": {
+      "frame": {
+        "x": 256,
+        "y": 1792,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 56,
+      "sourceTimeSeconds": 2.3333333333333335
+    },
+    "Front_Hit_10": {
+      "frame": {
+        "x": 512,
+        "y": 1792,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 62,
+      "sourceTimeSeconds": 2.5833333333333335
+    },
+    "Front_Hit_11": {
+      "frame": {
+        "x": 768,
+        "y": 1792,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 68,
+      "sourceTimeSeconds": 2.8333333333333335
+    },
+    "Front_Hit_12": {
+      "frame": {
+        "x": 1024,
+        "y": 1792,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 75,
+      "sourceTimeSeconds": 3.125
+    },
+    "Front_Hit_13": {
+      "frame": {
+        "x": 1280,
+        "y": 1792,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Front_Hit_14": {
+      "frame": {
+        "x": 1536,
+        "y": 1792,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 87,
+      "sourceTimeSeconds": 3.625
+    },
+    "Front_Hit_15": {
+      "frame": {
+        "x": 1792,
+        "y": 1792,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 93,
+      "sourceTimeSeconds": 3.875
+    },
+    "Front_Hit_16": {
+      "frame": {
+        "x": 0,
+        "y": 2048,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 99,
+      "sourceTimeSeconds": 4.125
+    },
+    "Front_Hit_17": {
+      "frame": {
+        "x": 256,
+        "y": 2048,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 106,
+      "sourceTimeSeconds": 4.416666666666667
+    },
+    "Front_Hit_18": {
+      "frame": {
+        "x": 512,
+        "y": 2048,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 112,
+      "sourceTimeSeconds": 4.666666666666667
+    },
+    "Front_Hit_19": {
+      "frame": {
+        "x": 768,
+        "y": 2048,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 118,
+      "sourceTimeSeconds": 4.916666666666667
+    },
+    "Front_Hit_20": {
+      "frame": {
+        "x": 1024,
+        "y": 2048,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 124,
+      "sourceTimeSeconds": 5.166666666666667
+    },
+    "Front_Hit_21": {
+      "frame": {
+        "x": 1280,
+        "y": 2048,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 131,
+      "sourceTimeSeconds": 5.458333333333333
+    },
+    "Front_Hit_22": {
+      "frame": {
+        "x": 1536,
+        "y": 2048,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 137,
+      "sourceTimeSeconds": 5.708333333333333
+    },
+    "Front_Hit_23": {
+      "frame": {
+        "x": 1792,
+        "y": 2048,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 143,
+      "sourceTimeSeconds": 5.958333333333333
+    },
+    "Front_Downed_00": {
+      "frame": {
+        "x": 0,
+        "y": 2304,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Front_Downed_01": {
+      "frame": {
+        "x": 256,
+        "y": 2304,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 6,
+      "sourceTimeSeconds": 0.25
+    },
+    "Front_Downed_02": {
+      "frame": {
+        "x": 512,
+        "y": 2304,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 12,
+      "sourceTimeSeconds": 0.5
+    },
+    "Front_Downed_03": {
+      "frame": {
+        "x": 768,
+        "y": 2304,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Front_Downed_04": {
+      "frame": {
+        "x": 1024,
+        "y": 2304,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 25,
+      "sourceTimeSeconds": 1.0416666666666667
+    },
+    "Front_Downed_05": {
+      "frame": {
+        "x": 1280,
+        "y": 2304,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Front_Downed_06": {
+      "frame": {
+        "x": 1536,
+        "y": 2304,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Front_Downed_07": {
+      "frame": {
+        "x": 1792,
+        "y": 2304,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Front_Downed_08": {
+      "frame": {
+        "x": 0,
+        "y": 2560,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 50,
+      "sourceTimeSeconds": 2.0833333333333335
+    },
+    "Front_Downed_09": {
+      "frame": {
+        "x": 256,
+        "y": 2560,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 56,
+      "sourceTimeSeconds": 2.3333333333333335
+    },
+    "Front_Downed_10": {
+      "frame": {
+        "x": 512,
+        "y": 2560,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 62,
+      "sourceTimeSeconds": 2.5833333333333335
+    },
+    "Front_Downed_11": {
+      "frame": {
+        "x": 768,
+        "y": 2560,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 68,
+      "sourceTimeSeconds": 2.8333333333333335
+    },
+    "Front_Downed_12": {
+      "frame": {
+        "x": 1024,
+        "y": 2560,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 75,
+      "sourceTimeSeconds": 3.125
+    },
+    "Front_Downed_13": {
+      "frame": {
+        "x": 1280,
+        "y": 2560,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Front_Downed_14": {
+      "frame": {
+        "x": 1536,
+        "y": 2560,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 87,
+      "sourceTimeSeconds": 3.625
+    },
+    "Front_Downed_15": {
+      "frame": {
+        "x": 1792,
+        "y": 2560,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 93,
+      "sourceTimeSeconds": 3.875
+    },
+    "Front_Downed_16": {
+      "frame": {
+        "x": 0,
+        "y": 2816,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 99,
+      "sourceTimeSeconds": 4.125
+    },
+    "Front_Downed_17": {
+      "frame": {
+        "x": 256,
+        "y": 2816,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 106,
+      "sourceTimeSeconds": 4.416666666666667
+    },
+    "Front_Downed_18": {
+      "frame": {
+        "x": 512,
+        "y": 2816,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 112,
+      "sourceTimeSeconds": 4.666666666666667
+    },
+    "Front_Downed_19": {
+      "frame": {
+        "x": 768,
+        "y": 2816,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 118,
+      "sourceTimeSeconds": 4.916666666666667
+    },
+    "Front_Downed_20": {
+      "frame": {
+        "x": 1024,
+        "y": 2816,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 124,
+      "sourceTimeSeconds": 5.166666666666667
+    },
+    "Front_Downed_21": {
+      "frame": {
+        "x": 1280,
+        "y": 2816,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 131,
+      "sourceTimeSeconds": 5.458333333333333
+    },
+    "Front_Downed_22": {
+      "frame": {
+        "x": 1536,
+        "y": 2816,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 137,
+      "sourceTimeSeconds": 5.708333333333333
+    },
+    "Front_Downed_23": {
+      "frame": {
+        "x": 1792,
+        "y": 2816,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 143,
+      "sourceTimeSeconds": 5.958333333333333
+    },
+    "Back_Walk_00": {
+      "frame": {
+        "x": 0,
+        "y": 3072,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Back_Walk_01": {
+      "frame": {
+        "x": 256,
+        "y": 3072,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 33,
+      "sourceTimeSeconds": 1.375
+    },
+    "Back_Walk_02": {
+      "frame": {
+        "x": 512,
+        "y": 3072,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 35,
+      "sourceTimeSeconds": 1.4583333333333333
+    },
+    "Back_Walk_03": {
+      "frame": {
+        "x": 768,
+        "y": 3072,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Back_Walk_04": {
+      "frame": {
+        "x": 1024,
+        "y": 3072,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 39,
+      "sourceTimeSeconds": 1.625
+    },
+    "Back_Walk_05": {
+      "frame": {
+        "x": 1280,
+        "y": 3072,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 41,
+      "sourceTimeSeconds": 1.7083333333333333
+    },
+    "Back_Walk_06": {
+      "frame": {
+        "x": 1536,
+        "y": 3072,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Back_Walk_07": {
+      "frame": {
+        "x": 1792,
+        "y": 3072,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 46,
+      "sourceTimeSeconds": 1.9166666666666667
+    },
+    "Back_Walk_08": {
+      "frame": {
+        "x": 0,
+        "y": 3328,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 48,
+      "sourceTimeSeconds": 2.0
+    },
+    "Back_Walk_09": {
+      "frame": {
+        "x": 256,
+        "y": 3328,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 50,
+      "sourceTimeSeconds": 2.0833333333333335
+    },
+    "Back_Walk_10": {
+      "frame": {
+        "x": 512,
+        "y": 3328,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 52,
+      "sourceTimeSeconds": 2.1666666666666665
+    },
+    "Back_Walk_11": {
+      "frame": {
+        "x": 768,
+        "y": 3328,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 54,
+      "sourceTimeSeconds": 2.25
+    },
+    "Back_Walk_12": {
+      "frame": {
+        "x": 1024,
+        "y": 3328,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 57,
+      "sourceTimeSeconds": 2.375
+    },
+    "Back_Walk_13": {
+      "frame": {
+        "x": 1280,
+        "y": 3328,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 59,
+      "sourceTimeSeconds": 2.4583333333333335
+    },
+    "Back_Walk_14": {
+      "frame": {
+        "x": 1536,
+        "y": 3328,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 61,
+      "sourceTimeSeconds": 2.5416666666666665
+    },
+    "Back_Walk_15": {
+      "frame": {
+        "x": 1792,
+        "y": 3328,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 63,
+      "sourceTimeSeconds": 2.625
+    },
+    "Back_Walk_16": {
+      "frame": {
+        "x": 0,
+        "y": 3584,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 65,
+      "sourceTimeSeconds": 2.7083333333333335
+    },
+    "Back_Walk_17": {
+      "frame": {
+        "x": 256,
+        "y": 3584,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 67,
+      "sourceTimeSeconds": 2.7916666666666665
+    },
+    "Back_Walk_18": {
+      "frame": {
+        "x": 512,
+        "y": 3584,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 70,
+      "sourceTimeSeconds": 2.9166666666666665
+    },
+    "Back_Walk_19": {
+      "frame": {
+        "x": 768,
+        "y": 3584,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 72,
+      "sourceTimeSeconds": 3.0
+    },
+    "Back_Walk_20": {
+      "frame": {
+        "x": 1024,
+        "y": 3584,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 74,
+      "sourceTimeSeconds": 3.0833333333333335
+    },
+    "Back_Walk_21": {
+      "frame": {
+        "x": 1280,
+        "y": 3584,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 76,
+      "sourceTimeSeconds": 3.1666666666666665
+    },
+    "Back_Walk_22": {
+      "frame": {
+        "x": 1536,
+        "y": 3584,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 78,
+      "sourceTimeSeconds": 3.25
+    },
+    "Back_Walk_23": {
+      "frame": {
+        "x": 1792,
+        "y": 3584,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 90.27777777777779,
+      "sourceFrameIndex": 80,
+      "sourceTimeSeconds": 3.3333333333333335
+    },
+    "Back_Attack_00": {
+      "frame": {
+        "x": 0,
+        "y": 3840,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Back_Attack_01": {
+      "frame": {
+        "x": 256,
+        "y": 3840,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 6,
+      "sourceTimeSeconds": 0.25
+    },
+    "Back_Attack_02": {
+      "frame": {
+        "x": 512,
+        "y": 3840,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 12,
+      "sourceTimeSeconds": 0.5
+    },
+    "Back_Attack_03": {
+      "frame": {
+        "x": 768,
+        "y": 3840,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Back_Attack_04": {
+      "frame": {
+        "x": 1024,
+        "y": 3840,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 25,
+      "sourceTimeSeconds": 1.0416666666666667
+    },
+    "Back_Attack_05": {
+      "frame": {
+        "x": 1280,
+        "y": 3840,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Back_Attack_06": {
+      "frame": {
+        "x": 1536,
+        "y": 3840,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Back_Attack_07": {
+      "frame": {
+        "x": 1792,
+        "y": 3840,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Back_Attack_08": {
+      "frame": {
+        "x": 0,
+        "y": 4096,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 50,
+      "sourceTimeSeconds": 2.0833333333333335
+    },
+    "Back_Attack_09": {
+      "frame": {
+        "x": 256,
+        "y": 4096,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 56,
+      "sourceTimeSeconds": 2.3333333333333335
+    },
+    "Back_Attack_10": {
+      "frame": {
+        "x": 512,
+        "y": 4096,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 62,
+      "sourceTimeSeconds": 2.5833333333333335
+    },
+    "Back_Attack_11": {
+      "frame": {
+        "x": 768,
+        "y": 4096,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 68,
+      "sourceTimeSeconds": 2.8333333333333335
+    },
+    "Back_Attack_12": {
+      "frame": {
+        "x": 1024,
+        "y": 4096,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 75,
+      "sourceTimeSeconds": 3.125
+    },
+    "Back_Attack_13": {
+      "frame": {
+        "x": 1280,
+        "y": 4096,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Back_Attack_14": {
+      "frame": {
+        "x": 1536,
+        "y": 4096,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 87,
+      "sourceTimeSeconds": 3.625
+    },
+    "Back_Attack_15": {
+      "frame": {
+        "x": 1792,
+        "y": 4096,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 93,
+      "sourceTimeSeconds": 3.875
+    },
+    "Back_Attack_16": {
+      "frame": {
+        "x": 0,
+        "y": 4352,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 99,
+      "sourceTimeSeconds": 4.125
+    },
+    "Back_Attack_17": {
+      "frame": {
+        "x": 256,
+        "y": 4352,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 106,
+      "sourceTimeSeconds": 4.416666666666667
+    },
+    "Back_Attack_18": {
+      "frame": {
+        "x": 512,
+        "y": 4352,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 112,
+      "sourceTimeSeconds": 4.666666666666667
+    },
+    "Back_Attack_19": {
+      "frame": {
+        "x": 768,
+        "y": 4352,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 118,
+      "sourceTimeSeconds": 4.916666666666667
+    },
+    "Back_Attack_20": {
+      "frame": {
+        "x": 1024,
+        "y": 4352,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 124,
+      "sourceTimeSeconds": 5.166666666666667
+    },
+    "Back_Attack_21": {
+      "frame": {
+        "x": 1280,
+        "y": 4352,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 131,
+      "sourceTimeSeconds": 5.458333333333333
+    },
+    "Back_Attack_22": {
+      "frame": {
+        "x": 1536,
+        "y": 4352,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 137,
+      "sourceTimeSeconds": 5.708333333333333
+    },
+    "Back_Attack_23": {
+      "frame": {
+        "x": 1792,
+        "y": 4352,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 143,
+      "sourceTimeSeconds": 5.958333333333333
+    },
+    "Back_Hit_00": {
+      "frame": {
+        "x": 0,
+        "y": 4608,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Back_Hit_01": {
+      "frame": {
+        "x": 256,
+        "y": 4608,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 6,
+      "sourceTimeSeconds": 0.25
+    },
+    "Back_Hit_02": {
+      "frame": {
+        "x": 512,
+        "y": 4608,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 12,
+      "sourceTimeSeconds": 0.5
+    },
+    "Back_Hit_03": {
+      "frame": {
+        "x": 768,
+        "y": 4608,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Back_Hit_04": {
+      "frame": {
+        "x": 1024,
+        "y": 4608,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 25,
+      "sourceTimeSeconds": 1.0416666666666667
+    },
+    "Back_Hit_05": {
+      "frame": {
+        "x": 1280,
+        "y": 4608,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Back_Hit_06": {
+      "frame": {
+        "x": 1536,
+        "y": 4608,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Back_Hit_07": {
+      "frame": {
+        "x": 1792,
+        "y": 4608,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Back_Hit_08": {
+      "frame": {
+        "x": 0,
+        "y": 4864,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 50,
+      "sourceTimeSeconds": 2.0833333333333335
+    },
+    "Back_Hit_09": {
+      "frame": {
+        "x": 256,
+        "y": 4864,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 56,
+      "sourceTimeSeconds": 2.3333333333333335
+    },
+    "Back_Hit_10": {
+      "frame": {
+        "x": 512,
+        "y": 4864,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 62,
+      "sourceTimeSeconds": 2.5833333333333335
+    },
+    "Back_Hit_11": {
+      "frame": {
+        "x": 768,
+        "y": 4864,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 68,
+      "sourceTimeSeconds": 2.8333333333333335
+    },
+    "Back_Hit_12": {
+      "frame": {
+        "x": 1024,
+        "y": 4864,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 75,
+      "sourceTimeSeconds": 3.125
+    },
+    "Back_Hit_13": {
+      "frame": {
+        "x": 1280,
+        "y": 4864,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Back_Hit_14": {
+      "frame": {
+        "x": 1536,
+        "y": 4864,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 87,
+      "sourceTimeSeconds": 3.625
+    },
+    "Back_Hit_15": {
+      "frame": {
+        "x": 1792,
+        "y": 4864,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 93,
+      "sourceTimeSeconds": 3.875
+    },
+    "Back_Hit_16": {
+      "frame": {
+        "x": 0,
+        "y": 5120,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 99,
+      "sourceTimeSeconds": 4.125
+    },
+    "Back_Hit_17": {
+      "frame": {
+        "x": 256,
+        "y": 5120,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 106,
+      "sourceTimeSeconds": 4.416666666666667
+    },
+    "Back_Hit_18": {
+      "frame": {
+        "x": 512,
+        "y": 5120,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 112,
+      "sourceTimeSeconds": 4.666666666666667
+    },
+    "Back_Hit_19": {
+      "frame": {
+        "x": 768,
+        "y": 5120,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 118,
+      "sourceTimeSeconds": 4.916666666666667
+    },
+    "Back_Hit_20": {
+      "frame": {
+        "x": 1024,
+        "y": 5120,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 124,
+      "sourceTimeSeconds": 5.166666666666667
+    },
+    "Back_Hit_21": {
+      "frame": {
+        "x": 1280,
+        "y": 5120,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 131,
+      "sourceTimeSeconds": 5.458333333333333
+    },
+    "Back_Hit_22": {
+      "frame": {
+        "x": 1536,
+        "y": 5120,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 137,
+      "sourceTimeSeconds": 5.708333333333333
+    },
+    "Back_Hit_23": {
+      "frame": {
+        "x": 1792,
+        "y": 5120,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 143,
+      "sourceTimeSeconds": 5.958333333333333
+    },
+    "Back_Downed_00": {
+      "frame": {
+        "x": 0,
+        "y": 5376,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Back_Downed_01": {
+      "frame": {
+        "x": 256,
+        "y": 5376,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 6,
+      "sourceTimeSeconds": 0.25
+    },
+    "Back_Downed_02": {
+      "frame": {
+        "x": 512,
+        "y": 5376,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 12,
+      "sourceTimeSeconds": 0.5
+    },
+    "Back_Downed_03": {
+      "frame": {
+        "x": 768,
+        "y": 5376,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Back_Downed_04": {
+      "frame": {
+        "x": 1024,
+        "y": 5376,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 25,
+      "sourceTimeSeconds": 1.0416666666666667
+    },
+    "Back_Downed_05": {
+      "frame": {
+        "x": 1280,
+        "y": 5376,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Back_Downed_06": {
+      "frame": {
+        "x": 1536,
+        "y": 5376,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Back_Downed_07": {
+      "frame": {
+        "x": 1792,
+        "y": 5376,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Back_Downed_08": {
+      "frame": {
+        "x": 0,
+        "y": 5632,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 50,
+      "sourceTimeSeconds": 2.0833333333333335
+    },
+    "Back_Downed_09": {
+      "frame": {
+        "x": 256,
+        "y": 5632,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 56,
+      "sourceTimeSeconds": 2.3333333333333335
+    },
+    "Back_Downed_10": {
+      "frame": {
+        "x": 512,
+        "y": 5632,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 62,
+      "sourceTimeSeconds": 2.5833333333333335
+    },
+    "Back_Downed_11": {
+      "frame": {
+        "x": 768,
+        "y": 5632,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 68,
+      "sourceTimeSeconds": 2.8333333333333335
+    },
+    "Back_Downed_12": {
+      "frame": {
+        "x": 1024,
+        "y": 5632,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 75,
+      "sourceTimeSeconds": 3.125
+    },
+    "Back_Downed_13": {
+      "frame": {
+        "x": 1280,
+        "y": 5632,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Back_Downed_14": {
+      "frame": {
+        "x": 1536,
+        "y": 5632,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 87,
+      "sourceTimeSeconds": 3.625
+    },
+    "Back_Downed_15": {
+      "frame": {
+        "x": 1792,
+        "y": 5632,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 93,
+      "sourceTimeSeconds": 3.875
+    },
+    "Back_Downed_16": {
+      "frame": {
+        "x": 0,
+        "y": 5888,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 99,
+      "sourceTimeSeconds": 4.125
+    },
+    "Back_Downed_17": {
+      "frame": {
+        "x": 256,
+        "y": 5888,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 106,
+      "sourceTimeSeconds": 4.416666666666667
+    },
+    "Back_Downed_18": {
+      "frame": {
+        "x": 512,
+        "y": 5888,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 112,
+      "sourceTimeSeconds": 4.666666666666667
+    },
+    "Back_Downed_19": {
+      "frame": {
+        "x": 768,
+        "y": 5888,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 118,
+      "sourceTimeSeconds": 4.916666666666667
+    },
+    "Back_Downed_20": {
+      "frame": {
+        "x": 1024,
+        "y": 5888,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 124,
+      "sourceTimeSeconds": 5.166666666666667
+    },
+    "Back_Downed_21": {
+      "frame": {
+        "x": 1280,
+        "y": 5888,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 131,
+      "sourceTimeSeconds": 5.458333333333333
+    },
+    "Back_Downed_22": {
+      "frame": {
+        "x": 1536,
+        "y": 5888,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 137,
+      "sourceTimeSeconds": 5.708333333333333
+    },
+    "Back_Downed_23": {
+      "frame": {
+        "x": 1792,
+        "y": 5888,
+        "w": 256,
+        "h": 256
+      },
+      "durationMs": 250.0,
+      "sourceFrameIndex": 143,
+      "sourceTimeSeconds": 5.958333333333333
+    }
+  },
+  "normalization": {
+    "mode": "fixed-view-transform",
+    "views": {
+      "Front": {
+        "resizedSize": [
+          269,
+          269
+        ],
+        "destinationXY": [
+          -6,
+          -16
+        ],
+        "referenceBBox": [
+          148,
+          68,
+          396,
+          472
+        ],
+        "unionBBox": [
+          38,
+          46,
+          497,
+          512
+        ]
+      },
+      "Back": {
+        "resizedSize": [
+          269,
+          269
+        ],
+        "destinationXY": [
+          -6,
+          -16
+        ],
+        "referenceBBox": [
+          152,
+          68,
+          388,
+          472
+        ],
+        "unionBBox": [
+          76,
+          62,
+          468,
+          488
+        ]
+      }
+    }
+  },
+  "sources": [
+    {
+      "key": "Front_Walk",
+      "video": "video/Front_Walk_Source.mp4",
+      "sha256": "08d1be17ec06ab7a453267bd1eee82d294701a2b8af64314651cf8e75548e343"
+    },
+    {
+      "key": "Front_Attack",
+      "video": "video/Front_Attack_Source.mp4",
+      "sha256": "49ef386ab819c889ed651eb03f4b667f3c13e4cdfdb6a21a122b67d17a5b5a94"
+    },
+    {
+      "key": "Front_Hit",
+      "video": "video/Front_Hit_Source.mp4",
+      "sha256": "2659cccf17ac1fbc4effbc78e3ead720c4c986188f199478bbf843955524c6ed"
+    },
+    {
+      "key": "Front_Downed",
+      "video": "video/Front_Downed_Source.mp4",
+      "sha256": "d74a54d6e2990c74d125f42e2c1cd085462233c43d9759e24c4b346568f02237"
+    },
+    {
+      "key": "Back_Walk",
+      "video": "video/Back_Walk_Source.mp4",
+      "sha256": "bb453a8900c288aa95444af5e5e214d0f13763d9eaa8628fd17e952205680013"
+    },
+    {
+      "key": "Back_Attack",
+      "video": "video/Back_Attack_Source.mp4",
+      "sha256": "539797890dabaa5f3cf5ef5699482049b12b82e309f6e5e122599e406c0d5b94"
+    },
+    {
+      "key": "Back_Hit",
+      "video": "video/Back_Hit_Source.mp4",
+      "sha256": "e379d51f35a6ff39dd7e6f8556a9623ae8f477c133ff76afc2ca1397c102cfee"
+    },
+    {
+      "key": "Back_Downed",
+      "video": "video/Back_Downed_Source.mp4",
+      "sha256": "dc820e849494c14ab9d5c9ee148f1c852c4e55685ff934c1fcdffcade9736a72"
+    }
+  ],
+  "sockets": {
+    "Front_Attack_00": {
+      "x": 86,
+      "y": 157,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_01": {
+      "x": 86,
+      "y": 157,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_02": {
+      "x": 86,
+      "y": 157,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_03": {
+      "x": 86,
+      "y": 157,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_04": {
+      "x": 82,
+      "y": 136,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_05": {
+      "x": 94,
+      "y": 112,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_06": {
+      "x": 157,
+      "y": 108,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_07": {
+      "x": 151,
+      "y": 104,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_08": {
+      "x": 150,
+      "y": 104,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_09": {
+      "x": 142,
+      "y": 111,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_10": {
+      "x": 87,
+      "y": 138,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_11": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_12": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_13": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_14": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_15": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_16": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_17": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_18": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_19": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_20": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_21": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_22": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Front_Attack_23": {
+      "x": 82,
+      "y": 150,
+      "angle": 0,
+      "behind": false
+    },
+    "Back_Attack_00": {
+      "x": 91,
+      "y": 157,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_01": {
+      "x": 91,
+      "y": 157,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_02": {
+      "x": 91,
+      "y": 157,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_03": {
+      "x": 91,
+      "y": 157,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_04": {
+      "x": 91,
+      "y": 155,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_05": {
+      "x": 100,
+      "y": 140,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_06": {
+      "x": 100,
+      "y": 140,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_07": {
+      "x": 104,
+      "y": 101,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_08": {
+      "x": 74,
+      "y": 86,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_09": {
+      "x": 74,
+      "y": 89,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_10": {
+      "x": 69,
+      "y": 109,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_11": {
+      "x": 73,
+      "y": 135,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_12": {
+      "x": 89,
+      "y": 146,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_13": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_14": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_15": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_16": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_17": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_18": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_19": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_20": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_21": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_22": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    },
+    "Back_Attack_23": {
+      "x": 90,
+      "y": 150,
+      "angle": 0,
+      "behind": true
+    }
+  },
+  "socketSource": "grip-annotations.json"
+}

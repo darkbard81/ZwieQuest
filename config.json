@@ -1,0 +1,106 @@
+{
+  "onlineRate": 1,
+  "offlineRate": 1.5,
+  "presenceGraceMs": 12000,
+  "homeMs": 7000,
+  "travelMs": 6000,
+  "choiceMs": 9000,
+  "battleActionMs": 1100,
+  "treasureMs": 3200,
+  "returnMs": 7000,
+  "downedMs": 4500,
+  "stepsPerRun": 10,
+  "xpPerLevel": 40,
+  "classes": {
+    "warrior": {
+      "name": "전사",
+      "base": {
+        "STR": 3,
+        "CON": 3,
+        "DEX": 1,
+        "PER": 2,
+        "INT": 0,
+        "RES": 1
+      },
+      "hp": 95,
+      "hpGrowth": 9,
+      "B": {
+        "ACC": 4,
+        "DEF": 4,
+        "FOR": 1,
+        "REF": 1,
+        "WIL": 3
+      }
+    },
+    "wizard": {
+      "name": "마법사",
+      "base": {
+        "STR": 0,
+        "CON": 1,
+        "DEX": 2,
+        "PER": 4,
+        "INT": 3,
+        "RES": 1
+      },
+      "hp": 85,
+      "hpGrowth": 7,
+      "B": {
+        "ACC": 3,
+        "DEF": 4,
+        "FOR": 3,
+        "REF": 0,
+        "WIL": 2
+      }
+    }
+  },
+  "balance": {
+    "battleXP": 24,
+    "treasureXP": 14,
+    "riskXP": 6,
+    "battleGold": 12,
+    "treasureGold": 20,
+    "riskGold": 8,
+    "rareChance": 18,
+    "riskRareChance": 15,
+    "battleHeal": 6,
+    "treasureHeal": 15,
+    "warriorBasic": 16,
+    "warriorStrong": 24,
+    "wizardBasic": 20,
+    "wizardStrong": 30,
+    "strongPenBonus": 1,
+    "carefulAccuracy": 2,
+    "piercePenBonus": 1,
+    "enemyHP": 40,
+    "enemyHPPerStep": 5,
+    "enemyHPPerLevel": 3,
+    "enemyRiskHP": 10,
+    "enemyDamage": 9,
+    "enemyRiskDamage": 2,
+    "bossXP": 90,
+    "bossGold": 120,
+    "bossHPMultiplier": 1.6,
+    "bossDamageMultiplier": 1.2
+  },
+  "initiative": {
+    "policy": "higher-dex",
+    "tieWinner": "hero",
+    "enemyDEX": 1
+  },
+  "equipment": {
+    "warriorPEN": 3,
+    "wizardPEN": 2,
+    "powerPerTier": 3,
+    "armorAR": 2,
+    "armorHPPerTier": 4,
+    "charmACC": 1,
+    "basePrice": 12,
+    "pricePerTier": 14
+  },
+  "mastery": {
+    "fromLevel": 10,
+    "warriorACC": 2,
+    "warriorFOR": 2,
+    "wizardWIL": 3
+  }
+}

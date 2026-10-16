@@ -1,0 +1,144 @@
+{
+  "generated": [
+    {
+      "file": "beach.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "2ddfe85968671c9cb6a778300a4a36750c717a7eaa6f17c44d36e83a43479f80",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true
+    },
+    {
+      "file": "volcano.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "0057e75c39ec8d48a72b9bdd473be1f35d0c739df44ee5c8692f411ef619ae7f",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true
+    },
+    {
+      "file": "village.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "f3309491af22888b6c48ef6d6f209e993915f40d9cf7df4df2ca46b47fd44f86",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true
+    },
+    {
+      "file": "icons.png",
+      "width": 1774,
+      "height": 887,
+      "sha256": "382d9c9b2eed4952bb4fbe592b91cd43bdfae0ea9fc284678773c4d37d5d7e71",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true
+    },
+    {
+      "file": "snow.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "4075cae83bc62a72b0f2c50197036b7cc419b1b4fdb1be2e18a650951d538b72",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true
+    },
+    {
+      "file": "desert.png",
+      "width": 1672,
+      "height": 940,
+      "sha256": "aecf91345960e2f61aa7bc7528303d60a816912c1d45ef4775b60a4f5c4c43bc",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true
+    },
+    {
+      "file": "forest.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "fde76087a4b581ddefef14c56bf63d2795d6548a71fda916c7d6ec3a4231c4ec",
+      "source": "built-in image_gen.imagegen",
+      "runtime": false
+    }
+  ],
+  "copiedCharacters": [
+    {
+      "file": "warrior/sprite.png",
+      "source": "/home/deck/Documents/TacticsSD/game/assets/video-character-sprites/warrior/sprite.png",
+      "sha256": "8dc1aefeacb5177660b8c81a49ec076897b01c856e08bf0faca12c9ffa07bd2a",
+      "byteIdentical": true
+    },
+    {
+      "file": "warrior/sprite.json",
+      "source": "/home/deck/Documents/TacticsSD/game/assets/video-character-sprites/warrior/sprite.json",
+      "sha256": "4f95e38e298859382fed637b8437a59a2764d014e4ab3137f2e34f90bc14e7ec",
+      "byteIdentical": true
+    },
+    {
+      "file": "wizard/sprite.png",
+      "source": "/home/deck/Documents/TacticsSD/game/assets/video-character-sprites/wizard/sprite.png",
+      "sha256": "250de9e93486d374d8cfa6d27fe8c274986f5ee171f4d43c47b49ddc6a5fc218",
+      "byteIdentical": true
+    },
+    {
+      "file": "wizard/sprite.json",
+      "source": "/home/deck/Documents/TacticsSD/game/assets/video-character-sprites/wizard/sprite.json",
+      "sha256": "d84d6ba8d114f30b32b73c160253511388120b3a224446153765f640c9b1fc3d",
+      "byteIdentical": true
+    }
+  ],
+  "renderer": {
+    "css": [
+      512,
+      384
+    ],
+    "buffer": [
+      1024,
+      768
+    ],
+    "footY": 317,
+    "backgroundFit": "height; center crop; limited horizontal overscan",
+    "engine": "PixiJS",
+    "version": "8.21.0",
+    "backends": [
+      "WebGLRenderer",
+      "CanvasRenderer"
+    ],
+    "defaultPreference": [
+      "webgl",
+      "canvas"
+    ],
+    "customCanvasFallback": false
+  },
+  "animation": {
+    "idle": "Front_Attack_00",
+    "walk": {
+      "left": "Front_Walk",
+      "right": "Back_Walk",
+      "mirrored": false
+    },
+    "downed": "Front_Downed",
+    "rewardWarrior": "Front_Attack_09",
+    "rewardWizard": "Front_Attack_06",
+    "limitations": [
+      "No side-walk source",
+      "No both-arms-up cheer source"
+    ]
+  },
+  "vendor": [
+    {
+      "file": "../pixi.js",
+      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/dist/pixi.min.js",
+      "sha256": "c6d9d4c897b15576cce0055d0ba4382021181c99cdf08a446be9d61e16833db0",
+      "byteIdentical": true
+    },
+    {
+      "file": "../pixi-csp.js",
+      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/dist/packages/unsafe-eval.min.js",
+      "sha256": "95b16558c615575f08d6b9e2b518b0edc4d446673b3307d967e2e59fab0464cd",
+      "byteIdentical": true
+    },
+    {
+      "file": "../PIXI-LICENSE.txt",
+      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/LICENSE",
+      "sha256": "5ce7447bc57f7349ffc48338782fbcabe613696e00712b20d66bc58e780f9473",
+      "byteIdentical": true
+    }
+  ]
+}

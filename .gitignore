@@ -1,0 +1,25 @@
+# Runtime data and credentials
+/data/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+
+# Dependencies and local artifacts
+node_modules/
+*.log
+/evidence/
+/IMPLEMENTATION.md
+/implementation-manifest.json
+.DS_Store

@@ -1,0 +1,14 @@
+{
+  "name": "zwiequest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "서버에서 계속되는 작은 자율 모험",
+  "scripts": {
+    "start": "bash ./start.sh",
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
