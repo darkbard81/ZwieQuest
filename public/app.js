@@ -1,3 +1,5 @@
+import { tacticDescription, roundStatus } from './tactics-view.js';
+import { itemIconHTML, itemDetailsHTML } from './equipment-view.js';
 import { createWorld } from './render.js';
 import { initWindows } from './windows.js';
 import { initInfoTabs } from './tabs.js';
@@ -11,6 +13,7 @@ const esc = text => String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const phases = { HOME: '여관에서 휴식', TRAVEL: '길 위를 걷는 중', CHOICE_WAIT: '갈림길 선택', BATTLE: '자동 전투', TREASURE: '전리품 획득', RETURN_HOME: '탐험 완료', DOWNED: '안전 귀환 준비' };
 const slotNames = { weapon: '무기', armor: '방어구', charm: '부적' };
 let data = null, receivedAt = 0, user = null, source = null, away = false, connected = false, filter = 'all', inventoryKey = '', journalSeq = -1, toastTimer, authMode = 'login';
+const equipmentViews = new Map();
 const clientId = crypto.randomUUID(); let lastHeartbeat = 0;
 let world, choicePending = false;
 const combatFeed = createCombatFeed();
@@ -48,19 +51,25 @@ function receive(next) {
   const portrait = $('#portrait'); portrait.style.backgroundImage = `url('/assets/${s.classId}/portrait.png?v=motions256-2')`; portrait.style.backgroundSize = 'cover'; portrait.style.backgroundPosition = 'center top';
   $('#hp-label').textContent = `${s.hp} / ${s.stats.maxHp}`; $('#hp-fill').style.width = `${100 * s.hp / s.stats.maxHp}%`;
   $('#xp-label').textContent = `${s.xp} / ${s.xpNext}`; $('#xp-fill').style.width = `${100 * s.xp / s.xpNext}%`;
-  $('#stats').innerHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statNames[k]}</small><b>${s.stats[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'FOR', 'REF', 'WIL'].map(k => statLabelHTML(k, s.stats[k])).join('')}</div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<span>${statNames[k]} <b>${s.stats[k]}</b></span>`).join('')}</div>`;
+  $('#stats').innerHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statNames[k]}</small><b>${(s.combatStats || s.stats)[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'FOR', 'REF', 'WIL'].map(k => statLabelHTML(k, s.stats[k])).join('')}</div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<span>${statNames[k]} <b>${s.stats[k]}</b></span>`).join('')}</div>`;
   $('#stats').title = ['STR', 'CON', 'DEX', 'PER', 'INT', 'RES', 'DEF', 'FOR', 'REF', 'WIL', 'LB'].map(k => `${statNames[k]} ${s.stats[k]}`).join(' · ');
   $('#class-switch').disabled = s.phase !== 'HOME';
-  $('#equipment').innerHTML = ['weapon', 'armor', 'charm'].map(slot => { const item = s.inventory.find(i => i.id === s.equipment[slot]); return `<div class="equip-slot" title="${item ? esc(item.name) : '빈 슬롯'}"><span class="icon ${item?.icon || slot}"></span><span>${item ? esc(item.name) : slotNames[slot] + ' 없음'}</span></div>`; }).join('');
+  renderEquipment(s);
   renderInventory(s);
   $('#scene-location').textContent = s.phase === 'HOME' ? `${theme.name} · ${s.mapId === 'village' ? 'HOME' : '출발점'}` : theme.name;
   $('#scene-direction').textContent = s.phase === 'TRAVEL' ? `${s.direction === 'left' ? '←' : '→'} 새로운 길을 향해` : '성장은 자동으로, 선택은 자유롭게';
+  const tacticOptions = s.availableTactics || [{ id: 'normal', name: '일반' }];
+  const optionKey = tacticOptions.map(t => t.id).join(',');
+  if ($('#tactic').dataset.options !== optionKey) {
+    $('#tactic').innerHTML = tacticOptions.map(t => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('');
+    $('#tactic').dataset.options = optionKey;
+  }
   $('#tactic').value = s.tactic;
-  const battle = s.battle;
-  $('#battle-status').textContent = battle ? `턴 ${battle.turn} · ${battle.actor === 'hero' ? '모험가' : '몬스터'} · 행동력 ${battle.ap}/3 · 연속 공격 ${battle.attacks}회` : `승리 ${s.victories}회 · 보물 ${s.chests}개 · 모든 기록 자동 저장`;
+  $('#tactic-summary').textContent = tacticDescription(tacticOptions.find(t => t.id === s.tactic));
+  $('#battle-status').textContent = roundStatus(s);
   $('#enemy-hud').hidden = !s.enemy || s.phase !== 'BATTLE';
   if (s.enemy) $('#enemy-hud').innerHTML = `${esc(s.enemy.name)} · ${s.enemy.hp}/${s.enemy.maxHp}<div class="meter"><div style="width:${100 * s.enemy.hp / s.enemy.maxHp}%"></div></div>`;
-  $('#scene-notice').textContent = s.phase === 'TREASURE' ? '새로운 발견! 가방에 전리품을 담았어요.' : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
+  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : '전투 보상으로 경험치와 금화를 얻었어요.') : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
   $('#return-overlay').hidden = s.phase !== 'RETURN_HOME';
   if (s.phase === 'RETURN_HOME') $('#return-overlay').innerHTML = `<small>JOURNEY COMPLETE</small><h2>${s.lastSummary?.downed ? '무사히 돌아왔어요' : s.lastSummary?.reason === 'boss' ? '수호자를 넘어섰어요' : '길 끝에서, 다시 출발'}</h2><p>${s.run}번째 여행 · ${theme.name}</p><strong>+ ${s.lastSummary.gold} G</strong><p>성장과 전리품을 안전하게 저장했습니다.<br>마을의 집(HOME)으로 돌아갑니다.</p>`;
   if ($('#map-dialog')?.open) renderMap();
@@ -69,13 +78,33 @@ function receive(next) {
     $('#journal').innerHTML = next.logs.slice(0, 45).map(e => `<li class="${esc(e.type)}">${logHTML(e.text)}<time>${new Date(e.at).toLocaleTimeString('ko-KR', { hour12: false })}</time></li>`).join('');
   }
 }
+function renderEquipment(s) {
+  // Keep decoded images mounted across snapshots; update only a changed slot.
+  for (const slot of ['weapon', 'armor', 'charm']) {
+    const item = s.inventory.find(i => i.id === s.equipment[slot]);
+    const title = item?.name || '빈 슬롯';
+    const html = `${itemIconHTML(item, slot)}<span>${item ? esc(item.name) : slotNames[slot] + ' 없음'}</span>`;
+    let view = equipmentViews.get(slot);
+    if (!view) {
+      const element = document.createElement('div');
+      element.className = 'equip-slot';
+      $('#equipment').append(element);
+      view = { element, html: null };
+      equipmentViews.set(slot, view);
+    }
+    if (view.html === html) continue;
+    view.element.title = title;
+    view.element.innerHTML = html;
+    view.html = html;
+  }
+}
 function renderInventory(s) {
-  const key = JSON.stringify([s.inventory, s.equipment, filter]); if (key === inventoryKey) return; inventoryKey = key;
+  const key = JSON.stringify([s.inventory, s.equipment, s.classId, filter]); if (key === inventoryKey) return; inventoryKey = key;
   $('#item-count').textContent = `${s.inventory.length}개`;
   const items = s.inventory.filter(i => filter === 'all' || i.slot === filter).slice().reverse();
   $('#inventory-list').innerHTML = items.length ? items.map(item => {
-    const equipped = Object.values(s.equipment).includes(item.id), usable = !item.classId || item.classId === s.classId;
-    return `<article class="item ${item.tier >= 2 ? 'rare' : ''}"><div class="item-icon"><span class="icon ${item.icon}"></span></div><div><h3>${esc(item.name)}${equipped ? '<span class="equipped">장착 중</span>' : ''}</h3><p>${Object.entries(item.stats).map(([k, v]) => statLabelHTML(k, `+${v}`)).join(' · ')}</p><div class="item-actions"><span class="rarity">${item.rarity}</span><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}" ${usable ? '' : 'disabled'}>${equipped ? '해제' : usable ? '장착' : '다른 직업'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${equipped ? 'disabled' : ''}>판매 ${item.value} G</button></div></div></article>`;
+    const equipped = Object.values(s.equipment).includes(item.id);
+    return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><h3>${esc(item.name)}${equipped ? '<span class="equipped">장착 중</span>' : ''}</h3><p>${itemDetailsHTML(item)}</p><div class="item-actions"><span class="rarity">${esc(item.rarity)}${item.special ? ' · 특수' : ''}</span><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}">${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${equipped ? 'disabled' : ''}>판매 ${item.value} G</button></div></div></article>`;
   }).join('') : '<p class="muted">아직 발견한 장비가 없어요. 여행을 조금 더 지켜보세요.</p>';
 }
 $('#inventory-list').addEventListener('click', e => { const b = e.target.closest('[data-action]'); if (b) command(b.dataset.action, { itemId: b.dataset.item }, b); });

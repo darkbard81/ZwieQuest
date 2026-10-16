@@ -60,17 +60,10 @@
     "battleGold": 12,
     "treasureGold": 20,
     "riskGold": 8,
-    "rareChance": 18,
-    "riskRareChance": 15,
     "battleHeal": 6,
     "treasureHeal": 15,
     "warriorBasic": 16,
-    "warriorStrong": 24,
     "wizardBasic": 20,
-    "wizardStrong": 30,
-    "strongPenBonus": 1,
-    "carefulAccuracy": 2,
-    "piercePenBonus": 1,
     "enemyHP": 40,
     "enemyHPPerStep": 5,
     "enemyHPPerLevel": 3,
@@ -80,7 +73,9 @@
     "bossXP": 90,
     "bossGold": 120,
     "bossHPMultiplier": 1.6,
-    "bossDamageMultiplier": 1.2
+    "bossDamageMultiplier": 1.2,
+    "charmRareChance": 18,
+    "charmRiskRareChance": 15
   },
   "initiative": {
     "policy": "higher-dex",
@@ -88,11 +83,6 @@
     "enemyDEX": 1
   },
   "equipment": {
-    "warriorPEN": 3,
-    "wizardPEN": 2,
-    "powerPerTier": 3,
-    "armorAR": 2,
-    "armorHPPerTier": 4,
     "charmACC": 1,
     "basePrice": 12,
     "pricePerTier": 14
@@ -102,5 +92,39 @@
     "warriorACC": 2,
     "warriorFOR": 2,
     "wizardWIL": 3
+  },
+  "tactics": {
+    "normal": {
+      "name": "일반",
+      "cost": 1
+    },
+    "defend": {
+      "name": "방어태세",
+      "classId": "warrior",
+      "cost": 2,
+      "baseAR": 2,
+      "intDivisor": 2
+    },
+    "assault": {
+      "name": "공격태세",
+      "classId": "warrior",
+      "cost": 2,
+      "baseACC": 4,
+      "accPerINT": 1
+    },
+    "heal": {
+      "name": "회복",
+      "classId": "wizard",
+      "cost": 2,
+      "baseHeal": 12,
+      "healPerINT": 4
+    },
+    "burst": {
+      "name": "마력폭발",
+      "classId": "wizard",
+      "cost": 2,
+      "baseDamageRate": 1,
+      "damageRatePerINT": 0.1
+    }
   }
 }

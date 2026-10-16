@@ -1,0 +1,392 @@
+{
+  "rulesVersion": 2,
+  "damageTypes": {
+    "slash": {
+      "name": "베기",
+      "prefix": "날카로운"
+    },
+    "pierce": {
+      "name": "찌르기",
+      "prefix": "꿰뚫는"
+    },
+    "blunt": {
+      "name": "때리기",
+      "prefix": "묵직한"
+    },
+    "fire": {
+      "name": "화염",
+      "prefix": "불꽃의"
+    },
+    "cold": {
+      "name": "냉기",
+      "prefix": "서리의"
+    },
+    "lightning": {
+      "name": "전기",
+      "prefix": "번개의"
+    },
+    "corrosion": {
+      "name": "부식",
+      "prefix": "부식의"
+    },
+    "raw": {
+      "name": "Raw"
+    }
+  },
+  "dropPercent": 25,
+  "weaponSpecialPercent": 1,
+  "armorSpecialPercent": 1,
+  "specialResistanceRange": [
+    1,
+    4
+  ],
+  "grades": [
+    {
+      "id": "normal",
+      "name": "일반",
+      "weight": 60,
+      "damageRate": 0,
+      "ACC": 0,
+      "PEN": 0,
+      "AR": 0
+    },
+    {
+      "id": "fine",
+      "name": "양질",
+      "weight": 25,
+      "damageRate": 0.15,
+      "ACC": 4,
+      "PEN": 1,
+      "AR": 1
+    },
+    {
+      "id": "excellent",
+      "name": "우수",
+      "weight": 10,
+      "damageRate": 0.3,
+      "ACC": 8,
+      "PEN": 2,
+      "AR": 2
+    },
+    {
+      "id": "superior",
+      "name": "고급",
+      "weight": 4,
+      "damageRate": 0.45,
+      "ACC": 12,
+      "PEN": 3,
+      "AR": 3
+    },
+    {
+      "id": "legendary",
+      "name": "전설",
+      "weight": 1,
+      "damageRate": 0.6,
+      "ACC": 15,
+      "PEN": 4,
+      "AR": 4
+    }
+  ],
+  "weapons": [
+    {
+      "id": "dagger",
+      "name": "단검",
+      "slot": "weapon",
+      "damageTypes": [
+        "slash",
+        "pierce"
+      ],
+      "damageMin": 9,
+      "damageMax": 13,
+      "ACC": 2,
+      "PEN": 3,
+      "hitDefense": "REF"
+    },
+    {
+      "id": "shortsword",
+      "name": "숏소드",
+      "slot": "weapon",
+      "damageTypes": [
+        "slash",
+        "pierce"
+      ],
+      "damageMin": 12,
+      "damageMax": 16,
+      "ACC": 1,
+      "PEN": 2,
+      "hitDefense": "DEF"
+    },
+    {
+      "id": "longsword",
+      "name": "롱소드",
+      "slot": "weapon",
+      "damageTypes": [
+        "slash",
+        "pierce"
+      ],
+      "damageMin": 14,
+      "damageMax": 18,
+      "ACC": 0,
+      "PEN": 2,
+      "hitDefense": "DEF"
+    },
+    {
+      "id": "rapier",
+      "name": "레이피어",
+      "slot": "weapon",
+      "damageTypes": [
+        "pierce"
+      ],
+      "damageMin": 12,
+      "damageMax": 16,
+      "ACC": 2,
+      "PEN": 4,
+      "hitDefense": "REF"
+    },
+    {
+      "id": "greatsword",
+      "name": "대검",
+      "slot": "weapon",
+      "damageTypes": [
+        "slash",
+        "blunt"
+      ],
+      "damageMin": 19,
+      "damageMax": 25,
+      "ACC": -2,
+      "PEN": 2,
+      "hitDefense": "DEF"
+    },
+    {
+      "id": "handaxe",
+      "name": "손도끼",
+      "slot": "weapon",
+      "damageTypes": [
+        "slash"
+      ],
+      "damageMin": 14,
+      "damageMax": 18,
+      "ACC": 1,
+      "PEN": 2,
+      "hitDefense": "DEF"
+    },
+    {
+      "id": "battleaxe",
+      "name": "전투도끼",
+      "slot": "weapon",
+      "damageTypes": [
+        "slash"
+      ],
+      "damageMin": 17,
+      "damageMax": 23,
+      "ACC": -1,
+      "PEN": 3,
+      "hitDefense": "DEF"
+    },
+    {
+      "id": "mace",
+      "name": "메이스",
+      "slot": "weapon",
+      "damageTypes": [
+        "blunt"
+      ],
+      "damageMin": 15,
+      "damageMax": 19,
+      "ACC": 0,
+      "PEN": 3,
+      "hitDefense": "FOR"
+    },
+    {
+      "id": "warhammer",
+      "name": "전투망치",
+      "slot": "weapon",
+      "damageTypes": [
+        "blunt"
+      ],
+      "damageMin": 17,
+      "damageMax": 23,
+      "ACC": -1,
+      "PEN": 4,
+      "hitDefense": "FOR"
+    },
+    {
+      "id": "spear",
+      "name": "창",
+      "slot": "weapon",
+      "damageTypes": [
+        "pierce"
+      ],
+      "damageMin": 15,
+      "damageMax": 19,
+      "ACC": 0,
+      "PEN": 3,
+      "hitDefense": "REF"
+    },
+    {
+      "id": "halberd",
+      "name": "할버드",
+      "slot": "weapon",
+      "damageTypes": [
+        "slash",
+        "blunt"
+      ],
+      "damageMin": 16,
+      "damageMax": 22,
+      "ACC": -1,
+      "PEN": 2,
+      "hitDefense": "DEF"
+    },
+    {
+      "id": "fire-staff",
+      "name": "화염 지팡이",
+      "slot": "weapon",
+      "damageTypes": [
+        "fire"
+      ],
+      "damageMin": 2,
+      "damageMax": 10,
+      "ACC": 0,
+      "PEN": 2,
+      "hitDefense": "WIL"
+    },
+    {
+      "id": "ice-staff",
+      "name": "냉기 지팡이",
+      "slot": "weapon",
+      "damageTypes": [
+        "cold"
+      ],
+      "damageMin": 2,
+      "damageMax": 10,
+      "ACC": 0,
+      "PEN": 2,
+      "hitDefense": "WIL"
+    },
+    {
+      "id": "lightning-staff",
+      "name": "번개 지팡이",
+      "slot": "weapon",
+      "damageTypes": [
+        "lightning"
+      ],
+      "damageMin": 2,
+      "damageMax": 10,
+      "ACC": 0,
+      "PEN": 2,
+      "hitDefense": "WIL"
+    },
+    {
+      "id": "corrosion-staff",
+      "name": "부식 지팡이",
+      "slot": "weapon",
+      "damageTypes": [
+        "corrosion"
+      ],
+      "damageMin": 2,
+      "damageMax": 10,
+      "ACC": 0,
+      "PEN": 2,
+      "hitDefense": "WIL"
+    }
+  ],
+  "armors": [
+    {
+      "id": "robe",
+      "name": "천옷 / 로브",
+      "slot": "armor",
+      "AR": 3,
+      "typeModifiers": {},
+      "DEX": 0
+    },
+    {
+      "id": "leather",
+      "name": "가죽 갑옷",
+      "slot": "armor",
+      "AR": 5,
+      "typeModifiers": {
+        "blunt": -2,
+        "cold": -2
+      },
+      "DEX": -1
+    },
+    {
+      "id": "padded",
+      "name": "덧댄 갑옷",
+      "slot": "armor",
+      "AR": 5,
+      "typeModifiers": {
+        "pierce": -2,
+        "fire": -2
+      },
+      "DEX": -1
+    },
+    {
+      "id": "hide",
+      "name": "생가죽 갑옷",
+      "slot": "armor",
+      "AR": 5,
+      "typeModifiers": {
+        "slash": -2,
+        "corrosion": -2
+      },
+      "DEX": -1
+    },
+    {
+      "id": "chainmail",
+      "name": "사슬 갑옷",
+      "slot": "armor",
+      "AR": 7,
+      "typeModifiers": {
+        "blunt": -2,
+        "cold": -2
+      },
+      "DEX": -2
+    },
+    {
+      "id": "scale",
+      "name": "비늘 갑옷",
+      "slot": "armor",
+      "AR": 7,
+      "typeModifiers": {
+        "pierce": -2,
+        "corrosion": -2
+      },
+      "DEX": -2
+    },
+    {
+      "id": "breastplate",
+      "name": "흉갑",
+      "slot": "armor",
+      "AR": 7,
+      "typeModifiers": {
+        "slash": -2,
+        "lightning": -2
+      },
+      "DEX": -2
+    },
+    {
+      "id": "brigandine",
+      "name": "브리건딘",
+      "slot": "armor",
+      "AR": 9,
+      "typeModifiers": {
+        "pierce": -4,
+        "corrosion": -4
+      },
+      "DEX": -3
+    },
+    {
+      "id": "plate",
+      "name": "판금 갑옷",
+      "slot": "armor",
+      "AR": 9,
+      "typeModifiers": {
+        "blunt": -4,
+        "lightning": -4
+      },
+      "DEX": -3
+    }
+  ],
+  "saleBase": 12,
+  "saleGradeStep": 14
+}

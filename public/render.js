@@ -66,7 +66,7 @@ export async function createWorld(container) {
     const motion = animator.sample(now, reduced);
     hero.texture = h.frames[meta.animations[motion.action].frameNames[motion.frame]];
     hero.anchor.set(meta.anchor.x / meta.frameWidth, meta.anchor.y / meta.frameHeight);
-    const size = 256 / meta.frameHeight;
+    const size = 192 / meta.frameHeight;
     hero.scale.set(motion.mirrored ? -size : size, size);
     currentAnimation = motion;
     const x = ['BATTLE', 'TREASURE'].includes(s.phase) ? 166 : 245;
@@ -115,7 +115,7 @@ export async function createWorld(container) {
       renderer: renderer.name, isPixiRenderer: renderer instanceof CanvasRenderer || renderer.name === 'webgl',
       feedback: { visible: feedback.visible, label: feedback.text, target: feedbackTarget, count: feedbackCount,
         bounds: feedback.visible ? { x: feedback.x - feedback.width / 2, y: feedback.y - feedback.height / 2, width: feedback.width, height: feedback.height } : null },
-      camera: cameraView, heroDisplay: { cellSize: 256, x: hero.x, y: hero.y }, objectDisplay: { x: object.x, y: object.y, width: object.width, visible: object.visible },
+      camera: cameraView, heroDisplay: { cellSize: 192, x: hero.x, y: hero.y }, objectDisplay: { x: object.x, y: object.y, width: object.width, visible: object.visible },
       framesRendered, animation: currentAnimation, displayObjects: stage.children.length, fps, width: renderer.canvas.width, height: renderer.canvas.height }; }
   };
 }

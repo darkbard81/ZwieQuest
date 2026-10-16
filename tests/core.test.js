@@ -31,12 +31,12 @@ test('rate switch preserves spent game time; choice timeout is real-time and not
   g.phase('CHOICE_WAIT',9000);g.tick(1000,1);g.tick(1000,1.5);assert.equal(g.state.remaining,7000);
 });
 test('equipment during battle affects next attack; HP swaps cannot heal; equipped sale rejected',()=>{
-  const g=make();g.state.run=1;g.state.step=1;g.state.risk=0;g.beginBattle();const before=stats(g.state,config);const item=g.item('weapon',2);g.state.inventory.push(item);g.command({type:'EQUIP',itemId:item.id});assert.ok(stats(g.state,config).PEN>before.PEN);g.battleAction();assert.equal(g.state.battle.lastHit.pen,stats(g.state,config).PEN+1);
+  const g=make();g.state.run=1;g.state.step=1;g.state.risk=0;g.beginBattle();while(g.state.battle.actor!=='hero')g.battleAction();const before=stats(g.state,config);const item=g.item('weapon',2);g.state.inventory.push(item);g.command({type:'EQUIP',itemId:item.id});assert.ok(stats(g.state,config).PEN>before.PEN);g.battleAction();assert.equal(g.state.battle.lastHit.pen,stats(g.state,config).PEN);
   assert.throws(()=>g.command({type:'SELL',itemId:item.id}));const armor=g.item('armor',2);g.state.inventory.push(armor);g.state.hp=30;g.command({type:'EQUIP',itemId:armor.id});assert.equal(g.state.hp,30);g.command({type:'UNEQUIP',itemId:armor.id});assert.equal(g.state.hp,30);const gold=g.state.gold;g.command({type:'SELL',itemId:armor.id});assert.equal(g.state.gold,gold+armor.value);assert.throws(()=>g.command({type:'SELL',itemId:armor.id}));
 });
 test('three AP and attack penalties reset each turn',()=>{
-  const g=make();g.state.step=1;g.state.risk=0;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=10000;g.state.hp=10000;
-  g.battleAction();assert.equal(g.state.battle.ap,1);assert.equal(g.state.battle.attacks,1);const first=g.state.battle.lastHit.margin;g.battleAction();assert.equal(g.state.battle.lastHit.margin,first-5);assert.equal(g.state.battle.actor,'enemy');assert.equal(g.state.battle.ap,3);for(let i=0;i<3;i++)g.battleAction();assert.equal(g.state.battle.actor,'hero');assert.equal(g.state.battle.attacks,0);
+  const g=make();g.state.step=1;g.state.risk=0;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=10000;g.state.hp=10000;while(g.state.battle.actor!=='hero')g.battleAction();
+  g.battleAction();assert.equal(g.state.battle.ap,2);assert.equal(g.state.battle.attacks,1);const first=g.state.battle.lastHit.margin;g.battleAction();assert.equal(g.state.battle.lastHit.margin,first-5);assert.equal(g.state.battle.ap,1);g.battleAction();assert.equal(g.state.battle.lastHit.margin,first-10);assert.equal(g.state.battle.actor,'enemy');assert.equal(g.state.battle.ap,3);for(let i=0;i<3;i++)g.battleAction();assert.equal(g.state.battle.actor,'hero');assert.equal(g.state.battle.attacks,0);
 });
 test('downed preserves possessions and returns home; no inventory silent cap',()=>{
   const g=make();g.state.step=1;g.state.run=1;g.state.runGold=0;g.state.risk=0;g.beginBattle();g.state.hp=1;g.state.battle.actor='enemy';g.state.enemy.ACC=100;g.battleAction();assert.equal(g.state.phase,'DOWNED');g.advance();g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.state.hp,stats(g.state,config).maxHp);
@@ -44,5 +44,5 @@ test('downed preserves possessions and returns home; no inventory silent cap',()
 });
 test('DEX initiative and configured tie policy determine first actor',()=>{
  const cfg=structuredClone(config);cfg.initiative.enemyDEX=2;const g=new Game(cfg);g.create('warrior');g.state.step=1;g.state.risk=0;g.beginBattle();assert.equal(g.state.battle.actor,'enemy');
- g.state.classId='wizard';g.beginBattle();assert.equal(g.state.battle.actor,'hero');cfg.initiative.tieWinner='enemy';g.beginBattle();assert.equal(g.state.battle.actor,'enemy');
+ g.state.classId='wizard';delete g.state.equipment.armor;g.beginBattle();assert.equal(g.state.battle.actor,'hero');cfg.initiative.tieWinner='enemy';g.beginBattle();assert.equal(g.state.battle.actor,'enemy');
 });

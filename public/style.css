@@ -91,3 +91,29 @@ nav{gap:7px}.quiet{padding:7px 9px;font-size:11px}.connection{font-size:10px;pad
 #world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) .scene-top h2{font-size:16px;margin:0}
 .enemy-hud{left:334px;top:164px;width:128px}
 #world[data-phase="TREASURE"] .scene-notice{top:auto;bottom:42px}
+
+/* Category art and five independent equipment grades. */
+.equipment-icon{display:block;width:43px;height:43px;object-fit:contain;flex:none}.equip-slot .equipment-icon{width:34px;height:34px;margin:auto}.item>div:last-child{min-width:0}.item p{line-height:1.6}.damage-types{color:#c6d7cd}.armor-matchups small{color:#92a69e;font-size:9px}.weakness{color:#e4a59a}.resistance{color:#a6d4b7}.item[data-grade=normal] .rarity{color:#c0ccc3}.item[data-grade=fine] .rarity{color:#a6d4b7}.item[data-grade=excellent] .rarity{color:#91bded}.item[data-grade=superior] .rarity{color:#c6addb}.item[data-grade=legendary] .rarity{color:#f0cc79}.item[data-grade=excellent] .item-icon{border-color:#6798c8;background:#273949}.item[data-grade=legendary] .item-icon{border-color:#c6a95f;background:#423d2a}.item[data-grade=fine] .item-icon{border-color:#7eaa86}
+
+.item[data-grade=superior] .item-icon{border-color:#7f7096;background:#36334a}
+
+.tactic-summary{font-size:10px;color:#b5cdbb;padding:6px 0 0;line-height:1.5}.battle-status{line-height:1.5;flex:none}.tactics{flex:none}
+.journal-content{grid-template-rows:28px auto minmax(0,1fr)}
+.journal-content .tactics{grid-column:1;grid-row:1}
+.journal-content .tactic-summary{grid-column:2;grid-row:1;align-self:center;padding:0}
+.journal-content .battle-status{grid-column:1/-1;grid-row:2;text-align:left;white-space:normal;padding:2px 0;line-height:1.4}
+.journal-content .journal{grid-column:1/-1;grid-row:3}
+
+/* Eight damage identities: requested hues, pale fills and readable dark text. */
+.damage-slash{--damage-color:#DC2626;--damage-ink:#991B1B;--damage-bg:#FEE2E2}
+.damage-pierce{--damage-color:#7C3AED;--damage-ink:#5B21B6;--damage-bg:#EDE9FE}
+.damage-blunt{--damage-color:#B45309;--damage-ink:#92400E;--damage-bg:#FEF3C7}
+.damage-fire{--damage-color:#EA580C;--damage-ink:#9A3412;--damage-bg:#FFEDD5}
+.damage-cold{--damage-color:#2563EB;--damage-ink:#1E40AF;--damage-bg:#DBEAFE}
+.damage-lightning{--damage-color:#CA8A04;--damage-ink:#854D0E;--damage-bg:#FEF9C3}
+.damage-corrosion{--damage-color:#16A34A;--damage-ink:#166534;--damage-bg:#DCFCE7}
+.damage-raw{--damage-color:#6B7280;--damage-ink:#374151;--damage-bg:#F3F4F6}
+.damage-tag{display:inline-flex;align-items:center;gap:3px;vertical-align:baseline;white-space:nowrap;border:1px solid var(--damage-color);border-left-width:3px;border-radius:4px;padding:0 4px;background:var(--damage-bg);color:var(--damage-ink);font-size:10px;font-weight:600;line-height:1.6}
+.damage-tag>span{font-family:'Noto Color Emoji','Apple Color Emoji','Segoe UI Emoji',sans-serif;font-size:11px}.damage-tag b{color:inherit}
+.damage-types{display:inline-flex;flex-wrap:wrap;gap:4px;margin:3px 0}.armor-matchup{display:inline-block;margin:3px 0}.armor-matchups .damage-tag{margin-right:2px}
+.journal .damage-tag{font-size:9px;line-height:1.5;padding:0 3px}.journal .damage-tag>span{font-size:10px}
