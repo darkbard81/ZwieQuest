@@ -15,6 +15,7 @@ export function itemDetailsHTML(item) {
     pieces.push(item.damageTypes.includes('raw') ? `고정 피해 <b>${item.fixedDamage}</b>` : `무기 피해 <b>${scaled(item.damageMin)}–${scaled(item.damageMax)}</b>${item.damageRate ? ` <small>(기본 ${item.damageMin}–${item.damageMax} · +${Math.round(item.damageRate * 100)}%)</small>` : ''}`);
     pieces.push(`<span class="damage-types">${item.damageTypes.map(t => damageTagHTML(t)).join(' ')}</span>`);
   }
+  if (item.slot === 'charm' && item.primaryStat) pieces.push(`주 능력치: ${statLabelHTML(item.primaryStat)}${item.secondaryStat ? ` · 추가: ${statLabelHTML(item.secondaryStat)}` : ''}`);
   if (item.slot === 'weapon' && item.hitDefense) pieces.push(`명중 판정: ${statLabelHTML(item.hitDefense)}`);
   pieces.push(Object.entries(item.stats).map(([k, v]) => statLabelHTML(k, signed(v))).join(' · '));
   if (item.typeModifiers && Object.keys(item.typeModifiers).length) pieces.push(`<span class="armor-matchups">${Object.entries(item.typeModifiers).map(([t, v]) => `<span class="armor-matchup">${damageTagHTML(t, signed(v))} <small>(방어도 ${item.stats.AR + v})</small></span>`).join(' · ')}</span>`);

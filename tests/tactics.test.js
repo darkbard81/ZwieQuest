@@ -55,7 +55,7 @@ test('DEX penalty affects REF and initiative, not ACC or other stats; negatives 
 test('existing armor DEX migrates once without changing other saved fields or item IDs',()=>{
  const g=make();const originals=catalog.armors.map(t=>{const a=item(t.id);delete a.stats.DEX;delete a.dexRulesVersion;return a;});originals.push({id:'coat',slot:'armor',name:'수호자의 외투',stats:{AR:4,HP:8},value:40});g.state.inventory.push(...originals);const old=JSON.parse(JSON.stringify(g.state));old.tactic='pierce';delete old.combatRulesVersion;delete old.battle.rulesVersion;old.battle.ap=2;old.battle.attacks=1;
  const restored=new Game(config,old);assert.equal(restored.state.tactic,'normal');assert.equal(restored.state.battle.ap,2);assert.equal(restored.state.battle.attacks,1);assert.equal(restored.state.battle.roundTactic,'normal');
- for(const orig of originals){const a=restored.state.inventory.find(i=>i.id===orig.id),expected=catalog.armors.find(t=>t.id===a.templateId)?.DEX||0;assert.equal(a.stats.DEX,expected);const clean=structuredClone(a);delete clean.stats.DEX;delete clean.dexRulesVersion;assert.deepEqual(clean,orig);}
+ for(const orig of originals){const a=restored.state.inventory.find(i=>i.id===orig.id),expected=catalog.armors.find(t=>t.id===a.templateId)?.DEX||0;assert.equal(a.stats.DEX,expected);if(orig.id==='coat'){assert.equal(a.templateId,'leather');assert.equal(a.stats.HP,undefined);continue;}const clean=structuredClone(a);delete clean.stats.DEX;delete clean.dexRulesVersion;assert.deepEqual(clean,orig);}
  const again=new Game(config,structuredClone(restored.state));assert.deepEqual(again.state,restored.state);
 });
 test('reload mid-round preserves reserved AP and already-used burst/heal without repeating them',()=>{

@@ -48,7 +48,9 @@
       "damageRate": 0,
       "ACC": 0,
       "PEN": 0,
-      "AR": 0
+      "AR": 0,
+      "primaryBonus": 1,
+      "secondaryBonus": 0
     },
     {
       "id": "fine",
@@ -57,7 +59,9 @@
       "damageRate": 0.15,
       "ACC": 4,
       "PEN": 1,
-      "AR": 1
+      "AR": 1,
+      "primaryBonus": 1,
+      "secondaryBonus": 1
     },
     {
       "id": "excellent",
@@ -66,7 +70,9 @@
       "damageRate": 0.3,
       "ACC": 8,
       "PEN": 2,
-      "AR": 2
+      "AR": 2,
+      "primaryBonus": 2,
+      "secondaryBonus": 0
     },
     {
       "id": "superior",
@@ -75,7 +81,9 @@
       "damageRate": 0.45,
       "ACC": 12,
       "PEN": 3,
-      "AR": 3
+      "AR": 3,
+      "primaryBonus": 2,
+      "secondaryBonus": 1
     },
     {
       "id": "legendary",
@@ -84,7 +92,9 @@
       "damageRate": 0.6,
       "ACC": 15,
       "PEN": 4,
-      "AR": 4
+      "AR": 4,
+      "primaryBonus": 2,
+      "secondaryBonus": 2
     }
   ],
   "weapons": [
@@ -388,5 +398,44 @@
     }
   ],
   "saleBase": 12,
-  "saleGradeStep": 14
+  "saleGradeStep": 14,
+  "accessoryRulesVersion": 1,
+  "charms": [
+    {
+      "id": "strength-charm",
+      "name": "완력의 부적",
+      "slot": "charm",
+      "primaryStat": "STR"
+    },
+    {
+      "id": "vitality-charm",
+      "name": "활력의 부적",
+      "slot": "charm",
+      "primaryStat": "CON"
+    },
+    {
+      "id": "agility-charm",
+      "name": "민첩의 부적",
+      "slot": "charm",
+      "primaryStat": "DEX"
+    },
+    {
+      "id": "insight-charm",
+      "name": "통찰의 부적",
+      "slot": "charm",
+      "primaryStat": "PER"
+    },
+    {
+      "id": "wisdom-charm",
+      "name": "지혜의 부적",
+      "slot": "charm",
+      "primaryStat": "INT"
+    },
+    {
+      "id": "resolve-charm",
+      "name": "의지의 부적",
+      "slot": "charm",
+      "primaryStat": "RES"
+    }
+  ]
 }

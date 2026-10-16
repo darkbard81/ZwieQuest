@@ -1,7 +1,7 @@
 import { randomInt, randomUUID } from 'node:crypto';
 import { attack, stats, levelBonus } from './combat.js';
 import { MAP_DEFS, createMaps } from './maps.js';
-import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX } from './equipment.js';
+import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
 import { availableTactics, validTactic, tacticEffect, validateTactics, COMBAT_RULES_VERSION } from './tactics.js';
 export const THEMES = Object.entries(MAP_DEFS).map(([id, def]) => ({ id, name: def.name, subtitle: def.subtitle }));
 export class Game {
@@ -9,7 +9,9 @@ export class Game {
     validateTactics(config); this.config = config; this.state = state; this.rng = n => ((rng(n) % n) + n) % n; this.events = [];
     if (state && !state.maps) { this.installMaps(); this.phase('HOME', config.homeMs); this.log('map', '새 경로 체계로 이동했습니다. 성장과 장비는 유지됩니다.'); }
     if (state) {
+      const replaced = migrateLegacyEquipment(state, this.rng);
       migrateArmorDEX(state.inventory);
+      if (replaced) state.hp = Math.min(state.hp, stats(state, config).maxHp);
       if (!validTactic(state.tactic, state.classId, config)) state.tactic = 'normal';
       if (state.battle && state.battle.rulesVersion !== COMBAT_RULES_VERSION) {
         // Finish the already-started round with its saved actor/AP. Never replay or reserve AP on load.
@@ -22,12 +24,7 @@ export class Game {
   log(type, text, detail = {}) { const e = { seq: ++this.state.eventSeq, at: Date.now(), type, text, ...detail }; this.events.push(e); this.state.lastEvent = e; }
   phase(phase, ms) { Object.assign(this.state, { phase, remaining: ms, duration: ms, phaseStartedAt: Date.now() }); }
   item(kind, tier) {
-    if (kind === 'weapon' || kind === 'armor') return generateEquipment({ slot: kind, classId: this.state.classId, rng: this.rng, gradeId: tier == null ? undefined : EQUIPMENT_CATALOG.grades[tier]?.id });
-    tier ??= 0;
-    const id = randomUUID(), gear = this.config.equipment;
-    const rarity = tier >= 2 ? '희귀' : tier === 1 ? '고급' : '일반';
-    const defs = { charm: { name: '새벽의 부적', icon: 'charm', stats: { ACC: gear.charmACC + Math.min(tier, 2), WIL: tier } } };
-    return { id, slot: kind, tier, rarity, value: gear.basePrice + tier * gear.pricePerTier, ...defs[kind] };
+    return generateEquipment({ slot: kind, rng: this.rng, gradeId: tier == null ? undefined : EQUIPMENT_CATALOG.grades[tier]?.id });
   }
   starter(kind) {
     const wizard = this.state.classId === 'wizard';
@@ -39,7 +36,6 @@ export class Game {
     this.state = { classId, level: 1, xp: 0, gold: 0, hp: 1, inventory: [], equipment: {}, run: 0, step: 0, eventSeq: 0, version: 0, completed: 0, victories: 0, chests: 0, theme: 'village', direction: 'right', tactic: 'normal', combatRulesVersion: COMBAT_RULES_VERSION, path: [], lastSummary: null };
     this.installMaps();
     for (const kind of ['weapon', 'armor']) { const i = this.starter(kind); this.state.inventory.push(i); this.state.equipment[kind] = i.id; }
-    this.state.inventory.push(this.item('charm', 1));
     this.state.hp = stats(this.state, this.config).maxHp;
     this.phase('HOME', this.config.homeMs); this.log('home', '새로운 모험가가 여관에 도착했습니다. 곧 자동으로 출발합니다.');
   }
@@ -78,10 +74,8 @@ export class Game {
     // One shared 25% roll, then equal weapon / armor / accessory odds.
     const slot = treasure ? 'charm' : chance(this.rng, EQUIPMENT_CATALOG.dropPercent)
       ? ['weapon', 'armor', 'charm'][this.rng(3)] : null;
-    const item = slot ? this.item(slot, slot === 'charm'
-      ? (this.rng(100) < tune.charmRareChance + s.risk * tune.charmRiskRareChance ? 2 : this.rng(2))
-      : undefined) : null;
-    // Chests keep their existing guaranteed accessory reward and rarity rules.
+    const item = slot ? this.item(slot) : null;
+    // Chests grant one of the same six accessories with the shared five-grade roll.
     if (item) s.inventory.push(item);
     s.lastReward = { kind, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
     this.log(kind, `${boss ? '보스 격파' : treasure ? '보물 발견' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : ' · 장비 없음'}`, { xp, gold, itemId: item?.id || null });

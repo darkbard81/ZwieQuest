@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 
+export const BASE_STATS = Object.freeze(['STR', 'CON', 'DEX', 'PER', 'INT', 'RES']);
+
 // Server-owned templates. Generated item snapshots, not templates, are persisted.
 export function validateCatalog(c) {
   const fail = message => { throw Error(`Invalid equipment catalog: ${message}`); };
@@ -15,8 +17,12 @@ export function validateCatalog(c) {
     if (![g.weight, g.damageRate, g.ACC, g.PEN, g.AR].every(Number.isFinite) || g.weight <= 0 || !Number.isInteger(g.weight) || g.damageRate < 0) fail('grade values');
   }
   if (c.grades.length !== 5) fail('five grades required');
+  if (c.accessoryRulesVersion !== 1 || !Array.isArray(c.charms) || c.charms.length !== 6) fail('six accessory categories required');
+  const bonuses = [[1,0],[1,1],[2,0],[2,1],[2,2]];
+  for (const [i, g] of c.grades.entries()) if (g.primaryBonus !== bonuses[i][0] || g.secondaryBonus !== bonuses[i][1]) fail('accessory grade bonuses');
+  if (new Set(c.charms.map(t => t.primaryStat)).size !== 6) fail('unique accessory base stats');
   ids.clear();
-  for (const t of [...c.weapons, ...c.armors]) {
+  for (const t of [...c.weapons, ...c.armors, ...c.charms]) {
     if (!/^[a-z]+(?:-[a-z]+)*$/.test(t.id) || ids.has(t.id)) fail('template id'); ids.add(t.id);
     if (t.slot === 'weapon') {
       if (t.classId != null) fail('equipment must not restrict class');
@@ -28,6 +34,8 @@ export function validateCatalog(c) {
     } else if (t.slot === 'armor') {
       if (!Number.isInteger(t.DEX) || t.DEX > 0 || t.DEX < -3) fail('armor DEX');
       if (!Number.isInteger(t.AR) || t.AR < 0 || !t.typeModifiers || Object.keys(t.typeModifiers).length > 2 || Object.entries(t.typeModifiers).some(([k, v]) => !normalTypes.includes(k) || !Number.isInteger(v) || v >= 0)) fail('armor values');
+    } else if (t.slot === 'charm') {
+      if (!BASE_STATS.includes(t.primaryStat) || t.classId != null) fail('accessory base stat');
     } else fail('slot');
   }
   if (!Array.isArray(c.specialResistanceRange) || c.specialResistanceRange.length !== 2 || !c.specialResistanceRange.every(Number.isInteger) || c.specialResistanceRange[0] < 1 || c.specialResistanceRange[1] < c.specialResistanceRange[0]) fail('resistance range');
@@ -43,7 +51,7 @@ export function rollGrade(rng, catalog = EQUIPMENT_CATALOG) {
   throw Error('Invalid grade random roll');
 }
 export function generateEquipment({ slot, classId, rng, gradeId, templateId, specials = true, catalog = EQUIPMENT_CATALOG }) {
-  const templates = (slot === 'weapon' ? catalog.weapons : slot === 'armor' ? catalog.armors : []);
+  const templates = (slot === 'weapon' ? catalog.weapons : slot === 'armor' ? catalog.armors : slot === 'charm' ? catalog.charms : []);
   const t = templateId ? templates.find(t => t.id === templateId) : templates[rng(templates.length)];
   if (!t) throw Error('Unknown or unavailable equipment template');
   // Grade is chosen before any grade bonuses or independent special option.
@@ -63,6 +71,15 @@ export function generateEquipment({ slot, classId, rng, gradeId, templateId, spe
       const available = types.filter(d => !item.damageTypes.includes(d));
       const type = available[rng(available.length)]; item.damageTypes.push(type);
       item.special = { type, kind: 'damage-type' }; item.name = `${catalog.damageTypes[type].prefix} ${item.name}`;
+    }
+  } else if (slot === 'charm') {
+    item.accessoryRulesVersion = catalog.accessoryRulesVersion;
+    item.primaryStat = t.primaryStat;
+    item.stats[t.primaryStat] = g.primaryBonus;
+    if (g.secondaryBonus) {
+      const available = BASE_STATS.filter(stat => stat !== t.primaryStat);
+      item.secondaryStat = available[rng(available.length)];
+      item.stats[item.secondaryStat] = g.secondaryBonus;
     }
   } else {
     item.stats.AR = t.AR + g.AR; item.stats.DEX = t.DEX; item.dexRulesVersion = 2; item.typeModifiers = { ...t.typeModifiers };
@@ -89,4 +106,21 @@ export function migrateArmorDEX(inventory) {
     item.stats.DEX = EQUIPMENT_CATALOG.armors.find(t => t.id === item.templateId)?.DEX || 0;
     item.dexRulesVersion = 2;
   }
+}
+
+// Replace retired items once, preserving identity so equipped slots keep working.
+export function migrateLegacyEquipment(state, rng) {
+  let changed = 0;
+  state.inventory = state.inventory.map(old => {
+    const list = old.slot === 'weapon' ? EQUIPMENT_CATALOG.weapons : old.slot === 'armor' ? EQUIPMENT_CATALOG.armors : old.slot === 'charm' ? EQUIPMENT_CATALOG.charms : [];
+    if (!['weapon','armor','charm'].includes(old.slot) || list.some(t => t.id === old.templateId)) return old;
+    const tier = Math.max(0, Math.min(2, Math.floor(Number(old.tier) || 0)));
+    const templateId = old.slot === 'charm' ? undefined : old.slot === 'weapon'
+      ? (old.icon === 'staff' ? 'fire-staff' : 'longsword')
+      : (state.classId === 'wizard' ? 'robe' : 'leather');
+    const item = generateEquipment({ slot: old.slot, templateId, gradeId: EQUIPMENT_CATALOG.grades[tier].id, rng, specials: false });
+    changed++;
+    return { ...item, id: old.id };
+  });
+  return changed;
 }

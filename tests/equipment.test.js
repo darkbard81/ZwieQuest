@@ -50,9 +50,9 @@ test('equipping new weapon and armor changes next attack, including type matchup
  const g=make();const w=generate('mace','legendary'),a=generate('leather');g.state.inventory.push(w,a);g.beginBattle();g.state.enemy.hp=9999;g.state.enemy.AR=5;g.state.enemy.typeModifiers={blunt:-2};g.command({type:'EQUIP',itemId:w.id});while(g.state.battle.actor!=='hero')g.battleAction();g.battleAction();assert.equal(g.state.battle.lastHit.damageType,'blunt');assert.equal(g.state.battle.lastHit.effectiveAR,3);assert.equal(g.state.battle.lastHit.pen,7);
  g.command({type:'EQUIP',itemId:a.id});g.state.battle.actor='enemy';g.battleAction();assert.equal(g.state.battle.lastHit.effectiveAR,3);
 });
-test('saved items survive reload/template changes and legacy gear stays unchanged and sellable',()=>{
+test('current saved items survive reload/template changes; retired gear becomes new catalog gear and stays sellable',()=>{
  const g=make();const legacy={id:'old-sword',slot:'weapon',name:'여행자의 검',classId:'warrior',tier:2,rarity:'희귀',value:40,icon:'sword',stats:{power:6,PEN:5}};g.state.inventory.push(legacy);g.command({type:'EQUIP',itemId:legacy.id});g.beginBattle();g.state.enemy.hp=9999;while(g.state.battle.actor!=='hero')g.battleAction();g.battleAction();assert.equal(g.state.battle.lastHit.base,22);assert.equal(g.state.battle.lastHit.pen,5);
- const special=generate('leather','legendary',{specials:true});g.state.inventory.push(special);const saved=JSON.parse(JSON.stringify(g.state));const restarted=new Game(config,saved);assert.deepEqual(restarted.state.inventory,g.state.inventory);restarted.command({type:'UNEQUIP',itemId:legacy.id});restarted.command({type:'SELL',itemId:legacy.id});assert.equal(restarted.state.gold,40);assert.deepEqual(restarted.state.inventory.find(i=>i.id===special.id),special);
+ const special=generate('leather','legendary',{specials:true});g.state.inventory.push(special);const saved=JSON.parse(JSON.stringify(g.state));const restarted=new Game(config,saved);assert.deepEqual(restarted.state.inventory.filter(i=>i.id!==legacy.id),g.state.inventory.filter(i=>i.id!==legacy.id));assert.equal(restarted.state.inventory.find(i=>i.id===legacy.id).templateId,'longsword');restarted.command({type:'UNEQUIP',itemId:legacy.id});restarted.command({type:'SELL',itemId:legacy.id});assert.equal(restarted.state.gold,40);assert.deepEqual(restarted.state.inventory.find(i=>i.id===special.id),special);
  const altered=structuredClone(c);altered.armors[1].AR=99;assert.equal(special.stats.AR,9);
 });
 test('monster growth depends on level and route, never on equipped gear',()=>{
@@ -68,7 +68,7 @@ test('both classes receive each equipment slot from victory and bosses, with one
   g.rng=n=>{calls.push(n);return n===3?pick:0;};g.reward(kind);
   assert.equal(g.state.inventory.length,before+1);const item=g.state.inventory.at(-1);
   assert.equal(item.slot,slot);assert.equal(g.state.lastReward.itemId,item.id);assert.equal(calls[0],10000);assert.equal(calls[1],3);
-  if(slot==='charm'){assert.equal(item.tier,2);assert.equal(item.stats.ACC,config.equipment.charmACC+2);g.command({type:'EQUIP',itemId:item.id});assert.equal(g.state.equipment.charm,item.id);const restored=new Game(config,JSON.parse(JSON.stringify(g.state)));assert.deepEqual(restored.state.inventory.at(-1),item);}
+  if(slot==='charm'){assert.equal(item.tier,0);assert.equal(item.primaryStat,'STR');assert.deepEqual(item.stats,{STR:1});g.command({type:'EQUIP',itemId:item.id});assert.equal(g.state.equipment.charm,item.id);const restored=new Game(config,JSON.parse(JSON.stringify(g.state)));assert.deepEqual(restored.state.inventory.at(-1),item);}
   const noDrop=make(cls),count=noDrop.state.inventory.length;noDrop.rng=n=>{assert.equal(n,10000);return 2500;};noDrop.reward(kind);assert.equal(noDrop.state.inventory.length,count);assert.equal(noDrop.state.lastReward.itemId,null);
  }
 });
