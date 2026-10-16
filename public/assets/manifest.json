@@ -57,7 +57,74 @@
       "runtime": false
     }
   ],
-  "copiedCharacters": [
+  "renderer": {
+    "css": [
+      512,
+      384
+    ],
+    "buffer": [
+      1024,
+      768
+    ],
+    "footY": 317,
+    "backgroundFit": "height; center crop; limited horizontal overscan",
+    "engine": "PixiJS",
+    "version": "8.21.0",
+    "backends": [
+      "WebGLRenderer",
+      "CanvasRenderer"
+    ],
+    "defaultPreference": [
+      "webgl",
+      "canvas"
+    ],
+    "customCanvasFallback": false
+  },
+  "animation": {
+    "idle": "Front_Idle",
+    "walk": "Side_Walk",
+    "walkLeftMirrored": true,
+    "attack": "Side_Attack",
+    "hit": "Side_Hit",
+    "downed": "Side_Down",
+    "victory": "Front_Victory",
+    "framesPerAction": 24,
+    "cellSize": [
+      256,
+      256
+    ],
+    "motionReviewPerformed": true,
+    "wizardViewAppearanceDiffers": true,
+    "walkDurationMs": 1200,
+    "idleDurationMs": 2000,
+    "sourceVideoSize": [
+      544,
+      544
+    ],
+    "sourceVideoFPS": 24,
+    "qualityReport": "sprite-workbench/reextracted-256-20261016/quality.json"
+  },
+  "vendor": [
+    {
+      "file": "../pixi.js",
+      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/dist/pixi.min.js",
+      "sha256": "c6d9d4c897b15576cce0055d0ba4382021181c99cdf08a446be9d61e16833db0",
+      "byteIdentical": true
+    },
+    {
+      "file": "../pixi-csp.js",
+      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/dist/packages/unsafe-eval.min.js",
+      "sha256": "95b16558c615575f08d6b9e2b518b0edc4d446673b3307d967e2e59fab0464cd",
+      "byteIdentical": true
+    },
+    {
+      "file": "../PIXI-LICENSE.txt",
+      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/LICENSE",
+      "sha256": "5ce7447bc57f7349ffc48338782fbcabe613696e00712b20d66bc58e780f9473",
+      "byteIdentical": true
+    }
+  ],
+  "legacyCopiedCharacters": [
     {
       "file": "warrior/sprite.png",
       "source": "/home/deck/Documents/TacticsSD/game/assets/video-character-sprites/warrior/sprite.png",
@@ -83,62 +150,440 @@
       "byteIdentical": true
     }
   ],
-  "renderer": {
-    "css": [
-      512,
-      384
-    ],
-    "buffer": [
-      1024,
-      768
-    ],
-    "footY": 317,
-    "backgroundFit": "height; center crop; limited horizontal overscan",
-    "engine": "PixiJS",
-    "version": "8.21.0",
-    "backends": [
-      "WebGLRenderer",
-      "CanvasRenderer"
-    ],
-    "defaultPreference": [
-      "webgl",
-      "canvas"
-    ],
-    "customCanvasFallback": false
-  },
-  "animation": {
-    "idle": "Front_Attack_00",
-    "walk": {
-      "left": "Front_Walk",
-      "right": "Back_Walk",
-      "mirrored": false
-    },
-    "downed": "Front_Downed",
-    "rewardWarrior": "Front_Attack_09",
-    "rewardWizard": "Front_Attack_06",
-    "limitations": [
-      "No side-walk source",
-      "No both-arms-up cheer source"
-    ]
-  },
-  "vendor": [
+  "characters": [
     {
-      "file": "../pixi.js",
-      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/dist/pixi.min.js",
-      "sha256": "c6d9d4c897b15576cce0055d0ba4382021181c99cdf08a446be9d61e16833db0",
-      "byteIdentical": true
+      "file": "warrior/sprite.png",
+      "sha256": "b658b9859d92166834e180d946082cf758503e91c2f37f2cf55c42a49454fe19"
     },
     {
-      "file": "../pixi-csp.js",
-      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/dist/packages/unsafe-eval.min.js",
-      "sha256": "95b16558c615575f08d6b9e2b518b0edc4d446673b3307d967e2e59fab0464cd",
-      "byteIdentical": true
+      "file": "warrior/sprite.json",
+      "sha256": "89b8c801f8caa03aa1075bd84a39fc2943c10e277439132457cc6f0548abf991"
     },
     {
-      "file": "../PIXI-LICENSE.txt",
-      "source": "/home/deck/Documents/TacticsSD/node_modules/pixi.js/LICENSE",
-      "sha256": "5ce7447bc57f7349ffc48338782fbcabe613696e00712b20d66bc58e780f9473",
-      "byteIdentical": true
+      "file": "warrior/portrait.png",
+      "sha256": "a3e69711e0b74523dd8ab29fffb75fbc7d198c24e8926860ff7ee57f5542c4d6"
+    },
+    {
+      "file": "wizard/sprite.png",
+      "sha256": "9460e26af92b53dc6da4a1288b03627fb5c769ffb61448554a592c13fdd8733e"
+    },
+    {
+      "file": "wizard/sprite.json",
+      "sha256": "59fa2660a701fec9bc09baf04e2ae32958d1bc93d836383579580cfcbf33b591"
+    },
+    {
+      "file": "wizard/portrait.png",
+      "sha256": "9d021053adc079825b729de8b302aa82c417a8d08ceed064204f6e4edccde5b8"
+    }
+  ],
+  "characterSources": [
+    {
+      "classId": "warrior",
+      "action": "Front_Idle",
+      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Front_Idle.mp4",
+      "sourceFrameIndices": [
+        30,
+        32,
+        34,
+        36,
+        38,
+        40,
+        42,
+        44,
+        46,
+        48,
+        50,
+        52,
+        54,
+        56,
+        58,
+        60,
+        62,
+        64,
+        66,
+        68,
+        70,
+        72,
+        74,
+        76
+      ],
+      "sha256": "127bb54def1753cddbe8f4e0c51ed2754c8715664e8ca513c4c3fc30806edcb0",
+      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Front_Idle.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "warrior",
+      "action": "Front_Victory",
+      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Front_Victory.mp4",
+      "sourceFrameIndices": [
+        17,
+        19,
+        21,
+        23,
+        26,
+        28,
+        30,
+        32,
+        34,
+        40,
+        54,
+        68,
+        82,
+        85,
+        87,
+        90,
+        92,
+        94,
+        96,
+        99,
+        101,
+        103,
+        106,
+        108
+      ],
+      "sha256": "0dfc00b80cfc2f3d477f9ff0bd6a2d945761d8d7d286599796082748987e57b5",
+      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Front_Victory.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "warrior",
+      "action": "Side_Walk",
+      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Side_Walk.mp4",
+      "sourceFrameIndices": [
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118,
+        119,
+        120,
+        121,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134
+      ],
+      "sha256": "32505cf72dcdede03e2bf522744078ae15a70cf1783d98014ecd872503dff15a",
+      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Side_Walk.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "warrior",
+      "action": "Side_Attack",
+      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Side_Attack.mp4",
+      "sourceFrameIndices": [
+        34,
+        37,
+        39,
+        42,
+        45,
+        48,
+        50,
+        53,
+        56,
+        59,
+        61,
+        64,
+        67,
+        70,
+        72,
+        75,
+        78,
+        81,
+        83,
+        86,
+        89,
+        92,
+        94,
+        97
+      ],
+      "sha256": "450992218e747a7dbf7683c4e9105baac27b72b08a1d29c6362b35d134136cac",
+      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Side_Attack.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "warrior",
+      "action": "Side_Down",
+      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Side_Down.mp4",
+      "sourceFrameIndices": [
+        24,
+        27,
+        29,
+        32,
+        34,
+        37,
+        39,
+        42,
+        45,
+        47,
+        50,
+        52,
+        55,
+        57,
+        60,
+        62,
+        65,
+        68,
+        70,
+        73,
+        75,
+        78,
+        80,
+        83
+      ],
+      "sha256": "d26819c06d41e90efe011276ce135380257be9900138cad8113ba7a6d9fda97f",
+      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Side_Down.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "warrior",
+      "action": "Side_Hit",
+      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Side_Hit.mp4",
+      "sourceFrameIndices": [
+        26,
+        29,
+        32,
+        35,
+        38,
+        41,
+        45,
+        48,
+        51,
+        54,
+        57,
+        60,
+        63,
+        66,
+        69,
+        72,
+        75,
+        78,
+        82,
+        85,
+        88,
+        91,
+        94,
+        97
+      ],
+      "sha256": "b1edeb0ace63cd939a81b4c2ce6a4af110b0e0871d8db8714064502deec6e4cc",
+      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Side_Hit.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "wizard",
+      "action": "Front_Idle",
+      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Front_Idle.mp4",
+      "sourceFrameIndices": [
+        69,
+        70,
+        72,
+        73,
+        75,
+        76,
+        78,
+        79,
+        81,
+        82,
+        84,
+        85,
+        87,
+        88,
+        90,
+        91,
+        93,
+        94,
+        96,
+        97,
+        99,
+        100,
+        102,
+        103
+      ],
+      "sha256": "fdbe992df854fee94da5f35ee3f1eec50007c398f197cf95c7acb610fdf6e25e",
+      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Front_Idle.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "wizard",
+      "action": "Front_Victory",
+      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Front_Victory.mp4",
+      "sourceFrameIndices": [
+        16,
+        18,
+        20,
+        22,
+        24,
+        26,
+        28,
+        30,
+        32,
+        40,
+        60,
+        80,
+        100,
+        105,
+        108,
+        111,
+        113,
+        116,
+        119,
+        122,
+        125,
+        127,
+        130,
+        133
+      ],
+      "sha256": "8202741dbe5999fa824222851b4b6f677634fcb1188d30873e1ed767bc23f805",
+      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Front_Victory.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "wizard",
+      "action": "Side_Walk",
+      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Side_Walk.mp4",
+      "sourceFrameIndices": [
+        39,
+        40,
+        42,
+        43,
+        44,
+        46,
+        47,
+        48,
+        50,
+        51,
+        52,
+        54,
+        55,
+        57,
+        58,
+        59,
+        61,
+        62,
+        63,
+        65,
+        66,
+        67,
+        69,
+        70
+      ],
+      "sha256": "1b4040ac8639eb8635dcc0aa480052df45310f9b7e4179074be28615bf3b5b82",
+      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Side_Walk.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "wizard",
+      "action": "Side_Attack",
+      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Side_Attack.mp4",
+      "sourceFrameIndices": [
+        68,
+        70,
+        73,
+        75,
+        78,
+        80,
+        82,
+        85,
+        87,
+        90,
+        92,
+        94,
+        97,
+        99,
+        101,
+        104,
+        106,
+        109,
+        111,
+        113,
+        116,
+        118,
+        121,
+        123
+      ],
+      "sha256": "116ff86e52fa02e542f7383bf12e9daafea4400a8f232f09fb15ee23d4dd1aa4",
+      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Side_Attack.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "wizard",
+      "action": "Side_Down",
+      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Side_Down.mp4",
+      "sourceFrameIndices": [
+        24,
+        27,
+        29,
+        32,
+        34,
+        37,
+        39,
+        42,
+        45,
+        47,
+        50,
+        52,
+        55,
+        57,
+        60,
+        62,
+        65,
+        68,
+        70,
+        73,
+        75,
+        78,
+        80,
+        83
+      ],
+      "sha256": "e75b4b82810c2142d2d1ebb03ce29f07c9ad473352666bcfad12822fa662ef50",
+      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Side_Down.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
+    },
+    {
+      "classId": "wizard",
+      "action": "Side_Hit",
+      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Side_Hit.mp4",
+      "sourceFrameIndices": [
+        60,
+        62,
+        65,
+        67,
+        70,
+        72,
+        75,
+        77,
+        80,
+        82,
+        85,
+        87,
+        90,
+        92,
+        95,
+        97,
+        100,
+        102,
+        105,
+        107,
+        110,
+        112,
+        115,
+        117
+      ],
+      "sha256": "f3b2e1dd703625718af68e7f5f6e5eab67dc9b18f6d7364c3b494f58c8f8d412",
+      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Side_Hit.png",
+      "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     }
   ]
 }

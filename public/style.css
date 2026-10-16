@@ -85,3 +85,9 @@ nav{gap:7px}.quiet{padding:7px 9px;font-size:11px}.connection{font-size:10px;pad
 #admin-confirm input{display:block;width:100%;padding:9px 10px;background:#17231f;border:1px solid #a28570;border-radius:5px;color:var(--text);font:inherit}
 .admin-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}.danger{border-color:#ab7161;background:#613c32;color:#ffe4da}.danger:hover{background:#784a3c;border-color:#d79881}
 @media(max-width:600px){#admin-settings{padding:20px}.admin-table th,.admin-table td{padding:8px 4px;font-size:11px}.admin-table td:nth-child(3),.admin-table th:nth-child(3){display:none}}
+
+/* Full-size 256px sprites: leave headroom and keep enemy labels above the boss. */
+#world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) #biome-tag,#world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) #biome-sub{display:none}
+#world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) .scene-top h2{font-size:16px;margin:0}
+.enemy-hud{left:334px;top:164px;width:128px}
+#world[data-phase="TREASURE"] .scene-notice{top:auto;bottom:42px}

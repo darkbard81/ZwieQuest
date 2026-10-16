@@ -23,3 +23,4 @@ node_modules/
 /IMPLEMENTATION.md
 /implementation-manifest.json
 .DS_Store
+/sprite-workbench/

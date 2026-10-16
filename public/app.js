@@ -4,7 +4,7 @@ import { initInfoTabs } from './tabs.js';
 import { initAdminSettings } from './admin-settings.js';
 import { initPasswordInput } from './password-input.js';
 import { validPassword } from './password-policy.js';
-import { createHitFeed } from './combat-feedback.js';
+import { createCombatFeed } from './combat-feedback.js';
 import { statNames, statLabelHTML, logHTML } from './labels.js';
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const esc = text => String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -13,7 +13,7 @@ const slotNames = { weapon: '무기', armor: '방어구', charm: '부적' };
 let data = null, receivedAt = 0, user = null, source = null, away = false, connected = false, filter = 'all', inventoryKey = '', journalSeq = -1, toastTimer, authMode = 'login';
 const clientId = crypto.randomUUID(); let lastHeartbeat = 0;
 let world, choicePending = false;
-const hitFeed = createHitFeed();
+const combatFeed = createCombatFeed();
 createWorld($('#world')).then(w => { world = w; if (data?.state) w.update(data.state); }).catch(e => { $('#render-error').hidden = false; $('#render-error').textContent = '게임 화면을 불러오지 못했습니다. 새로고침해 주세요. ' + e.message; console.error(e); });
 initWindows();
 initInfoTabs();
@@ -33,19 +33,19 @@ async function command(type, fields = {}, button) {
   finally { button?.classList.remove('busy'); }
 }
 function receive(next) {
-  const newHit = hitFeed.consume(next, connected);
+  const combatEvents = combatFeed.consume(next, connected);
   data = next; receivedAt = performance.now(); connected = true;
   $('#connection').classList.remove('lost'); $('#connection').innerHTML = `<i></i>${next.mode === 'ONLINE' ? '온라인' : '자리 비움'} · ${next.rate}×`;
   $('#server-status').textContent = 'SERVER LIVE · SAVED';
-  const s = next.state; updateChoices();
-  if (!s) { if (user && !user.isAdmin && !$('#welcome').open) $('#welcome').showModal(); return; }
-  if ($('#welcome').open) $('#welcome').close(); world?.update(s); if (newHit) world?.showHit(newHit);
+  const s = next.state; $('#world').dataset.phase = s?.phase || 'HOME'; updateChoices();
+  if (!s) { world?.update(null); if (user && !user.isAdmin && !$('#welcome').open) $('#welcome').showModal(); return; }
+  if ($('#welcome').open) $('#welcome').close(); world?.update(s); world?.playEvents(combatEvents);
   const theme = next.themes.find(t => t.id === s.theme);
   $('#biome-tag').textContent = s.theme.toUpperCase();
   $('#biome-name').textContent = theme.name; $('#biome-sub').textContent = theme.subtitle; $('#phase-badge').textContent = s.enemy?.boss && s.phase === 'BATTLE' ? '지역 보스전' : phases[s.phase];
   $('#run-total').textContent = String(s.completed).padStart(2, '0'); $('#gold-total').textContent = s.gold.toLocaleString();
   $('#class-label').textContent = s.classId.toUpperCase(); $('#hero-name').textContent = s.classId === 'warrior' ? '길을 여는 전사' : '별을 읽는 마법사'; $('#hero-level').textContent = `Lv. ${s.level} · ${user?.username || '모험가'}`;
-  const portrait = $('#portrait'); portrait.style.backgroundImage = `url('/assets/${s.classId}/sprite.png')`; portrait.style.backgroundSize = '512px 1536px'; portrait.style.backgroundPosition = '-8px -5px';
+  const portrait = $('#portrait'); portrait.style.backgroundImage = `url('/assets/${s.classId}/portrait.png?v=motions256-2')`; portrait.style.backgroundSize = 'cover'; portrait.style.backgroundPosition = 'center top';
   $('#hp-label').textContent = `${s.hp} / ${s.stats.maxHp}`; $('#hp-fill').style.width = `${100 * s.hp / s.stats.maxHp}%`;
   $('#xp-label').textContent = `${s.xp} / ${s.xpNext}`; $('#xp-fill').style.width = `${100 * s.xp / s.xpNext}%`;
   $('#stats').innerHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statNames[k]}</small><b>${s.stats[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'FOR', 'REF', 'WIL'].map(k => statLabelHTML(k, s.stats[k])).join('')}</div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<span>${statNames[k]} <b>${s.stats[k]}</b></span>`).join('')}</div>`;
@@ -105,10 +105,10 @@ $$('[data-class]').forEach(b => b.onclick = () => command('CREATE', { classId: b
 $('#welcome').addEventListener('cancel', e => e.preventDefault());
 $('#help-button').onclick = () => $('#help').showModal(); $$('#help .dialog-close').forEach(b => b.onclick = () => $('#help').close());
 async function presence(active = true) { if (!user) return; if (active) lastHeartbeat = Date.now(); try { await api('/api/presence', { clientId, active }); } catch (e) { if (active) $('#connection').classList.add('lost'); } }
-function disconnect() { source?.close(); source = null; connected = false; world?.clearFeedback(); updateChoices(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
+function disconnect() { source?.close(); source = null; connected = false; world?.clearTransient(); updateChoices(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
 async function connect() {
   disconnect(); away = false; $('#away-overlay').hidden = true;
-  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (!away && Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; world?.clearFeedback(); updateChoices(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
+  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (!away && Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; world?.clearTransient(); updateChoices(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
 }
 $('#away').onclick = async () => { if (!user) return showAuth(); away = true; await presence(false); disconnect(); $('#away-overlay').hidden = false; };
 $('#reconnect').onclick = connect;

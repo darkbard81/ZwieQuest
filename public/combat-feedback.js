@@ -1,19 +1,22 @@
-// Consume the server event sequence, including final blows whose battle has ended.
-// Initial/reconnected snapshots establish a baseline and never replay their backlog.
-export function createHitFeed() {
+// One cursor handles combat effects. History and reconnect baselines never replay.
+export function createCombatFeed() {
   let lastSeq = null;
   return {
     consume(snapshot, connected) {
       const seq = snapshot.state?.eventSeq;
-      if (!Number.isSafeInteger(seq)) { lastSeq = null; return null; }
-      if (!connected || lastSeq === null) { lastSeq = seq; return null; }
-      if (seq <= lastSeq) return null;
+      if (!Number.isSafeInteger(seq)) { lastSeq = null; return []; }
+      if (!connected || lastSeq === null) { lastSeq = seq; return []; }
+      if (seq <= lastSeq) return [];
       const previous = lastSeq; lastSeq = seq;
-      const latest = (snapshot.logs || []).filter(e => e.type === 'hit' && e.seq > previous && e.seq <= seq)
-        .sort((a, b) => b.seq - a.seq)[0];
-      // Suppress delayed/history-only results; compare server timestamps, not the client clock.
-      const age = snapshot.serverTime - latest?.at;
-      return latest?.hit && age >= 0 && age <= 2500 ? latest.hit : null;
+      return (snapshot.logs || []).filter(e => {
+        const age = snapshot.serverTime - e.at;
+        return ['hit', 'victory', 'boss'].includes(e.type) && e.seq > previous && e.seq <= seq && age >= 0 && age <= 2500;
+      }).sort((a, b) => a.seq - b.seq);
     }
   };
+}
+// Compatibility for callers interested only in the latest hit label.
+export function createHitFeed() {
+  const feed = createCombatFeed();
+  return { consume(snapshot, connected) { return feed.consume(snapshot, connected).filter(e => e.type === 'hit').at(-1)?.hit || null; } };
 }
