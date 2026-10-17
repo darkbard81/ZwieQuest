@@ -55,6 +55,15 @@
       "sha256": "fde76087a4b581ddefef14c56bf63d2795d6548a71fda916c7d6ec3a4231c4ec",
       "source": "built-in image_gen.imagegen",
       "runtime": false
+    },
+    {
+      "file": "pub.png",
+      "width": 1448,
+      "height": 1086,
+      "sha256": "faf87e51da1affd83882f42d1c52107d3bc379a03c01b77b87817eb84173c148",
+      "source": "built-in image_gen.imagegen",
+      "prompt": "pub-prompt.txt",
+      "runtime": true
     }
   ],
   "renderer": {

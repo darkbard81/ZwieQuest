@@ -2,7 +2,7 @@
   "onlineRate": 1,
   "offlineRate": 1.5,
   "presenceGraceMs": 12000,
-  "homeMs": 7000,
+  "homeMs": 15000,
   "travelMs": 6000,
   "choiceMs": 9000,
   "battleActionMs": 1100,

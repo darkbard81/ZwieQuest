@@ -1,4 +1,6 @@
 import { randomInt, randomUUID } from 'node:crypto';
+import { findAppearance, defaultAppearance } from '../public/appearances.js';
+import { initializeClassProgress, switchClassProgress, equippedClassIds, classProfiles } from './class-progress.js';
 import { attack, stats, levelBonus } from './combat.js';
 import { MAP_DEFS, createMaps } from './maps.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
@@ -9,6 +11,9 @@ export class Game {
     validateTactics(config); this.config = config; this.state = state; this.rng = n => ((rng(n) % n) + n) % n; this.events = [];
     if (state && !state.maps) { this.installMaps(); this.phase('HOME', config.homeMs); this.log('map', '새 경로 체계로 이동했습니다. 성장과 장비는 유지됩니다.'); }
     if (state) {
+      initializeClassProgress(state);
+      // Old saves keep their existing class and acquire its default appearance.
+      if (!findAppearance(state.appearanceId) || findAppearance(state.appearanceId).classId !== state.classId) state.appearanceId = defaultAppearance(state.classId).id;
       const replaced = migrateLegacyEquipment(state, this.rng);
       migrateArmorDEX(state.inventory);
       if (replaced) state.hp = Math.min(state.hp, stats(state, config).maxHp);
@@ -35,6 +40,8 @@ export class Game {
     if (this.state) throw Error('이미 모험가가 있습니다. HOME에서 직업을 변경하세요.');
     this.state = { classId, level: 1, xp: 0, gold: 0, hp: 1, inventory: [], equipment: {}, run: 0, step: 0, eventSeq: 0, version: 0, completed: 0, victories: 0, chests: 0, theme: 'village', direction: 'right', tactic: 'normal', combatRulesVersion: COMBAT_RULES_VERSION, path: [], lastSummary: null };
     this.installMaps();
+    initializeClassProgress(this.state);
+    this.state.appearanceId = defaultAppearance(classId).id;
     for (const kind of ['weapon', 'armor']) { const i = this.starter(kind); this.state.inventory.push(i); this.state.equipment[kind] = i.id; }
     this.state.hp = stats(this.state, this.config).maxHp;
     this.phase('HOME', this.config.homeMs); this.log('home', '새로운 모험가가 여관에 도착했습니다. 곧 자동으로 출발합니다.');
@@ -206,16 +213,25 @@ export class Game {
       const item = s.inventory.find(i => i.id === cmd.itemId); if (!item) throw Error('이미 판매했거나 없는 아이템입니다.');
       if (cmd.type === 'EQUIP') { s.equipment[item.slot] = item.id; this.log('equip', `${item.name} 장착 · 다음 공격부터 적용됩니다.`); }
       else if (cmd.type === 'UNEQUIP') { if (s.equipment[item.slot] !== item.id) throw Error('장착 중인 아이템이 아닙니다.'); delete s.equipment[item.slot]; this.log('equip', `${item.name} 장착 해제`); }
-      else { if (Object.values(s.equipment).includes(item.id)) throw Error('장착 해제 후 판매할 수 있습니다.'); s.inventory = s.inventory.filter(i => i.id !== item.id); s.gold += item.value; this.log('sell', `${item.name} 판매 · 금화 +${item.value}`); }
+      else {
+        const owners = equippedClassIds(s, item.id);
+        if (owners.length) throw Error(`${owners.map(id => this.config.classes[id]?.name || id).join('·')} 직업에서 장착 해제 후 판매할 수 있습니다.`);
+        s.inventory = s.inventory.filter(i => i.id !== item.id); s.gold += item.value; this.log('sell', `${item.name} 판매 · 금화 +${item.value}`);
+      }
       s.hp = Math.min(s.hp, stats(s, this.config).maxHp);
     } else if (cmd.type === 'TACTIC') { if (!validTactic(cmd.tactic, s.classId, this.config)) throw Error('잘못된 전술입니다.'); s.tactic = cmd.tactic; this.log('tactic', `${this.config.tactics[cmd.tactic].name} 선택 · ${s.phase === 'BATTLE' ? '다음 라운드부터' : '다음 전투부터'} 적용됩니다.`); }
-    else if (cmd.type === 'CLASS') {
+    else if (cmd.type === 'CLASS' || cmd.type === 'APPEARANCE') {
       if (s.phase !== 'HOME') throw Error('직업 변경은 여관에서 가능합니다.');
-      if (!this.config.classes[cmd.classId]) throw Error('잘못된 클래스입니다.');
-      if (s.classId === cmd.classId) return;
-      s.classId = cmd.classId;
+      if (s.remaining <= 0) throw Error('선택 시간이 지났습니다.');
+      if (cmd.type === 'CLASS' && !Object.hasOwn(this.config.classes, cmd.classId)) throw Error('잘못된 클래스입니다.');
+      const appearance = cmd.type === 'APPEARANCE' ? findAppearance(cmd.appearanceId) : defaultAppearance(cmd.classId);
+      if (!appearance || !this.config.classes[appearance.classId]) throw Error('잘못된 외형입니다.');
+      if (s.appearanceId === appearance.id) return;
+      const classChanged = switchClassProgress(s, appearance.classId);
+      s.appearanceId = appearance.id;
       if (!validTactic(s.tactic, s.classId, this.config)) s.tactic = 'normal';
-      s.hp = stats(s, this.config).maxHp; this.log('class', `${this.config.classes[s.classId].name}로 전직했습니다. 레벨과 수집품은 유지됩니다.`);
+      if (classChanged) s.hp = stats(s, this.config).maxHp;
+      this.log('class', `${appearance.name} 외형 선택 · ${this.config.classes[s.classId].name} Lv.${s.level}. 직업별 성장·장비·전술을 불러왔습니다. 인벤토리와 금화는 공용입니다.`);
     } else throw Error('지원하지 않는 명령입니다.');
   }
   snapshot() {
@@ -224,6 +240,8 @@ export class Game {
     const roundEffects = state.phase === 'BATTLE' ? { ...state.battle.roundEffects } : {};
     const weapon = state.inventory.find(i => i.id === state.equipment.weapon);
     return { ...structuredClone(state),
+      classProfiles: classProfiles(state, this.config),
+      equipmentUsers: Object.fromEntries(state.inventory.map(i => [i.id, equippedClassIds(state, i.id)])),
       inventory: structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : i),
       mapGraph: structuredClone(maps[state.mapId]), currentNode: structuredClone(maps[state.mapId].nodes[state.currentNodeId]),
       stats: hero, combatStats: { ...hero, AR: hero.AR + (roundEffects.AR || 0), ACC: hero.ACC + (roundEffects.ACC || 0) },

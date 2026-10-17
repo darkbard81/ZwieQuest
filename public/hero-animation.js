@@ -1,4 +1,5 @@
-// All source clips retain 24 frames. Runtime timing is independent of video duration.
+// One playback contract for every appearance, the world and inn previews.
+export const SPRITE_FRAME_COUNT = 24;
 export const PLAYBACK = {
   Front_Idle: { duration: 2000, loop: true },
   Front_Victory: { duration: 2000 },
@@ -7,12 +8,18 @@ export const PLAYBACK = {
   Side_Hit: { duration: 360 },
   Side_Down: { duration: 1500 }
 };
+export function sampleAnimationFrame(action, elapsed, reduced = false) {
+  if (reduced) return action === 'Side_Down' ? 23 : action === 'Front_Victory' ? 12 : 0;
+  const spec = PLAYBACK[action];
+  const frame = Math.floor(Math.max(0, elapsed) / spec.duration * SPRITE_FRAME_COUNT);
+  return spec.loop ? frame % SPRITE_FRAME_COUNT : Math.min(SPRITE_FRAME_COUNT - 1, frame);
+}
 export function createHeroAnimator() {
   let state = null, phaseKey = '', phaseAt = 0, sequence = [];
   function clear() { sequence = []; }
   return {
     update(next, now) {
-      const key = next ? `${next.classId}:${next.mapId}:${next.run}:${next.currentNodeId}:${next.phase}` : '';
+      const key = next ? `${next.appearanceId || next.classId}:${next.mapId}:${next.run}:${next.currentNodeId}:${next.phase}` : '';
       if (key !== phaseKey) { phaseAt = !state && next?.phase === 'DOWNED' ? now - PLAYBACK.Side_Down.duration : now; clear(); }
       phaseKey = key; state = next;
     },
@@ -46,9 +53,7 @@ export function createHeroAnimator() {
           action = active.action; elapsed = age; hold = true;
         } else if (active === sequence.at(-1)) clear();
       }
-      const spec = PLAYBACK[action];
-      let frame = spec.loop ? Math.floor(Math.max(0, elapsed) / spec.duration * 24) % 24 : Math.min(23, Math.floor(Math.max(0, elapsed) / spec.duration * 24));
-      if (reduced) frame = action === 'Side_Down' ? 23 : action === 'Front_Victory' ? 12 : 0;
+      const frame = sampleAnimationFrame(action, elapsed, reduced);
       return { classId: s.classId || 'warrior', action, frame, mirrored: action === 'Side_Walk' && s.direction === 'left', transient: hold, hurt: action === 'Side_Hit' };
     }
   };

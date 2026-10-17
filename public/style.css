@@ -117,3 +117,16 @@ nav{gap:7px}.quiet{padding:7px 9px;font-size:11px}.connection{font-size:10px;pad
 .damage-tag>span{font-family:'Noto Color Emoji','Apple Color Emoji','Segoe UI Emoji',sans-serif;font-size:11px}.damage-tag b{color:inherit}
 .damage-types{display:inline-flex;flex-wrap:wrap;gap:4px;margin:3px 0}.armor-matchup{display:inline-block;margin:3px 0}.armor-matchups .damage-tag{margin-right:2px}
 .journal .damage-tag{font-size:9px;line-height:1.5;padding:0 3px}.journal .damage-tag>span{font-size:10px}
+
+/* Inn selection stays within the fixed 512 x 384 adventure window. */
+.rest-countdown{position:absolute;top:59px;right:20px;padding:7px 11px;border:1px solid #eac58488;border-radius:8px;background:#33281ce8;color:#ffe7a8;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+#inn-selection{position:absolute;left:10px;right:10px;bottom:10px;padding:7px;background:#241f1ce8;border:1px solid #d6b77877;border-radius:10px;box-shadow:0 3px 12px #0003}
+.inn-heading{display:flex;justify-content:space-between;align-items:center;margin:0 2px 6px;font-size:11px;color:#f5dfb4}.inn-heading span{font-size:9px;color:#c9beaa}
+.appearance-list{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.appearance-option{display:flex;flex-direction:column;align-items:center;padding:0 0 4px;border:1px solid #77694e;background:#3d382f;border-radius:6px;min-width:0}
+.appearance-option strong{font-size:10px;line-height:14px}.appearance-option small{font-size:8px;color:#d5c8b1;line-height:12px}
+.appearance-option[aria-pressed="true"]{border:2px solid #ffd58b;background:#665039;padding-bottom:3px}.appearance-option[aria-pressed="true"] strong{color:#ffe1a8}
+.idle-preview{display:block;width:72px;height:72px;background-repeat:no-repeat;flex:none}
+#world[data-phase="HOME"] .scene-bottom{display:none}
+#world[data-phase="HOME"] .scene-top h2{font-size:22px}
+#portrait{width:56px;height:56px;background-repeat:no-repeat;background-color:#31413a}

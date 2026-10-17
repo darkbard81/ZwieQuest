@@ -22,9 +22,9 @@ test('15 category targets are identical for both classes and independent of adde
  }
  assert.equal(weaponDefense({icon:'staff',classId:'warrior'}),'WIL');assert.equal(weaponDefense({icon:'sword',classId:'wizard'}),'DEF');
 });
-test('class switch preserves equipped weapon/armor, changes only available class tactics',()=>{
+test('class switch restores separate gear and tactics, with shared inventory and unrestricted item classes',()=>{
  const g=make('warrior','defend');g.phase('HOME',10000);const w=item('fire-staff'),a=item('plate');g.state.inventory.push(w,a);g.command({type:'EQUIP',itemId:w.id});g.command({type:'EQUIP',itemId:a.id});const count=g.state.inventory.length,gear={...g.state.equipment};
- g.command({type:'CLASS',classId:'wizard'});assert.deepEqual(g.state.equipment,gear);assert.equal(g.state.inventory.length,count);assert.equal(g.state.tactic,'normal');assert.deepEqual(g.snapshot().availableTactics.map(t=>t.id),['normal','heal','burst']);
+ g.command({type:'CLASS',classId:'wizard'});assert.deepEqual(g.state.equipment,{});assert.deepEqual(g.state.inactiveClasses.warrior.equipment,gear);assert.equal(g.state.inventory.length,count);assert.equal(g.state.tactic,'normal');assert.deepEqual(g.snapshot().availableTactics.map(t=>t.id),['normal','heal','burst']);
  for(const cls of ['warrior','wizard']){const h=make(cls);for(const id of ['normal','defend','assault','heal','burst']){const allowed=availableTactics(cls,config).some(t=>t.id===id);if(allowed)h.command({type:'TACTIC',tactic:id});else assert.throws(()=>h.command({type:'TACTIC',tactic:id}));}}
  const old={id:'old',slot:'weapon',icon:'staff',classId:'wizard',stats:{PEN:2,power:0}};g.state.inventory.push(old);g.command({type:'CLASS',classId:'warrior'});g.command({type:'EQUIP',itemId:old.id});assert.equal(g.state.equipment.weapon,old.id);
 });

@@ -1,9 +1,31 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createHeroAnimator} from '../public/hero-animation.js';
+import {createHeroAnimator, sampleAnimationFrame, PLAYBACK} from '../public/hero-animation.js';
 import {createCombatFeed} from '../public/combat-feedback.js';
+import { APPEARANCES } from '../public/appearances.js';
 const state=(phase='HOME',extra={})=>({classId:'warrior',mapId:'village',run:1,currentNodeId:'n1',phase,...extra});
 const event=(actor,damage=10)=>({type:'hit',hit:{actor,damage}});
+test('all appearances share the 24-frame, two-second Idle used by inn previews',()=>{
+ for(const appearance of APPEARANCES){
+  assert.equal(appearance.idleDurationMs,undefined);assert.equal(appearance.idleFrameCount,undefined);
+  const a=createHeroAnimator();a.update(state('HOME',{appearanceId:appearance.id,classId:appearance.classId}),0);
+  for(let i=0;i<24;i++){
+   const now=(i+0.5)*2000/24;
+   assert.equal(a.sample(now).frame,i,appearance.id);
+   assert.equal(a.sample(now).frame,sampleAnimationFrame('Front_Idle',now));
+  }
+  assert.equal(a.sample(1999).frame,23);assert.equal(a.sample(2000).frame,0);assert.equal(a.sample(1000,true).frame,0);
+  a.update(state('TRAVEL',{appearanceId:appearance.id}),0);assert.equal(a.sample(600).frame,12);assert.equal(a.sample(1200).frame,0);
+ }
+});
+test('shared sampler loops only Idle/Walk and clamps all one-shot actions',()=>{
+ for(const [action,spec] of Object.entries(PLAYBACK)){
+  assert.equal(sampleAnimationFrame(action,-1),0);
+  assert.equal(sampleAnimationFrame(action,spec.duration/2),12);
+  assert.equal(sampleAnimationFrame(action,spec.duration),spec.loop?0:23);
+  assert.equal(sampleAnimationFrame(action,spec.duration*2),spec.loop?0:23);
+ }
+});
 test('idle, travel facing, combat neutral and class switch',()=>{
  const a=createHeroAnimator();a.update(state(),0);assert.equal(a.sample(300).action,'Front_Idle');
  a.update(state('TRAVEL',{direction:'left'}),400);assert.equal(a.sample(800).mirrored,true);assert.equal(a.sample(800).action,'Side_Walk');

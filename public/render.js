@@ -1,5 +1,6 @@
 import { createTravelCamera } from './travel-camera.js';
 import { createHeroAnimator } from './hero-animation.js';
+import { APPEARANCES, appearanceFor, appearanceAssets, mirrorAppearance } from './appearances.js';
 const { Assets, CanvasRenderer, Container, Graphics, Rectangle, Sprite, Text, Texture, VERSION, autoDetectRenderer } = globalThis.PIXI;
 
 // Both backends are official PixiJS renderers. All game visuals are Pixi display objects.
@@ -9,23 +10,23 @@ export async function createWorld(container) {
   container.prepend(renderer.canvas);
   const stage = new Container();
   await Assets.init({ preferences: { preferWorkers: false } });
-  const names = ['village', 'volcano', 'beach', 'desert', 'snow', 'icons'];
+  const names = ['village', 'volcano', 'beach', 'desert', 'snow', 'pub', 'icons'];
   const loaded = await Promise.all([
     ...names.map(name => Assets.load(`/assets/${name}.png`)),
-    ...['warrior', 'wizard'].map(name => Assets.load(`/assets/${name}/sprite.png?v=motions256-2`)),
-    ...['warrior', 'wizard'].map(name => fetch(`/assets/${name}/sprite.json?v=motions256-2`).then(response => response.json()))
+    ...APPEARANCES.map(({ id, assetVersion = 'inn-1' }) => Assets.load(`${appearanceAssets(id)}/sprite.png?v=${assetVersion}`)),
+    ...APPEARANCES.map(({ id, assetVersion = 'inn-1' }) => fetch(`${appearanceAssets(id)}/sprite.json?v=${assetVersion}`).then(response => response.json()))
   ]);
-  const backgrounds = Object.fromEntries(names.slice(0, 5).map((name, i) => [name, loaded[i]]));
+  const backgrounds = Object.fromEntries(names.slice(0, -1).map((name, i) => [name, loaded[i]]));
   const heroes = {};
-  for (const [i, name] of ['warrior', 'wizard'].entries()) {
-    const texture = loaded[6 + i], meta = loaded[8 + i];
+  for (const [i, { id: name }] of APPEARANCES.entries()) {
+    const texture = loaded[names.length + i], meta = loaded[names.length + APPEARANCES.length + i];
     const frames = Object.fromEntries(Object.entries(meta.frames).map(([key, value]) => {
       const f = value.frame;
       return [key, new Texture({ source: texture.source, frame: new Rectangle(f.x, f.y, f.w, f.h) })];
     }));
     heroes[name] = { meta, frames };
   }
-  const atlas = loaded[5], cells = Array.from({ length: 4 }, (_, i) => new Texture({
+  const atlas = loaded[names.length - 1], cells = Array.from({ length: 4 }, (_, i) => new Texture({
     source: atlas.source, frame: new Rectangle(i * atlas.width / 4, atlas.height / 2, atlas.width / 4, atlas.height / 2)
   }));
   const background = new Sprite(backgrounds.village);
@@ -58,20 +59,21 @@ export async function createWorld(container) {
     requestAnimationFrame(frame);
     if (document.hidden || container.closest('.collapsed') || stopped) return;
     const s = state || { classId: 'warrior', phase: 'HOME', theme: 'village', direction: 'right', run: 0, step: 0 };
-    const texture = backgrounds[s.theme] || backgrounds.village;
+    const texture = s.phase === 'HOME' ? backgrounds.pub : backgrounds[s.theme] || backgrounds.village;
     background.texture = texture; background.height = 384; background.width = 384 * texture.width / texture.height;
     cameraView = camera.sample(now, background.width, reduced);
     background.position.set(cameraView.x, 0);
-    const h = heroes[s.classId], meta = h.meta;
+    const appearance = appearanceFor(s), h = heroes[appearance.id], meta = h.meta;
     const motion = animator.sample(now, reduced);
     hero.texture = h.frames[meta.animations[motion.action].frameNames[motion.frame]];
     hero.anchor.set(meta.anchor.x / meta.frameWidth, meta.anchor.y / meta.frameHeight);
-    const size = 192 / meta.frameHeight;
-    hero.scale.set(motion.mirrored ? -size : size, size);
-    currentAnimation = motion;
+    const size = (s.phase === 'HOME' ? 154 : 192) / meta.frameHeight;
+    hero.scale.set(mirrorAppearance(meta, motion) ? -size : size, size);
+    currentAnimation = { ...motion, appearanceId: appearance.id };
     const x = ['BATTLE', 'TREASURE'].includes(s.phase) ? 166 : 245;
-    hero.position.set(x, 317);
-    hero.tint = motion.hurt ? 0xffdddd : 0xffffff; shadow.position.set(x, 317);
+    const groundY = s.phase === 'HOME' ? 242 : 317;
+    hero.position.set(x, groundY);
+    hero.tint = motion.hurt ? 0xffdddd : 0xffffff; shadow.position.set(x, groundY);
     object.visible = s.phase === 'BATTLE' || s.phase === 'TREASURE';
     if (object.visible) {
       object.texture = cells[s.phase === 'TREASURE' ? 0 : { village: 1, volcano: 2, beach: 3, desert: 2, snow: 3 }[s.theme]];
@@ -115,7 +117,7 @@ export async function createWorld(container) {
       renderer: renderer.name, isPixiRenderer: renderer instanceof CanvasRenderer || renderer.name === 'webgl',
       feedback: { visible: feedback.visible, label: feedback.text, target: feedbackTarget, count: feedbackCount,
         bounds: feedback.visible ? { x: feedback.x - feedback.width / 2, y: feedback.y - feedback.height / 2, width: feedback.width, height: feedback.height } : null },
-      camera: cameraView, heroDisplay: { cellSize: 192, x: hero.x, y: hero.y }, objectDisplay: { x: object.x, y: object.y, width: object.width, visible: object.visible },
+      background: state?.phase === 'HOME' ? 'pub' : state?.theme, camera: cameraView, heroDisplay: { cellSize: state?.phase === 'HOME' ? 154 : 192, x: hero.x, y: hero.y, mirrored: hero.scale.x < 0 }, objectDisplay: { x: object.x, y: object.y, width: object.width, visible: object.visible },
       framesRendered, animation: currentAnimation, displayObjects: stage.children.length, fps, width: renderer.canvas.width, height: renderer.canvas.height }; }
   };
 }
