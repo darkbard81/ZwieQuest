@@ -15,6 +15,8 @@ test('HTTP: registration, isolation, ownership, idempotency, offline events, res
  async function req(path,body,cookie='',extra={}){const r=await fetch(base+path,{method:body===undefined?'GET':'POST',headers:{Origin:base,'Content-Type':'application/json',Cookie:cookie,...extra},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:r.status,body:await r.json(),cookie:r.headers.get('set-cookie')?.split(';')[0]};}
  try{
   await start();const password=String(randomInt(1_000_000)).padStart(6,'0');
+  const icon=await fetch(base+'/assets/ui-icons/damage-fire.svg');
+  assert.equal(icon.status,200);assert.equal(icon.headers.get('content-type'),'image/svg+xml');assert.match(await icon.text(),/<path /);
   assert.equal((await req('/api/state')).status,401);
   const a=await req('/api/auth/register',{username:'test_alpha',password}),b=await req('/api/auth/register',{username:'test_beta',password});assert.equal(a.status,200);assert.equal(b.status,200);
   assert.equal((await req('/api/auth/login',{username:'test_alpha',password:'wrongpassword'})).status,400);

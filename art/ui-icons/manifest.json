@@ -1,0 +1,191 @@
+[
+  {
+    "id": "stat-WIL",
+    "name": "의지",
+    "source": "source/stat-WIL.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "995b2eb4a1a105af8ab7038224fd51584753fdec892445b6b8ea758a6e38dc6e"
+  },
+  {
+    "id": "stat-AR",
+    "name": "방어도",
+    "source": "source/stat-AR.webp",
+    "width": 16,
+    "height": 16,
+    "color": "#CBD5DC",
+    "sha256": "7a05d19bf9e4fc87be62a5eefea6d7f1edd5e2d4b33553c7203f04fd8a36034e"
+  },
+  {
+    "id": "stat-FOR",
+    "name": "인내",
+    "source": "source/stat-FOR.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "b088924f528e01db29485d9f72fa16e9ead0f9b109cd55c7f7ceb4c1d0e3a20b"
+  },
+  {
+    "id": "stat-DEF",
+    "name": "회피",
+    "source": "source/stat-DEF.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "50f523734c02ed0669aa45de56960b9b88350c05b7ea31984bb03ddce7d73657"
+  },
+  {
+    "id": "stat-ACC",
+    "name": "명중",
+    "source": "source/stat-ACC.webp",
+    "width": 16,
+    "height": 16,
+    "color": "#CBD5DC",
+    "sha256": "d31895849cd32ee6eae6cba04b81dac6861311e19ba621ea49a92fa28e4a33d4"
+  },
+  {
+    "id": "stat-CON",
+    "name": "체질",
+    "source": "source/stat-CON.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "9a2a74ef55e292f876288848d5b7ca6e32c803c17c6a928511a498f7c61203b5"
+  },
+  {
+    "id": "stat-INT",
+    "name": "지능",
+    "source": "source/stat-INT.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "324a01d8e0c3fa71786de11f18a0e14674b1de919c765bfb4f6208f6f1028165"
+  },
+  {
+    "id": "damage-raw",
+    "name": "고정",
+    "source": "source/damage-raw.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#6B7280",
+    "sha256": "2879cab1e26a9585a2bc209d834ab2291edba80356b7dbf1dd0d3ab2957aa76f"
+  },
+  {
+    "id": "damage-fire",
+    "name": "소각",
+    "source": "source/damage-fire.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#EA580C",
+    "sha256": "074fb84bdba1598f36dab9d2b9bb80d5ced1c6393008a352ef37aefcb7715c4a"
+  },
+  {
+    "id": "damage-corrosion",
+    "name": "부식",
+    "source": "source/damage-corrosion.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#16A34A",
+    "sha256": "207407d3c27c61577fe4a9dd7ab18e80eccd9c743fc9aee05180d6acb31635ad"
+  },
+  {
+    "id": "damage-blunt",
+    "name": "부수기",
+    "source": "source/damage-blunt.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#B45309",
+    "sha256": "772db64c581d22fd9b99d4c953604f3fb8f705221cf83a8b808396163aecdf7b"
+  },
+  {
+    "id": "damage-cold",
+    "name": "동결",
+    "source": "source/damage-cold.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#2563EB",
+    "sha256": "691f7d31e20da5bb02a1519dcb31df68c24f21e00fc0f7b8a86a8fee70cbf414"
+  },
+  {
+    "id": "damage-lightning",
+    "name": "충격",
+    "source": "source/damage-lightning.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CA8A04",
+    "sha256": "92194466405ee5ab8146f4f2150ba346f3bc9aef5edbd113facd9046d6cd2ef5"
+  },
+  {
+    "id": "damage-pierce",
+    "name": "관통",
+    "source": "source/damage-pierce.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#7C3AED",
+    "sha256": "7e3486a0da7330c9a0e75c1f4a7f6ac5bfe491cbbf8b78d17fee5059147b5a4b"
+  },
+  {
+    "id": "stat-DEX",
+    "name": "민첩",
+    "source": "source/stat-DEX.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "b82f726eecefd804fb48735dbdd175c43e5bf9d3697ffa712340c9dfd3400798"
+  },
+  {
+    "id": "stat-PER",
+    "name": "통찰",
+    "source": "source/stat-PER.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "1c86f610a1ef570cbaae22de99109dbbe41c0f662d3021045138ed23291e3d84"
+  },
+  {
+    "id": "stat-RES",
+    "name": "결의",
+    "source": "source/stat-RES.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "793f0e575c46c413580d94d3344f563a4f07a61cfbe0ac80008e3da12673b69b"
+  },
+  {
+    "id": "stat-STR",
+    "name": "힘",
+    "source": "source/stat-STR.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "9899e0f1d78258a83d3d195f6d0a6c39df8df34625b97fa407258dcc8540b6c9"
+  },
+  {
+    "id": "stat-REF",
+    "name": "반사",
+    "source": "source/stat-REF.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#CBD5DC",
+    "sha256": "9b2d10af4bbfdfee22c6f760ecf6c63aee8617cb7a6865dd90e69057fd8b30b4"
+  },
+  {
+    "id": "stat-LB",
+    "name": "레벨 보너스",
+    "source": "source/stat-LB.webp",
+    "width": 16,
+    "height": 16,
+    "color": "#CBD5DC",
+    "sha256": "37d52476643cc7286d7b0a275d43a22b82c7ede63a8bca22e3af37747162dd58"
+  },
+  {
+    "id": "damage-slash",
+    "name": "베기",
+    "source": "source/damage-slash.webp",
+    "width": 18,
+    "height": 18,
+    "color": "#DC2626",
+    "sha256": "7be234d146913450e4241c5eccc41d6806461783cdbddaf4142d4cb9d526ad46"
+  }
+]

@@ -1,5 +1,12 @@
 import { BASE_STATS } from './equipment.js';
-export const levelBonus = level => Math.floor((level - 1) / 3);
+const LEVEL_BONUS_INTERVAL = 3;
+export const levelBonus = level => Math.floor((level - 1) / LEVEL_BONUS_INTERVAL);
+const DEFENSE_RULES = {
+  DEF: { attributes: ['RES'] },
+  REF: { attributes: ['DEX', 'PER'] },
+  FOR: { attributes: ['STR', 'CON'], masteryClass: 'warrior', masteryKey: 'warriorFOR' },
+  WIL: { attributes: ['INT', 'RES'], masteryClass: 'wizard', masteryKey: 'wizardWIL' }
+};
 export function hitResult(roll, acc, defense) {
   const margin = roll + acc - (10 + defense);
   let tier = margin >= 10 ? 3 : margin >= 0 ? 2 : margin >= -5 ? 1 : 0;
@@ -28,20 +35,29 @@ export function attack({ roll, acc, defense, str, base, pen, ar, damageTypes = [
   return { ...hit, ...armor, damage, base, damageRate, tacticDamageRate, pen: raw ? null : pen, ar };
 }
 export function stats(state, config) {
+  return statDetails(state, config).values;
+}
+// Values and their displayed breakdown share the same authoritative calculation.
+export function statDetails(state, config) {
   const cls = config.classes[state.classId], lb = levelBonus(state.level);
   const gear = Object.values(state.equipment).map(id => state.inventory.find(i => i.id === id)).filter(Boolean);
   const e = key => gear.reduce((sum, i) => sum + (i.stats[key] || 0), 0);
   const b = Object.fromEntries(BASE_STATS.map(key => [key, cls.base[key] + e(key)]));
   const expert = state.level >= config.mastery.fromLevel;
-  return {
+  const defenses = Object.fromEntries(Object.entries(DEFENSE_RULES).map(([key, rule]) => {
+    const attributes = rule.attributes.map(key => ({ key, base: cls.base[key], equipment: e(key), value: b[key] }));
+    const mastery = rule.masteryClass === state.classId ? { fromLevel: config.mastery.fromLevel, value: expert ? config.mastery[rule.masteryKey] : 0 } : null;
+    const detail = { base: cls.B[key], attributes, level: state.level, levelBonus: lb, levelBonusInterval: LEVEL_BONUS_INTERVAL, equipment: e(key), mastery };
+    detail.total = detail.base + attributes.reduce((sum, a) => sum + a.value, 0) + lb + detail.equipment + (mastery?.value || 0);
+    return [key, detail];
+  }));
+  const values = {
     ...b, LB: lb,
     ACC: cls.B.ACC + b.PER + lb + e('ACC') + (expert && state.classId === 'warrior' ? config.mastery.warriorACC : 0),
-    DEF: cls.B.DEF + b.RES + lb + e('DEF'),
-    FOR: cls.B.FOR + b.STR + b.CON + lb + e('FOR') + (expert && state.classId === 'warrior' ? config.mastery.warriorFOR : 0),
-    REF: cls.B.REF + b.DEX + b.PER + lb + e('REF'),
-    WIL: cls.B.WIL + b.INT + b.RES + lb + e('WIL') + (expert && state.classId === 'wizard' ? config.mastery.wizardWIL : 0),
+    ...Object.fromEntries(Object.entries(defenses).map(([key, detail]) => [key, detail.total])),
     maxHp: cls.hp + cls.hpGrowth * (state.level - 1) + 5 * b.CON + e('HP'),
     PEN: e('PEN'), AR: e('AR'), power: e('power'), AP: 3,
     typeModifiers: { ...(gear.find(i => i.slot === 'armor')?.typeModifiers || {}) }
   };
+  return { values, defenses };
 }

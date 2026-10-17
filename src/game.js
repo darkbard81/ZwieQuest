@@ -1,7 +1,7 @@
 import { randomInt, randomUUID } from 'node:crypto';
 import { findAppearance, defaultAppearance } from '../public/appearances.js';
 import { initializeClassProgress, switchClassProgress, equippedClassIds, classProfiles } from './class-progress.js';
-import { attack, stats, levelBonus } from './combat.js';
+import { attack, stats, statDetails, levelBonus } from './combat.js';
 import { MAP_DEFS, createMaps } from './maps.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
 import { availableTactics, validTactic, tacticEffect, validateTactics, COMBAT_RULES_VERSION } from './tactics.js';
@@ -23,6 +23,8 @@ export class Game {
         Object.assign(state.battle, { rulesVersion: COMBAT_RULES_VERSION, roundTactic: 'normal', roundEffects: {}, heroReservedAP: 0, tacticUsed: false });
       }
       state.combatRulesVersion = COMBAT_RULES_VERSION;
+      // Older saves paused at regional entrances as HOME. Resume the same journey.
+      if (state.phase === 'HOME' && state.mapId !== 'village') this.nextChoice();
     }
   }
   installMaps() { const s = this.state; s.maps = createMaps(this.rng); s.mapId = 'village'; s.checkpointHistory = []; s.currentNodeId = s.maps.village.rootId; s.theme = 'village'; s.step = 0; s.path = []; s.bossDefeats = s.bossDefeats || 0; s.enemy = null; s.battle = null; }
@@ -66,9 +68,9 @@ export class Game {
     const s = this.state; s.completed++; s.mapId = region; s.theme = region;
     s.currentNodeId = s.maps[region].rootId;
     if (!s.checkpointHistory.some(c => c.mapId === region && c.nodeId === s.currentNodeId)) s.checkpointHistory.push({ mapId: region, nodeId: s.currentNodeId, firstPassedAt: Date.now() });
-    s.step = 0; s.path = []; s.hp = stats(s, this.config).maxHp; s.enemy = null; s.battle = null;
-    this.phase('HOME', this.config.homeMs);
+    s.step = 0; s.path = []; s.enemy = null; s.battle = null;
     this.log('checkpoint', `${MAP_DEFS[region].name}에 도착했습니다. 지역 출발점에 도착하여 체크포인트 통과 이력만 기록했습니다.`);
+    this.nextChoice();
   }
   reward(kind) {
     const s = this.state, treasure = kind === 'treasure', boss = kind === 'boss', tune = this.config.balance;
@@ -161,7 +163,7 @@ export class Game {
     if (isHero) enemy.hp = Math.max(0, enemy.hp - result.damage); else s.hp = Math.max(0, s.hp - result.damage);
     b.ap--; b.attacks++;
     b.lastHit = { ...result, actor: b.actor, ability, target, at: Date.now(), cost: 1, ap: b.ap, round: b.turn, tacticId: b.roundTactic };
-    this.log('hit', `라운드 ${b.turn} · ${isHero ? '모험가' : enemy.name} · ${ability} ${result.label} ${result.damage} 피해 (d20 ${result.roll}, ${target}, 1 AP, ${DAMAGE_NAMES[result.damageType]}${result.damageType === 'raw' ? ' 고정' : ` / AR ${result.effectiveAR}`})`, { hit: b.lastHit });
+    this.log('hit', `라운드 ${b.turn} · ${isHero ? '모험가' : enemy.name} · ${ability} ${result.label} ${result.damage} 피해 (d20 ${result.roll}, ${target}, 1 AP, ${DAMAGE_NAMES[result.damageType]}${result.damageType === 'raw' ? ' 피해' : ` / AR ${result.effectiveAR}`})`, { hit: b.lastHit });
     if (enemy.hp <= 0) { this.reward(enemy.boss ? 'boss' : 'victory'); return; }
     if (s.hp <= 0) { b.roundEffects = {}; this.phase('DOWNED', this.config.downedMs); this.log('downed', '잠시 쓰러졌습니다. 장비와 금화는 안전합니다. 여관으로 귀환합니다.'); return; }
     this.endAction();
@@ -236,7 +238,8 @@ export class Game {
   }
   snapshot() {
     if (!this.state) return null;
-    const { maps, ...state } = this.state, hero = stats(this.state, this.config);
+    const { maps, ...state } = this.state;
+    const { values: hero, defenses: defenseBreakdown } = statDetails(this.state, this.config);
     const roundEffects = state.phase === 'BATTLE' ? { ...state.battle.roundEffects } : {};
     const weapon = state.inventory.find(i => i.id === state.equipment.weapon);
     return { ...structuredClone(state),
@@ -244,7 +247,7 @@ export class Game {
       equipmentUsers: Object.fromEntries(state.inventory.map(i => [i.id, equippedClassIds(state, i.id)])),
       inventory: structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : i),
       mapGraph: structuredClone(maps[state.mapId]), currentNode: structuredClone(maps[state.mapId].nodes[state.currentNodeId]),
-      stats: hero, combatStats: { ...hero, AR: hero.AR + (roundEffects.AR || 0), ACC: hero.ACC + (roundEffects.ACC || 0) },
+      stats: hero, defenseBreakdown, combatStats: { ...hero, AR: hero.AR + (roundEffects.AR || 0), ACC: hero.ACC + (roundEffects.ACC || 0) },
       hitDefense: weaponDefense(weapon), availableTactics: availableTactics(state.classId, this.config).map(t => ({ ...t, effect: tacticEffect(t.id, hero.INT, this.config) })),
       xpNext: state.level * this.config.xpPerLevel };
   }

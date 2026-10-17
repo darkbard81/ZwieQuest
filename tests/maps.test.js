@@ -19,21 +19,39 @@ test('100 generated worlds: exact depth-10 destinations, all reachable, two forw
 test('each village exit transfers to its region and checkpoint passage history survives serialized restart',()=>{
  for(const region of ['volcano','snow','desert','beach']){
   const g=new Game(config,null,rng(7));g.create('warrior');g.rng=n=>Math.min(11,n-1);
-  const map=g.state.maps.village,target=Object.values(map.nodes).find(n=>n.kind==='exit'&&n.region===region);traverse(g,route(map,target.id));
+  const map=g.state.maps.village,target=Object.values(map.nodes).find(n=>n.kind==='exit'&&n.region===region),path=route(map,target.id);traverse(g,path.slice(0,-1));
+  g.state.hp=7;const run=g.state.run,runGold=g.state.runGold,eventSeq=g.state.eventSeq;
+  traverse(g,path.slice(-1));
+  assert.equal(g.state.phase,'CHOICE_WAIT');assert.equal(g.state.remaining,config.choiceMs);assert.equal(g.state.hp,7);assert.equal(g.state.run,run);assert.equal(g.state.runGold,runGold);
+  assert.equal(g.events.filter(e=>e.seq>eventSeq&&['home','depart'].includes(e.type)).length,0);
+  assert.throws(()=>g.command({type:'CLASS',classId:'wizard'}),/여관/);
   assert.equal(g.state.mapId,region);assert.equal(g.state.theme,region);assert.equal(g.state.checkpointHistory[0].mapId,region);assert.equal(g.state.checkpointHistory.length,1);assert.equal(g.state.currentNodeId,g.state.maps[region].rootId);
   const restored=new Game(config,JSON.parse(JSON.stringify(g.state)));assert.deepEqual(restored.state.checkpointHistory,g.state.checkpointHistory);assert.deepEqual(restored.state.maps,g.state.maps);assert.equal(restored.state.currentNodeId,g.state.currentNodeId);
+  assert.equal(restored.state.phase,'CHOICE_WAIT');assert.equal(restored.state.choiceId,g.state.choiceId);
+  restored.tick(config.choiceMs,1);assert.equal(restored.state.phase,'TRAVEL');assert.equal(restored.state.step,1);assert.equal(restored.state.run,run);
   restored.finish(true);restored.advance();assert.equal(restored.state.mapId,'village');assert.equal(restored.state.currentNodeId,restored.state.maps.village.rootId);assert.equal(restored.state.checkpointHistory[0].mapId,region);
  }
 });
 test('regional boss battle rewards once and returns HOME; checkpoint passage records never choose return location',()=>{
  const g=new Game(config,null,rng(4));g.create('wizard');g.rng=n=>Math.min(11,n-1);const village=g.state.maps.village;
  traverse(g,route(village,Object.values(village.nodes).find(n=>n.kind==='exit'&&n.region==='snow').id));
- const map=g.state.maps.snow;const path=route(map,map.terminalIds[0]);g.advance();
+ const map=g.state.maps.snow;const path=route(map,map.terminalIds[0]);
  for(let i=0;i<path.length;i++){g.command({type:'CHOOSE',direction:path[i],choiceId:g.state.choiceId});g.advance();if(i===path.length-1)break;while(['BATTLE','TREASURE'].includes(g.state.phase))g.advance();}
  assert.equal(g.state.enemy.boss,true);assert.equal(g.state.currentNodeId,map.terminalIds[0]);assert.equal(g.state.step,10);
  g.state.hp=10000;g.state.enemy.hp=1;g.state.battle.actor='hero';g.state.battle.attacks=0;g.battleAction();assert.equal(g.state.phase,'TREASURE');assert.equal(g.state.bossDefeats,1);
  const gold=g.state.gold,items=g.state.inventory.length,seq=g.state.eventSeq;g.reward('boss');assert.equal(g.state.gold,gold);assert.equal(g.state.inventory.length,items);assert.equal(g.state.eventSeq,seq);
  g.advance();assert.equal(g.state.phase,'RETURN_HOME');g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.state.mapId,'village');assert.equal(g.state.currentNodeId,g.state.maps.village.rootId);g.advance();assert.equal(g.state.mapId,'village');assert.equal(g.state.checkpointHistory.length,1);
+});
+test('saved regional HOME resumes without resting or starting another journey; village HOME stays intact',()=>{
+ for(const region of ['volcano','snow','desert','beach']){
+  const g=new Game(config,null,rng(7));g.create('warrior');g.advance();g.enterRegion(region);g.phase('HOME',config.homeMs);g.state.hp=7;
+  const saved=JSON.parse(JSON.stringify(g.state)),restored=new Game(config,saved,rng(7));
+  assert.equal(restored.state.phase,'CHOICE_WAIT');assert.equal(restored.state.hp,7);assert.equal(restored.state.run,g.state.run);assert.equal(restored.state.runGold,g.state.runGold);
+  assert.deepEqual(restored.state.checkpointHistory,g.state.checkpointHistory);assert.equal(restored.state.completed,g.state.completed);
+  restored.tick(config.choiceMs,1);assert.equal(restored.state.mapId,region);assert.equal(restored.state.step,1);assert.equal(restored.state.phase,'TRAVEL');
+ }
+ const g=new Game(config,null,rng(7));g.create('warrior');const saved=JSON.parse(JSON.stringify(g.state));
+ const restored=new Game(config,saved);assert.equal(restored.state.phase,'HOME');assert.equal(restored.state.remaining,config.homeMs);assert.equal(restored.events.length,0);
 });
 test('early and depth-10 dead ends return HOME without removing saved maps',()=>{
  const g=new Game(config,null,rng(1));g.create('warrior');g.rng=n=>Math.min(11,n-1);const map=g.state.maps.village;const dead=Object.values(map.nodes).find(n=>n.sideBranch)||map.nodes[map.terminalIds[0]];

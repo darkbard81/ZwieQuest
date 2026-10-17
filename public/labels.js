@@ -1,17 +1,26 @@
+import { uiIconHTML } from './ui-icons.js';
 import { damageNames, damageTagHTML } from './damage-tags.js';
-export const statNames = Object.freeze({ STR: '힘', CON: '체질', DEX: '민첩', PER: '지각', INT: '지능', RES: '의지',
-  ACC: '명중', DEF: '방어', FOR: '인내', REF: '반사', WIL: '정신', PEN: '관통력', AR: '방어도', HP: '체력', AP: '행동력', LB: '레벨 보너스', power: '피해' });
+export const statNames = Object.freeze({ STR: '힘', CON: '체질', DEX: '민첩', PER: '통찰', INT: '지능', RES: '결의',
+  ACC: '명중', DEF: '회피', FOR: '인내', REF: '반사', WIL: '의지', PEN: '관통력', AR: '방어도', HP: '체력', AP: '행동력', LB: '레벨 보너스', power: '피해' });
 const defenses = new Set(['DEF', 'FOR', 'REF', 'WIL']);
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-export function statLabelHTML(key, value) {
-  const name = escapeHTML(statNames[key] || key);
+export function defenseTooltip(key, detail) {
+  if (!detail || !defenses.has(key)) return '';
+  const terms = [['직업 기본값', detail.base], ...detail.attributes.map(a => [statNames[a.key], a.value]), ['레벨 보너스', detail.levelBonus], ['장비 보정', detail.equipment]];
+  if (detail.mastery) terms.push(['직업 숙련', detail.mastery.value]);
+  return `${terms.map(([name, value]) => `${name}(${value})`).join(' + ')} = ${detail.total}`;
+}
+export function statLabelHTML(key, value, tooltip = '') {
+  const name = uiIconHTML('stat', key) + escapeHTML(statNames[key] || key);
   const amount = value == null ? '' : ` <b>${escapeHTML(value)}</b>`;
-  return defenses.has(key) ? `<span class="defense-tag defense-${key}">${name}${amount}</span>` : `${name}${amount}`;
+  if (!defenses.has(key)) return `${name}${amount}`;
+  if (tooltip) return `<button type="button" class="defense-tag defense-${key}" data-defense="${key}" aria-expanded="false" aria-controls="defense-details" title="${escapeHTML(tooltip)}">${name}${amount}</button>`;
+  return `<span class="defense-tag defense-${key}">${name}${amount}</span>`;
 }
 export function logHTML(text) {
   // Format only the actual hit's damage suffix, never item names or saved data.
-  const source = String(text), typeByName = Object.fromEntries(Object.entries(damageNames).map(([id, name]) => [name, id]));
-  const tokens = /\b(STR|CON|DEX|PER|INT|RES|ACC|DEF|FOR|REF|WIL|PEN|AR|HP|AP|LB)\b|(베기|찌르기|때리기|화염|냉기|전기|부식|Raw)(?= (?:\/ AR\b|고정\)))/g;
+  const source = String(text), typeByName = { ...Object.fromEntries(Object.entries(damageNames).map(([id, name]) => [name, id])), '찌르기': 'pierce', '때리기': 'blunt', '화염': 'fire', '냉기': 'cold', '전기': 'lightning', Raw: 'raw' };
+  const tokens = /\b(STR|CON|DEX|PER|INT|RES|ACC|DEF|FOR|REF|WIL|PEN|AR|HP|AP|LB)\b|(베기|관통|부수기|소각|동결|충격|고정|찌르기|때리기|화염|냉기|전기|부식|Raw)(?= (?:\/ AR\b|고정\)|피해\)))/g;
   let html = '', cursor = 0;
   for (const match of source.matchAll(tokens)) {
     html += escapeHTML(source.slice(cursor, match.index));

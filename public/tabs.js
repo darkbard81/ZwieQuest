@@ -10,6 +10,7 @@ export function initInfoTabs() {
     }
     try { localStorage.setItem(key, tab.id); } catch {}
     if (focus) tab.focus();
+    document.dispatchEvent(new CustomEvent('info-tab-change', { detail: tab.id }));
   }
   for (const [index, tab] of tabs.entries()) {
     tab.addEventListener('click', () => select(tab));

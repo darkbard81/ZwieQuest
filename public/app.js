@@ -1,3 +1,5 @@
+import { initJournal } from './journal-view.js';
+import { initDefenseDetails } from './defense-details.js';
 import { initInn } from './inn-view.js';
 import { appearanceFor } from './appearances.js';
 import { tacticDescription, roundStatus } from './tactics-view.js';
@@ -9,20 +11,23 @@ import { initAdminSettings } from './admin-settings.js';
 import { initPasswordInput } from './password-input.js';
 import { validPassword } from './password-policy.js';
 import { createCombatFeed } from './combat-feedback.js';
-import { statNames, statLabelHTML, logHTML } from './labels.js';
+import { statNames, statLabelHTML, defenseTooltip } from './labels.js';
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const esc = text => String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const phases = { HOME: '여관에서 휴식', TRAVEL: '길 위를 걷는 중', CHOICE_WAIT: '갈림길 선택', BATTLE: '자동 전투', TREASURE: '전리품 획득', RETURN_HOME: '탐험 완료', DOWNED: '안전 귀환 준비' };
 const slotNames = { weapon: '무기', armor: '방어구', charm: '부적' };
-let data = null, receivedAt = 0, user = null, source = null, away = false, connected = false, filter = 'all', inventoryKey = '', journalSeq = -1, toastTimer, authMode = 'login';
+let data = null, receivedAt = 0, user = null, source = null, connected = false, filter = 'all', inventoryKey = '', journalSeq = -1, toastTimer, authMode = 'login';
 const equipmentViews = new Map();
+let statsHTML = '';
+const defenseDetails = initDefenseDetails($('#stats'), $('#defense-details'));
 const clientId = crypto.randomUUID(); let lastHeartbeat = 0;
 let world, choicePending = false;
 const combatFeed = createCombatFeed();
 const inn = initInn({ panel: $('#inn-selection'), portrait: $('#portrait'), countdown: $('#rest-countdown'), onSelect: (appearanceId, button) => command('APPEARANCE', { appearanceId }, button) });
-function updateInn() { inn.update(data?.state, receivedAt, data?.rate || 1, connected && !!user && !away); }
+function updateInn() { inn.update(data?.state, receivedAt, data?.rate || 1, connected && !!user); }
 createWorld($('#world')).then(w => { world = w; if (data?.state) w.update(data.state); }).catch(e => { $('#render-error').hidden = false; $('#render-error').textContent = '게임 화면을 불러오지 못했습니다. 새로고침해 주세요. ' + e.message; console.error(e); });
 initWindows();
+const journal = initJournal($('#journal'), $('#journal-panel'), $('#journal-unread'));
 initInfoTabs();
 function toast(text) { $('#toast').textContent = text; $('#toast').classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 3600); }
 async function api(path, body) {
@@ -42,7 +47,7 @@ async function command(type, fields = {}, button) {
 function receive(next) {
   const combatEvents = combatFeed.consume(next, connected);
   data = next; receivedAt = performance.now(); connected = true;
-  $('#connection').classList.remove('lost'); $('#connection').innerHTML = `<i></i>${next.mode === 'ONLINE' ? '온라인' : '자리 비움'} · ${next.rate}×`;
+  $('#connection').classList.remove('lost'); $('#connection').innerHTML = `<i></i>${next.mode === 'ONLINE' ? '온라인' : '오프라인'} · ${next.rate}×`;
   $('#server-status').textContent = 'SERVER LIVE · SAVED';
   updateInn();
   const s = next.state; $('#world').dataset.phase = s?.phase || 'HOME'; updateChoices();
@@ -51,11 +56,14 @@ function receive(next) {
   const theme = next.themes.find(t => t.id === s.theme);
   $('#biome-tag').textContent = s.phase === 'HOME' ? 'PUB / REST' : s.theme.toUpperCase();
   $('#biome-name').textContent = s.phase === 'HOME' ? '여행자의 여관' : theme.name; $('#biome-sub').textContent = s.phase === 'HOME' ? '잠시 쉬며 다음 여행을 준비해요' : theme.subtitle; $('#phase-badge').textContent = s.enemy?.boss && s.phase === 'BATTLE' ? '지역 보스전' : phases[s.phase];
-  $('#run-total').textContent = String(s.completed).padStart(2, '0'); $('#gold-total').textContent = s.gold.toLocaleString();
+  $('#journey-summary').textContent = `완료한 여행 ${s.completed}회 · 승리 ${s.victories}회 · 보물 ${s.chests}개`; $('#gold-total').textContent = s.gold.toLocaleString();
   $('#class-label').textContent = s.classId.toUpperCase(); $('#hero-name').textContent = appearanceFor(s).name; $('#hero-level').textContent = `Lv. ${s.level} · ${user?.username || '모험가'}`;
   $('#hp-label').textContent = `${s.hp} / ${s.stats.maxHp}`; $('#hp-fill').style.width = `${100 * s.hp / s.stats.maxHp}%`;
   $('#xp-label').textContent = `${s.xp} / ${s.xpNext}`; $('#xp-fill').style.width = `${100 * s.xp / s.xpNext}%`;
-  $('#stats').innerHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statNames[k]}</small><b>${(s.combatStats || s.stats)[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'FOR', 'REF', 'WIL'].map(k => statLabelHTML(k, s.stats[k])).join('')}</div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<span>${statNames[k]} <b>${s.stats[k]}</b></span>`).join('')}</div>`;
+  const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${(s.combatStats || s.stats)[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<span>${statLabelHTML(k)} <b>${s.stats[k]}</b></span>`).join('')}</div>`;
+  // Preserve hovered defense badges across unchanged server snapshots.
+  if (nextStatsHTML !== statsHTML) { $('#stats').innerHTML = nextStatsHTML; statsHTML = nextStatsHTML; }
+  defenseDetails.update();
   $('#stats').title = ['STR', 'CON', 'DEX', 'PER', 'INT', 'RES', 'DEF', 'FOR', 'REF', 'WIL', 'LB'].map(k => `${statNames[k]} ${s.stats[k]}`).join(' · ');
   $('#class-switch').disabled = s.phase !== 'HOME';
   renderEquipment(s);
@@ -79,7 +87,7 @@ function receive(next) {
   if ($('#map-dialog')?.open) renderMap();
   if (journalSeq !== s.eventSeq) {
     journalSeq = s.eventSeq;
-    $('#journal').innerHTML = next.logs.slice(0, 45).map(e => `<li class="${esc(e.type)}">${logHTML(e.text)}<time>${new Date(e.at).toLocaleTimeString('ko-KR', { hour12: false })}</time></li>`).join('');
+    journal.update(next.logs);
   }
 }
 function renderEquipment(s) {
@@ -117,7 +125,7 @@ $('#inventory-list').addEventListener('click', e => { const b = e.target.closest
 $$('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; $$('[data-filter]').forEach(a => a.classList.toggle('active', a === b)); if (data?.state) renderInventory(data.state); });
 function canChoose() {
   const s = data?.state;
-  return !!(user && connected && !away && !choicePending && s?.phase === 'CHOICE_WAIT' && s.choiceId && s.remaining > performance.now() - receivedAt);
+  return !!(user && connected && !choicePending && s?.phase === 'CHOICE_WAIT' && s.choiceId && s.remaining > performance.now() - receivedAt);
 }
 function updateChoices() {
   const available = canChoose();
@@ -133,7 +141,7 @@ async function choose(direction) {
   finally { choicePending = false; updateChoices(); }
 }
 for (const direction of ['left', 'right']) $(`#choose-${direction}`).onclick = () => choose(direction);
-addEventListener('keydown', e => { if (e.repeat || !['ArrowLeft', 'ArrowRight'].includes(e.key) || e.target.closest('input,textarea,select,dialog,[role=tablist]') || document.querySelector('dialog[open]') || away || data?.state?.phase !== 'CHOICE_WAIT') return; e.preventDefault(); $(`#choose-${e.key === 'ArrowLeft' ? 'left' : 'right'}`).click(); });
+addEventListener('keydown', e => { if (e.repeat || !['ArrowLeft', 'ArrowRight'].includes(e.key) || e.target.closest('input,textarea,select,dialog,[role=tablist]') || document.querySelector('dialog[open]') || data?.state?.phase !== 'CHOICE_WAIT') return; e.preventDefault(); $(`#choose-${e.key === 'ArrowLeft' ? 'left' : 'right'}`).click(); });
 $('#tactic').onchange = e => command('TACTIC', { tactic: e.target.value });
 $('#class-switch').onclick = () => { const w = $('#world-window'); if (w.classList.contains('collapsed')) w.querySelector('.minimize').click(); inn.focus(); };
 $$('[data-class]').forEach(b => b.onclick = () => command('CREATE', { classId: b.dataset.class }, b));
@@ -142,14 +150,12 @@ $('#help-button').onclick = () => $('#help').showModal(); $$('#help .dialog-clos
 async function presence(active = true) { if (!user) return; if (active) lastHeartbeat = Date.now(); try { await api('/api/presence', { clientId, active }); } catch (e) { if (active) $('#connection').classList.add('lost'); } }
 function disconnect() { source?.close(); source = null; connected = false; world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
 async function connect() {
-  disconnect(); away = false; $('#away-overlay').hidden = true;
-  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (!away && Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
+  disconnect();
+  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
 }
-$('#away').onclick = async () => { if (!user) return showAuth(); away = true; await presence(false); disconnect(); $('#away-overlay').hidden = false; };
-$('#reconnect').onclick = connect;
-setInterval(() => { if (user && !away) presence(); }, 4000);
+setInterval(() => { if (user) presence(); }, 4000);
 addEventListener('pagehide', () => { if (user) fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, active: false }), keepalive: true }); });
-addEventListener('pageshow', e => { if (e.persisted && user && !away) connect(); });
+addEventListener('pageshow', e => { if (e.persisted && user) connect(); });
 // Auth UI is independent of game state; no game ownership comes from browser-provided ids.
 const authDialog = document.createElement('dialog'); authDialog.id = 'auth-dialog';
 authDialog.innerHTML = `<div class="welcome-art"></div><form id="auth-form"><p class="eyebrow">WELCOME TO ZWIEQUEST</p><h2 id="auth-title">이어서 떠나는 여행</h2><p class="auth-desc">나만의 모험을 안전하게 저장하세요.</p><div class="auth-tabs"><button type="button" id="tab-login" class="active">로그인</button><button type="button" id="tab-register">회원가입</button></div><label for="username">아이디</label><input id="username" name="username" autocomplete="username" required minlength="3" maxlength="24" pattern="[a-zA-Z0-9_]+" placeholder="영문·숫자·밑줄 3~24자"><label for="password">비밀번호</label><div class="password-field"><input id="password" name="password" type="password" inputmode="numeric" autocomplete="current-password" required minlength="6" maxlength="6" pattern="[0-9]{6}" aria-describedby="password-hint password-input-error"><div class="password-cells" aria-hidden="true">${Array.from({length:6}, () => '<span class="password-cell"></span>').join('')}</div></div><p id="password-hint">숫자 6자리 · 각 칸에 한 자리씩 입력하세요.</p><p id="password-input-error" role="status" aria-live="polite"></p><p id="auth-error" role="alert"></p><button id="auth-submit" class="primary" type="submit">로그인하고 여행 계속하기</button><p class="auth-note">이 서버의 계정으로 로그인합니다.<br>ChatGPT 계정 연동은 현재 제공되지 않습니다.</p></form>`;
@@ -158,12 +164,12 @@ const passwordInput = initPasswordInput($('#password'), $('#password-input-error
 authDialog.addEventListener('cancel', e => e.preventDefault());
 const logout = document.createElement('button'); logout.className = 'quiet'; logout.id = 'logout'; logout.textContent = '로그아웃'; logout.hidden = true; $('nav').insertBefore(logout, $('#help-button'));
 const adminSettings = initAdminSettings({ api, getUser: () => user });
-function showAuth() { adminSettings.setUser(null); if ($('#welcome').open) $('#welcome').close(); $('#away-overlay').hidden = true; logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
+function showAuth() { adminSettings.setUser(null); if ($('#welcome').open) $('#welcome').close(); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
 function setAuthMode(mode) { passwordInput.clear(); authMode = mode; $('#tab-login').classList.toggle('active', mode === 'login'); $('#tab-register').classList.toggle('active', mode === 'register'); $('#auth-title').textContent = mode === 'login' ? '이어서 떠나는 여행' : '첫 여행을 시작해 볼까요?'; $('#auth-submit').textContent = mode === 'login' ? '로그인하고 여행 계속하기' : '계정 만들고 모험 시작하기'; $('#password').autocomplete = mode === 'login' ? 'current-password' : 'new-password'; $('#auth-error').textContent = ''; }
 $('#tab-login').onclick = () => setAuthMode('login'); $('#tab-register').onclick = () => setAuthMode('register');
 $('#auth-form').onsubmit = async e => {
   e.preventDefault(); if (!validPassword($('#password').value)) { $('#auth-error').textContent = '비밀번호는 숫자 6자리로 입력하세요.'; $('#password').focus(); return; } const button = $('#auth-submit'); button.disabled = true; $('#auth-error').textContent = '';
-  try { const result = await api(`/api/auth/${authMode}`, { username: $('#username').value, password: $('#password').value }); user = result.user; adminSettings.setUser(user); passwordInput.clear(); authDialog.close(); logout.hidden = false; inventoryKey = ''; journalSeq = -1; await connect(); }
+  try { const result = await api(`/api/auth/${authMode}`, { username: $('#username').value, password: $('#password').value }); user = result.user; adminSettings.setUser(user); passwordInput.clear(); authDialog.close(); logout.hidden = false; inventoryKey = ''; journalSeq = -1; journal.reset(); await connect(); }
   catch (error) { $('#auth-error').textContent = error.message; }
   finally { button.disabled = false; }
 };

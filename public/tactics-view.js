@@ -8,7 +8,7 @@ export function tacticDescription(tactic) {
 }
 export function roundStatus(state) {
   const b = state.battle;
-  if (!b || state.phase !== 'BATTLE') return `승리 ${state.victories}회 · 보물 ${state.chests}개 · 전술은 다음 전투부터 적용`;
+  if (!b || state.phase !== 'BATTLE') return '전술은 다음 전투부터 적용';
   const name = id => state.availableTactics?.find(t => t.id === id)?.name || '일반';
   const buffs = Object.entries(b.roundEffects || {}).map(([k,v]) => k === 'damageRate' ? `다음 피해 +${Math.round(v * 100)}%` : `${k === 'AR' ? '방어도' : '명중'} +${v}`);
   return `라운드 ${b.turn} · ${b.actor === 'hero' ? '모험가' : '몬스터'} 턴 · 행동력 ${b.ap}/3 · 적용 ${name(b.roundTactic)}${buffs.length ? ' (' + buffs.join(' · ') + ')' : ''}${state.tactic !== b.roundTactic ? ` · 다음: ${name(state.tactic)}` : ''}`;

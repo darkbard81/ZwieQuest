@@ -6,23 +6,23 @@
       "prefix": "날카로운"
     },
     "pierce": {
-      "name": "찌르기",
+      "name": "관통",
       "prefix": "꿰뚫는"
     },
     "blunt": {
-      "name": "때리기",
+      "name": "부수기",
       "prefix": "묵직한"
     },
     "fire": {
-      "name": "화염",
+      "name": "소각",
       "prefix": "불꽃의"
     },
     "cold": {
-      "name": "냉기",
+      "name": "동결",
       "prefix": "서리의"
     },
     "lightning": {
-      "name": "전기",
+      "name": "충격",
       "prefix": "번개의"
     },
     "corrosion": {
@@ -30,7 +30,7 @@
       "prefix": "부식의"
     },
     "raw": {
-      "name": "Raw"
+      "name": "고정"
     }
   },
   "dropPercent": 25,
