@@ -1,6 +1,6 @@
 {
   "name": "zwiequest",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "type": "module",
   "description": "서버에서 계속되는 작은 자율 모험",
