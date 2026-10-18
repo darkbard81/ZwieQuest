@@ -1,4 +1,5 @@
 import { mapSVG } from './map-view.js';
+import { mapViewState, nodeLabels } from './map-navigation.js';
 import { initJournal } from './journal-view.js';
 import { sortInventory } from './inventory-order.js';
 import { initDefenseDetails } from './defense-details.js';
@@ -42,18 +43,20 @@ async function command(type, fields = {}, button) {
   if (!connected) { toast('서버 연결을 기다려 주세요.'); return; }
   if (button?.classList.contains('busy')) return;
   button?.classList.add('busy');
-  try { receive(await api('/api/command', { type, ...fields, requestId: crypto.randomUUID() })); }
+  try { receive(await api('/api/command', { type, ...fields, progressId: data?.state?.progressId, requestId: crypto.randomUUID() })); }
   catch (e) { toast(e.message); }
   finally { button?.classList.remove('busy'); }
 }
 function receive(next) {
-  const combatEvents = combatFeed.consume(next, connected);
+  const reset = data?.state?.progressId && next.state?.progressId && data.state.progressId !== next.state.progressId;
+  if (reset) { journal.reset(); journalSeq = -1; inventoryKey = ''; choicePending = false; world?.clearTransient(); }
+  const combatEvents = combatFeed.consume(next, connected && !reset);
   data = next; receivedAt = performance.now(); connected = true;
   $('#connection').classList.remove('lost'); $('#connection').innerHTML = `<i></i>${next.mode === 'ONLINE' ? '온라인' : '오프라인'} · ${next.rate}×`;
   $('#server-status').textContent = 'SERVER LIVE · SAVED';
   updateInn();
   const s = next.state; $('#world').dataset.phase = s?.phase || 'HOME'; updateChoices();
-  if (!s) { world?.update(null); if (user && !user.isAdmin && !$('#welcome').open) $('#welcome').showModal(); return; }
+  if (!s) { world?.update(null); if (user && !$('#welcome').open) $('#welcome').showModal(); return; }
   if ($('#welcome').open) $('#welcome').close(); world?.update(s); world?.playEvents(combatEvents);
   const theme = next.themes.find(t => t.id === s.theme);
   $('#biome-tag').textContent = s.phase === 'HOME' ? 'PUB / REST' : s.theme.toUpperCase();
@@ -169,7 +172,7 @@ document.body.append(authDialog);
 const passwordInput = initPasswordInput($('#password'), $('#password-input-error'));
 authDialog.addEventListener('cancel', e => e.preventDefault());
 const logout = document.createElement('button'); logout.className = 'quiet'; logout.id = 'logout'; logout.textContent = '로그아웃'; logout.hidden = true; $('nav').insertBefore(logout, $('#help-button'));
-const adminSettings = initAdminSettings({ api, getUser: () => user });
+const adminSettings = initAdminSettings({ api, getUser: () => user, getState: () => data?.state, onReset: result => { if (result.state) receive(result); } });
 function showAuth() { adminSettings.setUser(null); if ($('#welcome').open) $('#welcome').close(); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
 function setAuthMode(mode) { passwordInput.clear(); authMode = mode; $('#tab-login').classList.toggle('active', mode === 'login'); $('#tab-register').classList.toggle('active', mode === 'register'); $('#auth-title').textContent = mode === 'login' ? '이어서 떠나는 여행' : '첫 여행을 시작해 볼까요?'; $('#auth-submit').textContent = mode === 'login' ? '로그인하고 여행 계속하기' : '계정 만들고 모험 시작하기'; $('#password').autocomplete = mode === 'login' ? 'current-password' : 'new-password'; $('#auth-error').textContent = ''; }
 $('#tab-login').onclick = () => setAuthMode('login'); $('#tab-register').onclick = () => setAuthMode('register');
@@ -186,9 +189,12 @@ window.zwiequestDiagnostics = () => ({ render: world?.diagnostics(), phase: data
 
 const mapButton = document.createElement('button'); mapButton.id = 'map-button'; mapButton.className = 'quiet'; mapButton.textContent = '경로 지도'; $('nav').insertBefore(mapButton, $('#restore'));
 const mapDialog = document.createElement('dialog'); mapDialog.id = 'map-dialog';
-mapDialog.innerHTML = '<button class="dialog-close" aria-label="지도 닫기">×</button><p class="eyebrow">FORWARD, ALWAYS</p><h2 id="map-title">경로 지도</h2><p id="map-subtitle"></p><div class="map-toolbar"><span>탐험한 경로 · 갈림길 너머는 도착 후 공개</span><button id="map-root">시작점</button><button id="map-current">현재 위치</button><label>배율 <select id="map-scale"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1" selected>100%</option><option value="1.25">125%</option></select></label></div><div id="map-graph" tabindex="0" aria-label="경로 지도 스크롤 영역"></div><p class="map-legend"><span class="current">● 현재 위치</span><span class="visited">● 탐험한 곳</span><span class="unknown">○ 미탐험 갈림길</span><span class="exit">● 체크포인트</span><span class="deadend">● 막다른 길</span><span class="boss">● 보스</span></p>';
+mapDialog.innerHTML = '<button class="dialog-close" aria-label="지도 닫기">×</button><p class="eyebrow">FORWARD, ALWAYS</p><h2 id="map-title">경로 지도</h2><p id="map-subtitle"></p><div class="map-toolbar"><span>탐험한 경로 · 갈림길 너머는 도착 후 공개</span><button id="map-root">시작점</button><button id="map-current">현재 위치</button><label>배율 <select id="map-scale"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1" selected>100%</option><option value="1.25">125%</option></select></label></div><div id="map-graph" tabindex="0" aria-label="경로 지도 스크롤 영역"></div><p class="map-legend"><span class="current">● 현재 위치</span><span class="visited">● 탐험한 곳</span><span class="unknown">○ 미탐험 갈림길</span><span class="exit">◆ 연결 지역</span><span class="boss">● 보스</span></p>';
 document.body.append(mapDialog);
-let mapRenderKey = '';
+const mapDeparture = document.createElement('div'); mapDeparture.className = 'map-departure';
+mapDeparture.innerHTML = '<label>다음 출발 지역 <select id="map-start-region" aria-label="다음 출발 지역"></select></label><span>여관에서 출발할 때 적용됩니다.</span><button id="map-cancel-route">자동 이동 해제</button><span id="map-route-status" role="status"></span>';
+mapDialog.insertBefore(mapDeparture, $('#map-graph'));
+let mapRenderKey = '', mapStartPending = false, mapRoutePending = false;
 function focusMapNode(id) {
   const graph = $('#map-graph'), node = [...graph.querySelectorAll('[data-node]')].find(n => n.dataset.node === id);
   if (!node) return;
@@ -197,19 +203,43 @@ function focusMapNode(id) {
   graph.scrollTop += target.y + target.height / 2 - bounds.y - graph.clientHeight / 2;
 }
 mapDialog.querySelector('.dialog-close').onclick = () => mapDialog.close();
-mapButton.onclick = () => { if (!data?.state) return toast('먼저 모험가를 선택하세요.'); renderMap(); mapDialog.showModal(); requestAnimationFrame(() => focusMapNode(data.state.currentNodeId)); };
+mapButton.onclick = () => { if (!data?.state) return toast('먼저 모험가를 선택하세요.'); renderMap(); mapDialog.showModal(); requestAnimationFrame(() => focusMapNode(mapViewState(data.state).currentNodeId)); };
 $('#map-root').onclick = () => focusMapNode(data.state.mapGraph.rootId);
-$('#map-current').onclick = () => focusMapNode(data.state.currentNodeId);
-$('#map-scale').onchange = () => { renderMap(); focusMapNode(data.state.currentNodeId); };
+$('#map-current').onclick = () => focusMapNode(mapViewState(data.state).currentNodeId);
+$('#map-scale').onchange = () => { renderMap(); focusMapNode(mapViewState(data.state).currentNodeId); };
+$('#map-start-region').onchange = async event => {
+  mapStartPending = true; event.target.disabled = true;
+  try { await command('START_MAP', { mapId: event.target.value }); }
+  finally { mapStartPending = false; renderMap(); }
+};
+$('#map-cancel-route').onclick = () => command('CANCEL_ROUTE', {}, $('#map-cancel-route'));
+async function selectMapTarget(event) {
+  const node = event.target.closest('.map-node.selectable');
+  if (!node || mapRoutePending || !connected) return;
+  mapRoutePending = true;
+  try { await command('AUTO_ROUTE', { mapId: data.state.mapGraph.id, nodeId: node.dataset.node }); }
+  finally { mapRoutePending = false; }
+}
+$('#map-graph').onclick = selectMapTarget;
+$('#map-graph').onkeydown = event => {
+  if (['Enter', ' '].includes(event.key) && event.target.closest('.map-node.selectable')) { event.preventDefault(); selectMapTarget(event); }
+};
 function renderMap() {
-  const s = data?.state; if (!s) return;
-  const scale = Number($('#map-scale').value), key = JSON.stringify([s.mapGraph, s.currentNodeId, s.path, s.exploredNodes, s.checkpointHistory, scale]);
+  if (!data?.state) return;
+  const s = mapViewState(data.state), select = $('#map-start-region');
+  const starts = s.availableStarts || [{ id: 'village', name: '바람꽃 마을' }], options = JSON.stringify(starts);
+  if (select.dataset.options !== options) { select.innerHTML = starts.map(map => `<option value="${esc(map.id)}">${esc(map.name)}</option>`).join(''); select.dataset.options = options; }
+  if (!mapStartPending) select.value = s.departureMapId || 'village';
+  select.disabled = !connected || mapStartPending;
+  $('#map-cancel-route').disabled = !connected || !s.autoRoute;
+  $('#map-route-status').textContent = s.autoRoute ? `자동 이동 중 · 목표 ${nodeLabels(s.mapGraph)[s.autoRoute.nodeId] || ''}` : '앞으로 이어지는 노드를 선택하면 자동 이동합니다.';
+  const scale = Number($('#map-scale').value), key = JSON.stringify([s.mapGraph, s.currentNodeId, s.path, s.exploredNodes, s.checkpointHistory, s.autoRoute, s.phase, scale]);
   if (key === mapRenderKey) return; mapRenderKey = key;
   $('#map-title').textContent = `${s.mapGraph.name} · 깊이 ${s.step} / ${s.mapGraph.depth}`;
-  $('#map-subtitle').textContent = '체크포인트 통과 기록: ' + (s.checkpointHistory.map(c => data.themes.find(t => t.id === c.mapId)?.name || c.mapId).join(', ') || '아직 없음') + ' · 통과 기록은 이동·귀환에 사용되지 않습니다.';
+  $('#map-subtitle').textContent = '노드 표기: 깊이-번호 · 일반 경로 도착 시 전투 12.5% / 보물 12.5% / 통과 75%';
   const graph = $('#map-graph'), { scrollLeft, scrollTop } = graph;
   const previousCurrent = graph.querySelector('.map-node.current')?.dataset.node;
-  graph.dataset.map = s.mapId; graph.innerHTML = mapSVG(s, scale);
+  graph.dataset.map = s.mapId; graph.innerHTML = mapSVG(s, scale, data.themes);
   graph.scrollLeft = scrollLeft; graph.scrollTop = scrollTop;
   if (mapDialog.open && previousCurrent !== s.currentNodeId) requestAnimationFrame(() => focusMapNode(s.currentNodeId));
 }

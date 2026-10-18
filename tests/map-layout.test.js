@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { generateMap, MAP_DEFS, upgradeMap } from '../src/maps.js';
 import { generateLegacyMap } from './fixtures/maps-v1.js';
 import { layoutMap, MAP_NODE_WIDTH } from '../public/map-layout.js';
+import { nodeLabels } from '../public/map-navigation.js';
 import { mapSVG, exploredMap } from '../public/map-view.js';
 function rng(seed) { let x=seed; return n=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x%n;}; }
 function intersects(a,b,c,d) {
@@ -38,7 +39,7 @@ test('unexplored forks reveal neither destinations, events nor deeper topology',
  assert.equal(visible.depth,1);
  for(const id of Object.values(root.edges))assert.deepEqual(visible.nodes[id],{id,depth:1,kind:'unknown',label:'미탐험'});
  assert.match(svg,/현재 위치/);assert.match(svg,/왼쪽/);assert.match(svg,/오른쪽/);
- assert.doesNotMatch(svg,/체크포인트 · 통과 기록|data-kind="(?:boss|exit|deadend)"/);
+ assert.doesNotMatch(svg,/통과 기록|data-kind="(?:boss|exit|deadend)"/);
  for(const id of map.terminalIds)assert.ok(!svg.includes(map.nodes[id].label));
  assert.doesNotMatch(svg,/<path[^>]+d="[^"]*[LQCA]/);
  assert.deepEqual(state,before);
@@ -56,11 +57,11 @@ test('arrival reveals destinations while unchosen siblings remain anonymous; sav
    const state={mapGraph:map,currentNodeId:path.at(-1).from,path:path.slice(0,-1),checkpointHistory:[{mapId:target.region}]};
    const hidden=exploredMap(state);assert.equal(hidden.nodes[target.id].kind,'unknown');assert.equal(hidden.nodes[target.id].edges,undefined);
    state.currentNodeId=target.id;state.path=path;
-   const svg=mapSVG(state);assert.ok(svg.includes(target.label));assert.match(svg,/map-edge visited/);
+   const svg=mapSVG(state);assert.ok(svg.includes(nodeLabels(map)[target.id]));if(target.kind!=='deadend')assert.ok(svg.includes(target.label));assert.match(svg,/map-edge visited/);
    assert.equal(exploredMap(state).nodes[target.id].kind,target.kind);
    state.exploredNodes={[map.id]:[map.rootId,...path.map(p=>p.to)]};state.path=[];state.currentNodeId=map.rootId;
-   const restored=mapSVG(state);assert.ok(restored.includes(target.label));
-   if(target.kind==='exit')assert.match(restored,/체크포인트 · 통과 기록/);
+   const restored=mapSVG(state,1,Object.entries(MAP_DEFS).map(([id,def])=>({id,name:def.name}))); assert.ok(restored.includes(nodeLabels(map)[target.id]));
+   if(target.kind==='exit'){assert.ok(restored.includes(`${MAP_DEFS[target.region].name} · 통과 기록`));assert.ok(!restored.includes('체크포인트'));}
   }
  }
 });

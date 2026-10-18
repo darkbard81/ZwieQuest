@@ -3,6 +3,8 @@ import { findAppearance, defaultAppearance } from '../public/appearances.js';
 import { initializeClassProgress, switchClassProgress, equippedClassIds, classProfiles } from './class-progress.js';
 import { attack, stats, statDetails, levelBonus } from './combat.js';
 import { MAP_DEFS, createMaps, migrateMaps } from './maps.js';
+import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
+import { rollEncounter } from './encounters.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
 import { availableTactics, validTactic, tacticEffect, validateTactics, COMBAT_RULES_VERSION } from './tactics.js';
 export const THEMES = Object.entries(MAP_DEFS).map(([id, def]) => ({ id, name: def.name, subtitle: def.subtitle }));
@@ -11,8 +13,13 @@ export class Game {
     validateTactics(config); this.config = config; this.state = state; this.rng = n => ((rng(n) % n) + n) % n; this.events = [];
     if (state && !state.maps) { this.installMaps(); this.phase('HOME', config.homeMs); this.log('map', '새 경로 체계로 이동했습니다. 성장과 장비는 유지됩니다.'); }
     if (state) {
+      state.progressId ||= randomUUID();
       if (migrateMaps(state)) this.log('map', '경로 지도를 합류 없는 트리로 정리했습니다. 현재 위치와 진행 중인 모험은 유지됩니다.');
       this.rememberExploration();
+      if (!availableStarts(state).includes(state.departureMapId)) state.departureMapId = 'village';
+      state.autoRoute ??= null;
+      // Keep geometry and in-flight encounters; only remove obsolete fixed assignments.
+      for (const map of Object.values(state.maps)) for (const node of Object.values(map.nodes)) delete node.event;
       initializeClassProgress(state);
       // Old saves keep their existing class and acquire its default appearance.
       if (!findAppearance(state.appearanceId) || findAppearance(state.appearanceId).classId !== state.classId) state.appearanceId = defaultAppearance(state.classId).id;
@@ -29,7 +36,7 @@ export class Game {
       if (state.phase === 'HOME' && state.mapId !== 'village') this.nextChoice();
     }
   }
-  installMaps() { const s = this.state; s.maps = createMaps(this.rng); s.mapId = 'village'; s.checkpointHistory = []; s.currentNodeId = s.maps.village.rootId; s.theme = 'village'; s.step = 0; s.path = []; s.exploredNodes = {}; this.rememberExploration(); s.bossDefeats = s.bossDefeats || 0; s.enemy = null; s.battle = null; }
+  installMaps() { const s = this.state; s.maps = createMaps(this.rng); s.mapId = 'village'; s.departureMapId = 'village'; s.autoRoute = null; s.checkpointHistory = []; s.currentNodeId = s.maps.village.rootId; s.theme = 'village'; s.step = 0; s.path = []; s.exploredNodes = {}; this.rememberExploration(); s.bossDefeats = s.bossDefeats || 0; s.enemy = null; s.battle = null; }
   rememberExploration() {
     const s = this.state;
     s.exploredNodes ||= {};
@@ -54,7 +61,7 @@ export class Game {
   create(classId) {
     if (!this.config.classes[classId]) throw Error('알 수 없는 클래스입니다.');
     if (this.state) throw Error('이미 모험가가 있습니다. HOME에서 직업을 변경하세요.');
-    this.state = { classId, level: 1, xp: 0, gold: 0, hp: 1, inventory: [], equipment: {}, run: 0, step: 0, eventSeq: 0, version: 0, completed: 0, victories: 0, chests: 0, theme: 'village', direction: 'right', tactic: 'normal', combatRulesVersion: COMBAT_RULES_VERSION, path: [], lastSummary: null };
+    this.state = { classId, progressId: randomUUID(), level: 1, xp: 0, gold: 0, hp: 1, inventory: [], equipment: {}, run: 0, step: 0, eventSeq: 0, version: 0, completed: 0, victories: 0, chests: 0, theme: 'village', direction: 'right', tactic: 'normal', combatRulesVersion: COMBAT_RULES_VERSION, path: [], lastSummary: null };
     this.installMaps();
     initializeClassProgress(this.state);
     this.state.appearanceId = defaultAppearance(classId).id;
@@ -67,6 +74,7 @@ export class Game {
     if (s.phase !== 'CHOICE_WAIT' || !['left', 'right'].includes(direction) || !node.edges?.[direction]) throw Error('이 갈림길은 이미 지나갔습니다.');
     const target = map.nodes[node.edges[direction]];
     if (target.depth !== node.depth + 1) throw Error('앞으로 가는 경로만 선택할 수 있습니다.');
+    if (!automatic) s.autoRoute = null;
     s.direction = direction; s.risk = direction === 'left' ? 0 : 1;
     s.path.push({ from: node.id, to: target.id, direction }); s.currentNodeId = target.id; s.step = target.depth; s.choiceId = null;
     this.rememberExploration();
@@ -78,6 +86,15 @@ export class Game {
     if (!node.edges) throw Error('종착점에는 다음 분기가 없습니다.');
     s.choiceId = randomUUID(); this.phase('CHOICE_WAIT', this.config.choiceMs);
     this.log('choice', '두 갈래 길을 만났습니다. 선택하지 않아도 모험은 계속됩니다.');
+    this.followAutoRoute();
+  }
+  followAutoRoute() {
+    const s = this.state, target = s.autoRoute;
+    if (!target) return false;
+    const path = target.mapId === s.mapId ? routeTo(s.maps[s.mapId], s.currentNodeId, target.nodeId) : null;
+    if (!path?.length) { s.autoRoute = null; return false; }
+    this.choose(path[0].direction, true);
+    return true;
   }
   enterRegion(region) {
     const s = this.state; s.completed++; s.mapId = region; s.theme = region;
@@ -85,7 +102,7 @@ export class Game {
     if (!s.checkpointHistory.some(c => c.mapId === region && c.nodeId === s.currentNodeId)) s.checkpointHistory.push({ mapId: region, nodeId: s.currentNodeId, firstPassedAt: Date.now() });
     s.step = 0; s.path = []; s.enemy = null; s.battle = null;
     this.rememberExploration();
-    this.log('checkpoint', `${MAP_DEFS[region].name}에 도착했습니다. 지역 출발점에 도착하여 체크포인트 통과 이력만 기록했습니다.`);
+    this.log('checkpoint', `${MAP_DEFS[region].name}에 도착했습니다. 다음 여관 출발 지역으로 선택할 수 있습니다.`);
     this.nextChoice();
   }
   reward(kind) {
@@ -184,7 +201,7 @@ export class Game {
     this.endAction();
   }
   finish(downed, reason = 'deadend') {
-    const s = this.state; s.completed++;
+    const s = this.state; s.completed++; s.autoRoute = null;
     s.lastSummary = { run: s.run, theme: s.theme, gold: s.gold - s.runGold, xp: s.eventSeq, steps: s.step, downed, reason, at: Date.now() };
     this.phase('RETURN_HOME', this.config.returnMs);
     this.log('return', `${downed ? '안전 귀환' : reason === 'boss' ? '보스 탐험 완료' : '막다른 길 도착'} · ${s.run}번째 여행에서 금화 ${s.lastSummary.gold}개를 모았습니다. 다음 여행이 곧 시작됩니다.`);
@@ -194,18 +211,24 @@ export class Game {
     const s = this.state;
     switch (s.phase) {
       case 'HOME':
+        s.mapId = availableStarts(s).includes(s.departureMapId) ? s.departureMapId : 'village';
         s.run++; s.runGold = s.gold; s.step = 0; s.path = []; s.pendingBossReturn = false;
         s.theme = s.mapId; s.currentNodeId = s.maps[s.mapId].rootId;
+        this.rememberExploration();
         this.log('depart', `${s.run}번째 여행 · ${MAP_DEFS[s.mapId].name} 출발점에서 모험을 시작합니다.`); this.nextChoice(); break;
-      case 'CHOICE_WAIT': this.choose(this.rng(2) ? 'right' : 'left', true); break;
+      case 'CHOICE_WAIT': if (!this.followAutoRoute()) this.choose(this.rng(2) ? 'right' : 'left', true); break;
       case 'TRAVEL': {
         const node = s.maps[s.mapId].nodes[s.currentNodeId];
+        if (s.autoRoute?.mapId === s.mapId && s.autoRoute.nodeId === node.id) s.autoRoute = null;
         if (node.kind === 'deadend') this.finish(false);
         else if (node.kind === 'exit') this.enterRegion(node.region);
         else if (node.kind === 'boss') this.beginBattle(true);
-        else if (node.event === 'battle') this.beginBattle();
-        else if (node.event === 'treasure') this.reward('treasure');
-        else { this.log('pass', '조용한 길을 지나 다음 갈림길에 도착했습니다.'); this.nextChoice(); }
+        else {
+          const encounter = rollEncounter(this.rng);
+          if (encounter === 'battle') this.beginBattle();
+          else if (encounter === 'treasure') this.reward('treasure');
+          else { this.log('pass', '조용한 길을 지나 다음 갈림길에 도착했습니다.'); this.nextChoice(); }
+        }
         break;
       }
       case 'BATTLE': this.battleAction(); break;
@@ -226,6 +249,24 @@ export class Game {
     if (cmd.type === 'CREATE') { this.create(cmd.classId); return; }
     const s = this.state; if (!s) throw Error('먼저 클래스를 선택하세요.');
     if (cmd.type === 'CHOOSE') { if (cmd.choiceId !== s.choiceId || s.remaining <= 0) throw Error('선택 시간이 지났습니다.'); this.choose(cmd.direction); }
+    else if (cmd.type === 'START_MAP') {
+      if (!availableStarts(s).includes(cmd.mapId)) throw Error('아직 통과하지 않은 체크포인트입니다.');
+      if (s.departureMapId === cmd.mapId) return;
+      s.departureMapId = cmd.mapId;
+      if (s.phase === 'HOME') s.autoRoute = null;
+      this.log('map', `다음 출발 지역 · ${s.maps[cmd.mapId].name}. 여관에서 출발할 때 적용됩니다.`);
+    }
+    else if (cmd.type === 'AUTO_ROUTE') {
+      if (!['HOME', 'CHOICE_WAIT', 'TRAVEL', 'BATTLE', 'TREASURE'].includes(s.phase)) throw Error('여관에 도착한 후 자동 이동을 선택하세요.');
+      const position = navigationPosition(s), map = s.maps[position.mapId];
+      if (cmd.mapId !== position.mapId || !map.nodes[cmd.nodeId] || !visibleTarget(s, position.mapId, cmd.nodeId)) throw Error('지도에 표시된 노드를 선택하세요.');
+      const path = routeTo(map, position.nodeId, cmd.nodeId);
+      if (!path?.length) throw Error('현재 위치보다 앞으로 이어지는 노드를 선택하세요.');
+      s.autoRoute = { mapId: position.mapId, nodeId: cmd.nodeId };
+      this.log('map', '자동 이동 목표를 선택했습니다. 도착할 때까지 갈림길 방향을 자동으로 선택합니다.');
+      if (s.phase === 'CHOICE_WAIT') this.followAutoRoute();
+    }
+    else if (cmd.type === 'CANCEL_ROUTE') { s.autoRoute = null; }
     else if (cmd.type === 'SELL_NORMAL') {
       const items = this.normalSaleItems(), ids = new Set(items.map(item => item.id));
       if (!items.length) return;
@@ -269,7 +310,8 @@ export class Game {
       classProfiles: classProfiles(state, this.config),
       equipmentUsers: Object.fromEntries(state.inventory.map(i => [i.id, equippedClassIds(state, i.id)])),
       inventory: structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : i),
-      mapGraph: structuredClone(maps[state.mapId]), currentNode: structuredClone(maps[state.mapId].nodes[state.currentNodeId]),
+      availableStarts: availableStarts(this.state).map(id => ({ id, name: maps[id].name })),
+      mapGraph: structuredClone(maps[navigationPosition(this.state).mapId]), currentNode: structuredClone(maps[state.mapId].nodes[state.currentNodeId]),
       stats: hero, defenseBreakdown, combatStats: { ...hero, AR: hero.AR + (roundEffects.AR || 0), ACC: hero.ACC + (roundEffects.ACC || 0) },
       hitDefense: weaponDefense(weapon), availableTactics: availableTactics(state.classId, this.config).map(t => ({ ...t, effect: tacticEffect(t.id, hero.INT, this.config) })),
       xpNext: state.level * this.config.xpPerLevel };

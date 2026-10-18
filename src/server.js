@@ -6,6 +6,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { Game, THEMES } from './game.js';
 import { LocalAuth } from './auth.js';
 import { AccountAdmin, forgetAccount } from './admin.js';
+import { prepareAdminGame, resetGameProgress } from './account-progress.js';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const config = JSON.parse(readFileSync(join(root, 'config.json')));
 const port = Number(process.env.PORT || 4317), host = process.env.HOST || '127.0.0.1';
@@ -21,7 +22,12 @@ const accountAdmin = new AccountAdmin(db);
 const games = new Map(db.prepare('SELECT * FROM account_state').all().map(r => [r.user_id, new Game(config, JSON.parse(r.body))]));
 const clients = new Map(), presence = new Map(), commandRates = new Map();
 let lastTick = performance.now(), lastPersist = performance.now(), lastBroadcast = 0, stopping = false;
-function getGame(id) { if (!games.has(id)) games.set(id, new Game(config)); return games.get(id); }
+function getGame(id) {
+  if (!games.has(id)) games.set(id, new Game(config));
+  const game = games.get(id);
+  if (auth.isAdmin(id)) prepareAdminGame(game);
+  return game;
+}
 function mode(id) { return [...presence.values()].some(p => p.userId === id && Date.now() - p.at < config.presenceGraceMs) ? 'ONLINE' : 'OFFLINE'; }
 function rate(id) { return mode(id) === 'ONLINE' ? config.onlineRate : config.offlineRate; }
 const logs = id => db.prepare('SELECT body FROM user_events WHERE user_id=? ORDER BY seq DESC LIMIT 80').all(id).map(r => JSON.parse(r.body));
@@ -36,6 +42,8 @@ function commit(id, command) {
     db.exec('COMMIT'); game.events = [];
   } catch (e) { db.exec('ROLLBACK'); throw e; }
 }
+// Provision existing administrator accounts once, including accounts without a hero.
+for (const { user_id: id } of db.prepare('SELECT user_id FROM admin_accounts').all()) commit(id);
 function broadcast(id) {
   let line;
   for (const [res, u] of clients) if (u.id === id) {
@@ -102,6 +110,14 @@ const server = http.createServer(async (req, res) => {
         return json(res, 200, { ok: true, username: deleted.username });
       } catch (e) { if (e.status) return json(res, e.status, { error: e.message }); throw e; }
     }
+    if (url.pathname === '/api/admin/reset-account') {
+      try {
+        const result = accountAdmin.reset(user.id, cmd.userId, cmd.confirmUsername, cmd.requestId,
+          () => resetGameProgress(getGame(cmd.userId), auth.isAdmin(cmd.userId)));
+        if (result.replacement) { games.set(result.target.id, result.replacement); commandRates.delete(result.target.id); broadcast(result.target.id); }
+        return json(res, 200, { ok: true, username: result.target.username, duplicate: result.duplicate, ...(result.target.id === user.id ? payload(user.id) : {}) });
+      } catch (e) { if (e.status) return json(res, e.status, { error: e.message }); throw e; }
+    }
     if (url.pathname === '/api/presence') {
       if (typeof cmd.clientId !== 'string' || cmd.clientId.length > 80) return json(res, 400, { error: 'Invalid client' });
       tick(); const key = user.sessionHash + ':' + cmd.clientId;
@@ -109,6 +125,9 @@ const server = http.createServer(async (req, res) => {
       broadcast(user.id); return json(res, 200, { ok: true });
     }
     if (url.pathname === '/api/command') {
+      if (cmd.type === 'ADMIN_REVEAL_MAP' && !user.isAdmin) return json(res, 403, { error: '관리자만 전체 지도를 공개할 수 있습니다.' });
+      const current = getGame(user.id).state;
+      if ((cmd.progressId !== undefined || current?.resetAt) && cmd.progressId !== current?.progressId) return json(res, 409, { error: '계정이 초기화되었습니다. 현재 상태에서 다시 선택하세요.', ...payload(user.id) });
       const budget = commandRates.get(user.id) || { second: 0, count: 0 }, second = Math.floor(Date.now() / 1000);
       if (budget.second !== second) { budget.second = second; budget.count = 0; } budget.count++; commandRates.set(user.id, budget);
       if (budget.count > 20) return json(res, 429, { error: '잠시 후 다시 시도하세요.' });
@@ -116,7 +135,7 @@ const server = http.createServer(async (req, res) => {
       const prev = db.prepare('SELECT body FROM requests WHERE user_id=? AND id=?').get(user.id, cmd.requestId);
       if (prev) return json(res, 200, { ...JSON.parse(prev.body), duplicate: true, ...payload(user.id) });
       tick(); const game = getGame(user.id), old = structuredClone(game.state);
-      try { game.command(cmd); const result = { ok: true }; commit(user.id, { id: cmd.requestId, result }); broadcast(user.id); return json(res, 200, { ...result, ...payload(user.id) }); }
+      try { if (cmd.type === 'ADMIN_REVEAL_MAP') prepareAdminGame(game, true); else game.command(cmd); const result = { ok: true }; commit(user.id, { id: cmd.requestId, result }); broadcast(user.id); return json(res, 200, { ...result, ...payload(user.id) }); }
       catch (e) { game.state = old; game.events = []; return json(res, 409, { error: e.message, ...payload(user.id) }); }
     }
   }

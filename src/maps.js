@@ -6,39 +6,56 @@ export const MAP_DEFS = {
   beach: { name: '푸른달 해변', subtitle: '파도 너머 들려오는 노래', boss: '밀물의 수호자' }
 };
 export const MAP_VERSION = 2;
+// Generation rules are independent of the saved graph format. Existing trees stay intact.
+export const MAP_GENERATION_VERSION = 3;
 const directions = ['left', 'right'];
 
-// Reserve the authored destinations first, then build their parents backwards.
-// A missing sibling becomes a dead end, rather than sharing a descendant.
+function shuffle(items, rng) {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = rng(i + 1); [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+// All regions share the same forward branching rules; only their destinations differ.
 export function generateMap(id, rng) {
   const def = MAP_DEFS[id], depth = 10, nodes = {};
   const terminals = def.terminals || [{ kind: 'boss', label: def.boss }];
-  let layer = terminals.map((terminal, i) => {
-    const node = { id: `${id}:10:${i}`, depth, ...terminal };
-    nodes[node.id] = node; return node.id;
+  const destinations = terminals.map((terminal, i) => ({ id: `${id}:10:${i}`, depth, ...terminal }));
+  const terminalIds = destinations.map(node => node.id);
+  // Every branching node has two children, including the boss's final dead-end sibling.
+  if (destinations.length % 2) destinations.push({ id: `${id}:10:dead:0`, depth, kind: 'deadend', label: '막다른 길', sideBranch: true });
+  const pathNode = (d, index) => ({
+    id: `${id}:${d}:${index}`, depth: d, kind: d === 0 ? 'start' : 'path',
+    label: d === 0 ? (id === 'village' ? 'HOME' : `${def.name} 출발점`) : `${def.name} ${d}-${index + 1}`
   });
-  const terminalIds = [...layer];
-  for (let d = depth - 1; d >= 0; d--) {
-    // Shuffle siblings without changing the identity of destinations.
-    for (let i = layer.length - 1; i > 0; i--) {
-      const j = rng(i + 1); [layer[i], layer[j]] = [layer[j], layer[i]];
+  const root = pathNode(0, 0); nodes[root.id] = root;
+  let layer = [root];
+  for (let d = 0; d < depth; d++) {
+    let continuing = layer.length;
+    if (d === depth - 1) continuing = destinations.length / 2;
+    else if (d >= 4) {
+      // The NEXT layer includes both continuing paths and dead ends in its depth*4 cap.
+      const maximum = Math.min(layer.length, (d + 1) * 2);
+      // Keep several routes alive, and reserve enough capacity for every destination.
+      const minimum = Math.max(Math.ceil(maximum / 2), Math.ceil(destinations.length / 2 ** (depth - d)));
+      continuing = minimum + rng(maximum - minimum + 1);
     }
-    const parents = [];
-    for (let i = 0; i < layer.length; i += 2) {
-      let pair = layer.slice(i, i + 2);
-      if (pair.length === 1) {
-        const dead = { id: `${id}:${d + 1}:dead:${i}`, depth: d + 1, kind: 'deadend', label: '막다른 길', sideBranch: true };
-        nodes[dead.id] = dead; pair.push(dead.id);
-        if (rng(2)) pair.reverse();
+    const parents = shuffle(layer, rng);
+    for (const node of parents.slice(continuing)) {
+      node.kind = 'deadend'; node.label = '막다른 길'; node.sideBranch = true; delete node.event;
+    }
+    const next = d === depth - 1 ? shuffle(destinations, rng) : Array.from({ length: continuing * 2 }, (_, i) => pathNode(d + 1, i));
+    for (let i = 0; i < continuing; i++) {
+      const parent = parents[i]; parent.edges = {};
+      for (const [offset, direction] of directions.entries()) {
+        const child = next[i * 2 + offset]; nodes[child.id] = child; parent.edges[direction] = child.id;
       }
-      const node = { id: `${id}:${d}:${parents.length}`, depth: d, kind: d === 0 ? 'start' : 'path',
-        label: d === 0 ? (id === 'village' ? 'HOME' : `${def.name} 출발점`) : `${def.name} ${d}-${parents.length + 1}`,
-        event: d % 3 === 0 ? 'treasure' : d % 3 === 2 ? 'battle' : 'pass', edges: { left: pair[0], right: pair[1] } };
-      nodes[node.id] = node; parents.push(node.id);
     }
-    layer = parents;
+    layer = next;
   }
-  return { id, name: def.name, depth, rootId: layer[0], terminalIds, nodes, version: MAP_VERSION };
+  return { id, name: def.name, depth, rootId: root.id, terminalIds, nodes, version: MAP_VERSION, generationVersion: MAP_GENERATION_VERSION };
 }
 
 // Keep every original node/event and its ID. Only duplicate incoming edges
