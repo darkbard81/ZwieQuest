@@ -30,6 +30,9 @@ export class Game {
   installMaps() { const s = this.state; s.maps = createMaps(this.rng); s.mapId = 'village'; s.checkpointHistory = []; s.currentNodeId = s.maps.village.rootId; s.theme = 'village'; s.step = 0; s.path = []; s.bossDefeats = s.bossDefeats || 0; s.enemy = null; s.battle = null; }
   log(type, text, detail = {}) { const e = { seq: ++this.state.eventSeq, at: Date.now(), type, text, ...detail }; this.events.push(e); this.state.lastEvent = e; }
   phase(phase, ms) { Object.assign(this.state, { phase, remaining: ms, duration: ms, phaseStartedAt: Date.now() }); }
+  normalSaleItems() {
+    return this.state.inventory.filter(item => item.gradeId === 'normal' && !equippedClassIds(this.state, item.id).length);
+  }
   item(kind, tier) {
     return generateEquipment({ slot: kind, rng: this.rng, gradeId: tier == null ? undefined : EQUIPMENT_CATALOG.grades[tier]?.id });
   }
@@ -81,10 +84,9 @@ export class Game {
     s.xp += xp; s.gold += gold;
     if (treasure) s.chests++; else s.victories++;
     // One shared 25% roll, then equal weapon / armor / accessory odds.
-    const slot = treasure ? 'charm' : chance(this.rng, EQUIPMENT_CATALOG.dropPercent)
+    const slot = !treasure && chance(this.rng, EQUIPMENT_CATALOG.dropPercent)
       ? ['weapon', 'armor', 'charm'][this.rng(3)] : null;
     const item = slot ? this.item(slot) : null;
-    // Chests grant one of the same six accessories with the shared five-grade roll.
     if (item) s.inventory.push(item);
     s.lastReward = { kind, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
     this.log(kind, `${boss ? '보스 격파' : treasure ? '보물 발견' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : ' · 장비 없음'}`, { xp, gold, itemId: item?.id || null });
@@ -162,8 +164,8 @@ export class Game {
     const ability = isHero ? '일반 공격' : '몸통 박치기';
     if (isHero) enemy.hp = Math.max(0, enemy.hp - result.damage); else s.hp = Math.max(0, s.hp - result.damage);
     b.ap--; b.attacks++;
-    b.lastHit = { ...result, actor: b.actor, ability, target, at: Date.now(), cost: 1, ap: b.ap, round: b.turn, tacticId: b.roundTactic };
-    this.log('hit', `라운드 ${b.turn} · ${isHero ? '모험가' : enemy.name} · ${ability} ${result.label} ${result.damage} 피해 (d20 ${result.roll}, ${target}, 1 AP, ${DAMAGE_NAMES[result.damageType]}${result.damageType === 'raw' ? ' 피해' : ` / AR ${result.effectiveAR}`})`, { hit: b.lastHit });
+    b.lastHit = { ...result, actor: b.actor, ability, target, attackerName: isHero ? '모험가' : enemy.name, defenderName: isHero ? enemy.name : '모험가', at: Date.now(), cost: 1, ap: b.ap, round: b.turn, tacticId: b.roundTactic };
+    this.log('hit', `${b.lastHit.attackerName} → ${b.lastHit.defenderName} · ${result.label}! ${DAMAGE_NAMES[result.damageType]} 피해 ${result.damage}`, { hit: b.lastHit });
     if (enemy.hp <= 0) { this.reward(enemy.boss ? 'boss' : 'victory'); return; }
     if (s.hp <= 0) { b.roundEffects = {}; this.phase('DOWNED', this.config.downedMs); this.log('downed', '잠시 쓰러졌습니다. 장비와 금화는 안전합니다. 여관으로 귀환합니다.'); return; }
     this.endAction();
@@ -211,6 +213,13 @@ export class Game {
     if (cmd.type === 'CREATE') { this.create(cmd.classId); return; }
     const s = this.state; if (!s) throw Error('먼저 클래스를 선택하세요.');
     if (cmd.type === 'CHOOSE') { if (cmd.choiceId !== s.choiceId || s.remaining <= 0) throw Error('선택 시간이 지났습니다.'); this.choose(cmd.direction); }
+    else if (cmd.type === 'SELL_NORMAL') {
+      const items = this.normalSaleItems(), ids = new Set(items.map(item => item.id));
+      if (!items.length) return;
+      const gold = items.reduce((sum, item) => sum + item.value, 0);
+      s.inventory = s.inventory.filter(item => !ids.has(item.id)); s.gold += gold;
+      this.log('sell', `일반 아이템 ${items.length}개 일괄 판매 · 금화 +${gold}`, { count: items.length, gold });
+    }
     else if (['EQUIP', 'UNEQUIP', 'SELL'].includes(cmd.type)) {
       const item = s.inventory.find(i => i.id === cmd.itemId); if (!item) throw Error('이미 판매했거나 없는 아이템입니다.');
       if (cmd.type === 'EQUIP') { s.equipment[item.slot] = item.id; this.log('equip', `${item.name} 장착 · 다음 공격부터 적용됩니다.`); }
@@ -243,6 +252,7 @@ export class Game {
     const roundEffects = state.phase === 'BATTLE' ? { ...state.battle.roundEffects } : {};
     const weapon = state.inventory.find(i => i.id === state.equipment.weapon);
     return { ...structuredClone(state),
+      normalSale: this.normalSaleItems().reduce((total, item) => ({ count: total.count + 1, gold: total.gold + item.value }), { count: 0, gold: 0 }),
       classProfiles: classProfiles(state, this.config),
       equipmentUsers: Object.fromEntries(state.inventory.map(i => [i.id, equippedClassIds(state, i.id)])),
       inventory: structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : i),

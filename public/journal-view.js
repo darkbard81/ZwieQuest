@@ -1,4 +1,5 @@
 import { logHTML } from './labels.js';
+import { combatLogHTML } from './combat-log.js';
 
 export function initJournal(list, panel, unread) {
   let latest = null, follow = true, reading = null;
@@ -24,7 +25,7 @@ export function initJournal(list, panel, unread) {
   document.addEventListener('info-tab-change', () => {
     if (panel.hidden) return;
     unread.hidden = true;
-    if (follow) bottom(); else restore();
+    follow = true; reading = null; bottom();
   });
   new ResizeObserver(() => { if (visible() && follow) bottom(); }).observe(list);
   return {
@@ -38,10 +39,7 @@ export function initJournal(list, panel, unread) {
         const item = document.createElement('li');
         item.className = entry.type;
         item.dataset.seq = String(entry.seq);
-        item.innerHTML = logHTML(entry.text);
-        const time = document.createElement('time');
-        time.textContent = new Date(entry.at).toLocaleTimeString('ko-KR', { hour12: false });
-        item.append(time);
+        item.innerHTML = entry.type === 'hit' ? combatLogHTML(entry) : logHTML(entry.text);
         return item;
       }));
       if (visible()) { if (follow) bottom(); else restore(); }

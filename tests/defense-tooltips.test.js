@@ -37,7 +37,7 @@ test('four defense names are Korean throughout badges, item details and combat l
   const strip=html=>html.replace(/<[^>]+>/g,'');
   assert.equal(strip(statLabelHTML(key,7)),`${statNames[key]} 7`);
   assert.equal(strip(logHTML(`${key} 7`)),`${statNames[key]} 7`);
-  assert.match(strip(itemDetailsHTML({slot:'weapon',stats:{},hitDefense:key})),new RegExp(`명중 판정: ${statNames[key]}`));
+  assert.equal(strip(itemDetailsHTML({slot:'weapon',stats:{},hitDefense:key})),statNames[key]);
  }
 });
 test('snapshot formulas follow class switches and equipment changes without stale values',()=>{

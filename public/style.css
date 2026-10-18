@@ -180,3 +180,15 @@ main{padding-top:12px}
 #stats .base-stats>span{display:inline-flex;align-items:center;gap:2px}
 .journal .ui-icon,.item p .ui-icon{width:15px;height:15px}
 .damage-tag{gap:4px}
+
+.inventory-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;margin:0 0 8px;flex:none}.inventory-tools span{font-size:10px;color:var(--muted)}.inventory-tools button{font-size:11px;padding:7px 9px}
+
+.item h3 .rarity{font-size:inherit;font-weight:600;margin-right:3px}.item-combat-tags{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;margin:3px 0}.item-stat-tag{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;border:1px solid var(--line);border-radius:4px;padding:0 4px}.item-special{color:var(--gold);font-size:10px}
+
+.item-heading{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px}.item-heading h3{flex:1;min-width:0;margin:0;overflow-wrap:anywhere;line-height:1.6}.item .item-heading .item-actions{flex:none;margin:0;white-space:nowrap}
+
+.combat-summary{display:block;color:var(--text);font-size:12px;margin-bottom:5px}.combat-calculation{display:block;color:var(--muted);font-size:10px;line-height:2.1}.combat-value-tag,.combat-stat-tag,.combat-result{display:inline-flex;align-items:center;gap:3px;vertical-align:middle;white-space:nowrap;border:1px solid var(--line);border-radius:4px;padding:0 4px;line-height:1.7;background:#203238}.combat-value-tag b{color:var(--text);font-variant-numeric:tabular-nums}.combat-stat-tag:has(>.defense-tag){padding:0;border:0;background:none}.combat-result{font-weight:700}.combat-result-0{color:#b4bfc4}.combat-result-1{color:#a4c6dc}.combat-result-2{color:#b9dfac}.combat-result-3{color:#f3cc73;border-color:#a78a4f}.combat-calculation .ui-icon{width:13px;height:13px}.combat-separator{padding:0 3px}
+
+#journal .combat-calculation :is(.damage-tag,.defense-tag,.combat-value-tag,.combat-stat-tag,.combat-result){vertical-align:middle;min-height:20px;font-size:10px;line-height:18px;align-items:center}#journal .combat-calculation .ui-icon{width:13px;height:13px}#journal .combat-calculation+.combat-calculation{margin-top:3px}
+
+#journal .combat-summary :is(.damage-tag,.combat-value-tag,.combat-result){vertical-align:middle;min-height:20px;font-size:10px;line-height:18px;align-items:center}#journal .combat-summary .ui-icon{width:13px;height:13px}

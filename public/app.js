@@ -1,4 +1,5 @@
 import { initJournal } from './journal-view.js';
+import { sortInventory } from './inventory-order.js';
 import { initDefenseDetails } from './defense-details.js';
 import { initInn } from './inn-view.js';
 import { appearanceFor } from './appearances.js';
@@ -81,7 +82,7 @@ function receive(next) {
   $('#battle-status').textContent = roundStatus(s);
   $('#enemy-hud').hidden = !s.enemy || s.phase !== 'BATTLE';
   if (s.enemy) $('#enemy-hud').innerHTML = `${esc(s.enemy.name)} · ${s.enemy.hp}/${s.enemy.maxHp}<div class="meter"><div style="width:${100 * s.enemy.hp / s.enemy.maxHp}%"></div></div>`;
-  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : '전투 보상으로 경험치와 금화를 얻었어요.') : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
+  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : `${s.lastReward?.kind === 'treasure' ? '보물상자에서' : '전투 보상으로'} 경험치와 금화를 얻었어요.`) : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
   $('#return-overlay').hidden = s.phase !== 'RETURN_HOME';
   if (s.phase === 'RETURN_HOME') $('#return-overlay').innerHTML = `<small>JOURNEY COMPLETE</small><h2>${s.lastSummary?.downed ? '무사히 돌아왔어요' : s.lastSummary?.reason === 'boss' ? '수호자를 넘어섰어요' : '길 끝에서, 다시 출발'}</h2><p>${s.run}번째 여행 · ${theme.name}</p><strong>+ ${s.lastSummary.gold} G</strong><p>성장과 전리품을 안전하게 저장했습니다.<br>마을의 집(HOME)으로 돌아갑니다.</p>`;
   if ($('#map-dialog')?.open) renderMap();
@@ -113,15 +114,19 @@ function renderEquipment(s) {
 function renderInventory(s) {
   const key = JSON.stringify([s.inventory, s.equipment, s.equipmentUsers, s.classId, filter]); if (key === inventoryKey) return; inventoryKey = key;
   $('#item-count').textContent = `${s.inventory.length}개`;
-  const items = s.inventory.filter(i => filter === 'all' || i.slot === filter).slice().reverse();
+  const sale = s.normalSale || { count: 0, gold: 0 };
+  $('#sell-normal').textContent = `일반 일괄 판매 (${sale.count}개 · ${sale.gold} G)`;
+  $('#sell-normal').disabled = !sale.count;
+  const items = sortInventory(s, filter);
   $('#inventory-list').innerHTML = items.length ? items.map(item => {
     const equipped = Object.values(s.equipment).includes(item.id);
     const users = s.equipmentUsers?.[item.id] || (equipped ? [s.classId] : []);
     const names = users.map(id => s.classProfiles?.[id]?.name || id).join('·');
-    return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><h3>${esc(item.name)}${users.length ? `<span class="equipped">${esc(names)} 장착</span>` : ''}</h3><p>${itemDetailsHTML(item)}</p><div class="item-actions"><span class="rarity">${esc(item.rarity)}${item.special ? ' · 특수' : ''}</span><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}">${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${users.length ? `disabled title="${esc(names)} 직업에서 장착을 해제해 주세요"` : ''}>판매 ${item.value} G</button></div></div></article>`;
+    return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3><span class="rarity">${esc(item.rarity)}</span> ${esc(item.name)}${users.length ? `<span class="equipped">${esc(names)} 장착</span>` : ''}${item.special ? ' <span class="item-special">특수</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}">${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${users.length ? `disabled title="${esc(names)} 직업에서 장착을 해제해 주세요"` : ''}>판매 ${item.value} G</button></div></div><p>${itemDetailsHTML(item)}</p></div></article>`;
   }).join('') : '<p class="muted">아직 발견한 장비가 없어요. 여행을 조금 더 지켜보세요.</p>';
 }
 $('#inventory-list').addEventListener('click', e => { const b = e.target.closest('[data-action]'); if (b) command(b.dataset.action, { itemId: b.dataset.item }, b); });
+$('#sell-normal').onclick = e => command('SELL_NORMAL', {}, e.currentTarget);
 $$('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; $$('[data-filter]').forEach(a => a.classList.toggle('active', a === b)); if (data?.state) renderInventory(data.state); });
 function canChoose() {
   const s = data?.state;

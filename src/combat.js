@@ -31,8 +31,10 @@ export function attack({ roll, acc, defense, str, base, pen, ar, damageTypes = [
   const armor = effectiveArmor(ar, damageTypes, typeModifiers);
   const raw = armor.damageType === 'raw';
   if (raw && (!Number.isInteger(fixedDamage) || fixedDamage < 0)) throw Error('Raw requires nonnegative fixed damage');
-  const damage = raw ? (hit.tier === 0 ? 0 : fixedDamage) : Math.floor(base * (1 + damageRate) * (1 + tacticDamageRate) * (1 + .05 * str) * hit.multiplier * penetration(pen, armor.effectiveAR));
-  return { ...hit, ...armor, damage, base, damageRate, tacticDamageRate, pen: raw ? null : pen, ar };
+  const factors = raw ? null : { grade: 1 + damageRate, tactic: 1 + tacticDamageRate, strength: 1 + .05 * str, hit: hit.multiplier, armor: penetration(pen, armor.effectiveAR) };
+  const damage = raw ? (hit.tier === 0 ? 0 : fixedDamage) : Math.floor(base * factors.grade * factors.tactic * factors.strength * factors.hit * factors.armor);
+  return { ...hit, ...armor, damage, base, damageRate, tacticDamageRate, pen: raw ? null : pen, ar,
+    calculation: { acc, defense, factors, fixedDamage: raw ? fixedDamage : null } };
 }
 export function stats(state, config) {
   return statDetails(state, config).values;

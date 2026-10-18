@@ -11,13 +11,15 @@ export function itemIconHTML(item, empty = 'armor') {
 export function itemDetailsHTML(item) {
   const pieces = [];
   if (item.damageTypes) {
-    const rate = 1 + (item.damageRate || 0), scaled = n => Number((n * rate).toFixed(2));
-    pieces.push(item.damageTypes.includes('raw') ? `고정 피해 <b>${item.fixedDamage}</b>` : `무기 피해 <b>${scaled(item.damageMin)}–${scaled(item.damageMax)}</b>${item.damageRate ? ` <small>(기본 ${item.damageMin}–${item.damageMax} · +${Math.round(item.damageRate * 100)}%)</small>` : ''}`);
-    pieces.push(`<span class="damage-types">${item.damageTypes.map(t => damageTagHTML(t)).join(' ')}</span>`);
+    const rate = 1 + (item.damageRate || 0), scaled = n => Math.floor(n * rate);
+    pieces.push(item.damageTypes.includes('raw') ? `고정 피해 <b>${Math.floor(item.fixedDamage)}</b>` : `무기 피해 <b>${scaled(item.damageMin)}–${scaled(item.damageMax)}</b>`);
   }
-  if (item.slot === 'charm' && item.primaryStat) pieces.push(`주 능력치: ${statLabelHTML(item.primaryStat)}${item.secondaryStat ? ` · 추가: ${statLabelHTML(item.secondaryStat)}` : ''}`);
-  if (item.slot === 'weapon' && item.hitDefense) pieces.push(`명중 판정: ${statLabelHTML(item.hitDefense)}`);
-  pieces.push(Object.entries(item.stats).map(([k, v]) => statLabelHTML(k, signed(v))).join(' · '));
-  if (item.typeModifiers && Object.keys(item.typeModifiers).length) pieces.push(`<span class="armor-matchups">${Object.entries(item.typeModifiers).map(([t, v]) => `<span class="armor-matchup">${damageTagHTML(t, signed(v))} <small>(방어도 ${item.stats.AR + v})</small></span>`).join(' · ')}</span>`);
+  if (item.slot === 'weapon') {
+    const tags = (item.damageTypes || []).map(t => damageTagHTML(t));
+    if (item.hitDefense) tags.push(statLabelHTML(item.hitDefense));
+    if (tags.length) pieces.push(`<span class="item-combat-tags">${tags.join('')}</span>`);
+  }
+  pieces.push(Object.entries(item.stats).map(([k, v]) => item.slot === 'armor' ? `<span class="item-stat-tag">${statLabelHTML(k, signed(v))}</span>` : statLabelHTML(k, signed(v))).join(item.slot === 'armor' ? ' ' : ' · '));
+  if (item.typeModifiers && Object.keys(item.typeModifiers).length) pieces.push(`<span class="armor-matchups">${Object.entries(item.typeModifiers).map(([t, v]) => damageTagHTML(t, signed(v))).join(' ')}</span>`);
   return pieces.filter(Boolean).join('<br>');
 }

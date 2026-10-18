@@ -40,7 +40,7 @@ test('three AP and attack penalties reset each turn',()=>{
 });
 test('downed preserves possessions and returns home; no inventory silent cap',()=>{
   const g=make();g.state.step=1;g.state.run=1;g.state.runGold=0;g.state.risk=0;g.beginBattle();g.state.hp=1;g.state.battle.actor='enemy';g.state.enemy.ACC=100;g.battleAction();assert.equal(g.state.phase,'DOWNED');g.advance();g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.state.hp,stats(g.state,config).maxHp);
-  const count=g.state.inventory.length;for(let i=0;i<120;i++)g.reward('treasure');assert.equal(g.state.inventory.length,count+120);
+  const count=g.state.inventory.length;g.rng=()=>0;for(let i=0;i<120;i++)g.reward('victory');assert.equal(g.state.inventory.length,count+120);
 });
 test('DEX initiative and configured tie policy determine first actor',()=>{
  const cfg=structuredClone(config);cfg.initiative.enemyDEX=2;const g=new Game(cfg);g.create('warrior');g.state.step=1;g.state.risk=0;g.beginBattle();assert.equal(g.state.battle.actor,'enemy');
