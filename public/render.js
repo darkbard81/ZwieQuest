@@ -1,4 +1,5 @@
 import { createTravelCamera } from './travel-camera.js';
+import { REGIONS } from './regions.js';
 import { createHeroAnimator } from './hero-animation.js';
 import { APPEARANCES, appearanceFor, appearanceAssets, mirrorAppearance } from './appearances.js';
 const { Assets, CanvasRenderer, Container, Graphics, Rectangle, Sprite, Text, Texture, VERSION, autoDetectRenderer } = globalThis.PIXI;
@@ -12,7 +13,7 @@ export async function createWorld(container) {
   await Assets.init({ preferences: { preferWorkers: false } });
   const names = ['village', 'volcano', 'beach', 'desert', 'snow', 'pub', 'icons'];
   const loaded = await Promise.all([
-    ...names.map(name => Assets.load(`/assets/${name}.png`)),
+    ...names.map(name => Assets.load(REGIONS[name]?.canvas || `/assets/${name}.png`)),
     ...APPEARANCES.map(({ id, assetVersion = 'inn-1' }) => Assets.load(`${appearanceAssets(id)}/sprite.png?v=${assetVersion}`)),
     ...APPEARANCES.map(({ id, assetVersion = 'inn-1' }) => fetch(`${appearanceAssets(id)}/sprite.json?v=${assetVersion}`).then(response => response.json()))
   ]);

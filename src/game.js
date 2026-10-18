@@ -2,7 +2,7 @@ import { randomInt, randomUUID } from 'node:crypto';
 import { findAppearance, defaultAppearance } from '../public/appearances.js';
 import { initializeClassProgress, switchClassProgress, equippedClassIds, classProfiles } from './class-progress.js';
 import { attack, stats, statDetails, levelBonus } from './combat.js';
-import { MAP_DEFS, createMaps, migrateMaps } from './maps.js';
+import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
 import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
 import { rollEncounter } from './encounters.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
@@ -15,6 +15,7 @@ export class Game {
     if (state) {
       state.progressId ||= randomUUID();
       if (migrateMaps(state)) this.log('map', '경로 지도를 합류 없는 트리로 정리했습니다. 현재 위치와 진행 중인 모험은 유지됩니다.');
+      for (const map of Object.values(state.maps)) refreshMapNames(map);
       this.rememberExploration();
       if (!availableStarts(state).includes(state.departureMapId)) state.departureMapId = 'village';
       state.autoRoute ??= null;

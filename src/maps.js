@@ -1,10 +1,22 @@
-export const MAP_DEFS = {
-  village: { name: '바람꽃 마을', subtitle: '모든 여행이 시작되는 곳', terminals: [...Array.from({ length: 6 }, (_, i) => ({ kind: 'deadend', label: `마을 막다른 길 ${i + 1}` })), ...['volcano', 'snow', 'desert', 'beach'].map(region => ({ kind: 'exit', region, label: { volcano: '화산으로 가는 길', snow: '설원으로 가는 길', desert: '사막으로 가는 길', beach: '해변으로 가는 길' }[region] }))] },
-  volcano: { name: '잿불 화산', subtitle: '붉은 산맥 깊이 잠든 수호자', boss: '잿불의 군주' },
-  snow: { name: '별빛 설원', subtitle: '고요한 눈길 끝의 온기', boss: '서리 왕관' },
-  desert: { name: '황금빛 사막', subtitle: '모래 아래 잠든 작은 비밀', boss: '사막의 파수꾼' },
-  beach: { name: '푸른달 해변', subtitle: '파도 너머 들려오는 노래', boss: '밀물의 수호자' }
-};
+import { REGIONS } from '../public/regions.js';
+const bosses = { volcano: '잿불의 군주', snow: '서리 왕관', desert: '사막의 파수꾼', beach: '밀물의 수호자' };
+export const MAP_DEFS = Object.fromEntries(Object.entries(REGIONS).map(([id, { name, subtitle }]) => [id, {
+  name, subtitle,
+  ...(id === 'village' ? { terminals: [
+    ...Array.from({ length: 6 }, (_, i) => ({ kind: 'deadend', label: `마을 막다른 길 ${i + 1}` })),
+    ...Object.keys(bosses).map(region => ({ kind: 'exit', region, label: `${REGIONS[region].name} 연결` }))
+  ] } : { boss: bosses[id] })
+}]));
+
+export function refreshMapNames(map) {
+  const def = MAP_DEFS[map.id], previousName = map.name;
+  map.name = def.name;
+  for (const node of Object.values(map.nodes)) {
+    if (node.kind === 'exit') node.label = `${REGIONS[node.region].name} 연결`;
+    else if (node.kind === 'start') node.label = map.id === 'village' ? 'HOME' : `${def.name} 출발점`;
+    else if (node.kind === 'path' && previousName !== def.name && node.label.startsWith(previousName)) node.label = def.name + node.label.slice(previousName.length);
+  }
+}
 export const MAP_VERSION = 2;
 // Generation rules are independent of the saved graph format. Existing trees stay intact.
 export const MAP_GENERATION_VERSION = 3;

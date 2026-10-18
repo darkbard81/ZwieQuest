@@ -4,9 +4,10 @@
       "file": "beach.png",
       "width": 1672,
       "height": 941,
-      "sha256": "2ddfe85968671c9cb6a778300a4a36750c717a7eaa6f17c44d36e83a43479f80",
+      "sha256": "f2759522a6fb79f1209e6b759e1527986cfeec0c1db5d606654b3fdd6ce98965",
       "source": "built-in image_gen.imagegen",
-      "runtime": true
+      "runtime": true,
+      "prompt": "ASSET-PROMPTS.md#region-refresh-20261018"
     },
     {
       "file": "volcano.png",
@@ -44,9 +45,10 @@
       "file": "desert.png",
       "width": 1672,
       "height": 940,
-      "sha256": "aecf91345960e2f61aa7bc7528303d60a816912c1d45ef4775b60a4f5c4c43bc",
+      "sha256": "35fa126aa4da76858397abe82e560f23ecf9c760f7bfe34b856a9e63eaa9b4cf",
       "source": "built-in image_gen.imagegen",
-      "runtime": true
+      "runtime": true,
+      "prompt": "ASSET-PROMPTS.md#region-refresh-20261018"
     },
     {
       "file": "forest.png",
@@ -64,6 +66,42 @@
       "source": "built-in image_gen.imagegen",
       "prompt": "pub-prompt.txt",
       "runtime": true
+    },
+    {
+      "file": "maps/volcano-route-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "127c15624b3dab8f6f45935c3b9a8d8bad1e5f0878dbae3a5207a140a9edb445",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true,
+      "prompt": "ASSET-PROMPTS.md#region-refresh-20261018"
+    },
+    {
+      "file": "maps/snow-route-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "05660cd61aa2089f67ef1faee4e93d7fb4e61ea4e93c90d21735ec74c2783bf4",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true,
+      "prompt": "ASSET-PROMPTS.md#region-refresh-20261018"
+    },
+    {
+      "file": "maps/desert-route-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "6813de50514949a35e337531205e6c47beb9cba4ee8e93ec7d18a8620b4cbcca",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true,
+      "prompt": "ASSET-PROMPTS.md#region-refresh-20261018"
+    },
+    {
+      "file": "maps/beach-route-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "7b88cacca361ac1f905b813a8dab49198ed5f04e760f58b350cd0e03fffd4e54",
+      "source": "built-in image_gen.imagegen",
+      "runtime": true,
+      "prompt": "ASSET-PROMPTS.md#region-refresh-20261018"
     }
   ],
   "renderer": {

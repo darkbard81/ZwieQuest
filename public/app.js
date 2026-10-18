@@ -1,4 +1,5 @@
 import { mapSVG } from './map-view.js';
+import { REGIONS } from './regions.js';
 import { mapViewState, nodeLabels } from './map-navigation.js';
 import { initJournal } from './journal-view.js';
 import { sortInventory } from './inventory-order.js';
@@ -59,7 +60,7 @@ function receive(next) {
   if (!s) { world?.update(null); if (user && !$('#welcome').open) $('#welcome').showModal(); return; }
   if ($('#welcome').open) $('#welcome').close(); world?.update(s); world?.playEvents(combatEvents);
   const theme = next.themes.find(t => t.id === s.theme);
-  $('#biome-tag').textContent = s.phase === 'HOME' ? 'PUB / REST' : s.theme.toUpperCase();
+  $('#biome-tag').textContent = s.phase === 'HOME' ? 'PUB / REST' : REGIONS[s.theme].tag;
   $('#biome-name').textContent = s.phase === 'HOME' ? '여행자의 여관' : theme.name; $('#biome-sub').textContent = s.phase === 'HOME' ? '잠시 쉬며 다음 여행을 준비해요' : theme.subtitle; $('#phase-badge').textContent = s.enemy?.boss && s.phase === 'BATTLE' ? '지역 보스전' : phases[s.phase];
   $('#journey-summary').textContent = `완료한 여행 ${s.completed}회 · 승리 ${s.victories}회 · 보물 ${s.chests}개`; $('#gold-total').textContent = s.gold.toLocaleString();
   $('#class-label').textContent = s.classId.toUpperCase(); $('#hero-name').textContent = appearanceFor(s).name; $('#hero-level').textContent = `Lv. ${s.level} · ${user?.username || '모험가'}`;
@@ -227,7 +228,7 @@ $('#map-graph').onkeydown = event => {
 function renderMap() {
   if (!data?.state) return;
   const s = mapViewState(data.state), select = $('#map-start-region');
-  const starts = s.availableStarts || [{ id: 'village', name: '바람꽃 마을' }], options = JSON.stringify(starts);
+  const starts = s.availableStarts || [{ id: 'village', name: REGIONS.village.name }], options = JSON.stringify(starts);
   if (select.dataset.options !== options) { select.innerHTML = starts.map(map => `<option value="${esc(map.id)}">${esc(map.name)}</option>`).join(''); select.dataset.options = options; }
   if (!mapStartPending) select.value = s.departureMapId || 'village';
   select.disabled = !connected || mapStartPending;
@@ -240,6 +241,7 @@ function renderMap() {
   const graph = $('#map-graph'), { scrollLeft, scrollTop } = graph;
   const previousCurrent = graph.querySelector('.map-node.current')?.dataset.node;
   graph.dataset.map = s.mapId; graph.innerHTML = mapSVG(s, scale, data.themes);
+  graph.style.backgroundImage = `linear-gradient(#16333166,#11292888),url('${REGIONS[s.mapId].route}')`;
   graph.scrollLeft = scrollLeft; graph.scrollTop = scrollTop;
   if (mapDialog.open && previousCurrent !== s.currentNodeId) requestAnimationFrame(() => focusMapNode(s.currentNodeId));
 }

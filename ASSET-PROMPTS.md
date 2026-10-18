@@ -9,8 +9,8 @@
 | `public/assets/village.png` | 마을/HOME의 모든 노드. 새 생성 |
 | `public/assets/volcano.png` | 화산의 모든 노드. 새 생성 |
 | `public/assets/snow.png` | 설원의 모든 노드. 이번 작업에서 생성한 배경 재사용 |
-| `public/assets/desert.png` | 사막의 모든 노드. 이번 작업에서 생성한 배경 재사용 |
-| `public/assets/beach.png` | 해변의 모든 노드. 첫 4:3 결과를 폐기하고 내장 편집 생성으로 넓은 구도 수정 |
+| `public/assets/desert.png` | 산성 호수의 모든 노드. 2026-10-18 교체 |
+| `public/assets/beach.png` | 낙뢰 고원의 모든 노드. 2026-10-18 교체 |
 | `public/assets/forest.png` | 초기 구현 시 생성. 최신 맵에서는 사용하지 않고 생성 원본 보존 |
 | `public/assets/icons.png` | 무기·갑옷·부적·상자·몬스터. 4열×2행 투명 아틀라스 |
 
@@ -52,3 +52,55 @@ Use case: stylized-concept. A production 2D anime fantasy game icon atlas with e
 - 프레임별 크기 변경 없이 클래스 공통 배율과 동작별 고정 발 기준점을 사용합니다. 마법사 시전과 전사 승리 영상의 확대 차이는 동작 전체에 한 가지 고정 배율을 적용해 보정합니다. 마젠타 배경을 분리하고 경계 색만 보정하여 보라색 의상의 불필요한 투명화를 방지했습니다.
 - 288개 셀의 프레임 수·알파·잘림 검사, 원본 타임라인과 추출 시트 검수, 밝고 어두운 배경의 4배 확대 가장자리 검수 및 실제 브라우저 재생 검증을 수행했습니다. `quality.json`과 `evidence/sprite-hq-20261016/`에 결과를 보관합니다.
 - 원본 생성 영상의 신체·의상 형태 변화와 전사 Idle의 가벼운 발 움직임은 남습니다. Wizard 정면·측면 Base의 의상·머리 장식 차이와 승리 영상의 작은 반짝임도 유지합니다. 재추출만으로 원본 영상에 없는 세부 묘사를 복구하지는 않습니다.
+
+## Region refresh 20261018
+
+내장 `image_gen.imagegen`으로 캔버스 2장과 경로 지도 4장을 생성했습니다. 캔버스는 기존 desert/beach를 구도·화풍 참조로, 경로 지도는 기존 village-route를 화풍 참조로 사용했습니다. 모두 RGB PNG이며 생성 원본이 요청 규격과 일치하여 크기 변경 없이 복사했습니다. 기존 파일명과 맵 ID는 저장 호환성을 위해 유지합니다. 새싹마을 경로 지도와 마을·분화구·설원·여관 캔버스는 유지합니다. 교체 전 원본과 작업 기록은 Git 제외된 `art-workbench/backgrounds/region-refresh-20261018/`에 보관합니다.
+
+### acid-lake-canvas
+
+최종 파일: `public/assets/desert.png` (1672×940, RGB PNG).
+
+```text
+Use case: stylized-concept. Asset type: production panoramic background for a 2D SD anime fantasy RPG gameplay canvas. Create a NEW environment illustration, wide approximately 16:9 composition, opaque RGB. Input image 1 is STYLE AND CAMERA COMPOSITION REFERENCE ONLY, not an edit target: match its polished hand-painted 2D anime landscape rendering, softened outlines, detailed distant scenery and open foreground stage, but create the requested new biome. Eye-level scenic side view with distant horizon. Keep the lower third as a broad, dry, flat horizontal ground plane where small characters will walk and fight; the hero feet are at about 82% image height. Foreground must continue across the full width and remain walkable and uncluttered at all horizontal pan positions. Distant scenery above the ground, atmospheric depth, readable background behind small sprites. No characters, monsters, buildings, UI, text, labels, icons, route lines, frames or watermark. Primary request: Acid Lake (산성 호수). A fantasy corrosive lake with softly luminous yellow-green water, pale mineral deposits along the shoreline, eroded gray rocky banks and distant ridges, subtle rising vapour, subdued overcast light. Distinctly acidic mineral water rather than clear ocean water or a sandy desert. The lower foreground is a safe dry gray mineral shore, not liquid; keep the main water surface in the middle distance. Do not copy the reference desert cliffs, ruins, arches or sunset. Final target size 1672x940.
+```
+
+### thunder-plateau-canvas
+
+최종 파일: `public/assets/beach.png` (1672×941, RGB PNG).
+
+```text
+Use case: stylized-concept. Asset type: production panoramic background for a 2D SD anime fantasy RPG gameplay canvas. Create a NEW environment illustration, wide approximately 16:9 composition, opaque RGB. Input image 1 is STYLE AND CAMERA COMPOSITION REFERENCE ONLY, not an edit target: match its polished hand-painted 2D anime landscape rendering, softened outlines, detailed distant scenery and open foreground stage, but create the requested new biome. Eye-level scenic side view with distant horizon. Keep the lower third as a broad, dry, flat horizontal ground plane where small characters will walk and fight; the hero feet are at about 82% image height. Foreground must continue across the full width and remain walkable and uncluttered at all horizontal pan positions. Distant scenery above the ground, atmospheric depth, readable background behind small sprites. No characters, monsters, buildings, UI, text, labels, icons, route lines, frames or watermark. Primary request: Lightning Plateau (낙뢰 고원). A windswept elevated rocky grassland with layered highland mesas, weathered stone ridges and sparse short grass, distant storm clouds and a few visible slender lightning forks in the far sky. Cool storm daylight with readable softly lit ground; dramatic but compatible with charming SD anime characters. This is an inland high plateau, not a beach: no sea, ocean, sand beach, lighthouse or tropical vegetation. Lower third is a broad flat rocky grassland stage. Final target size 1672x941.
+```
+
+### crimson-crater-route
+
+최종 파일: `public/assets/maps/volcano-route-v1.png` (1536×1024, RGB PNG).
+
+```text
+Use case: stylized-concept. Asset type: production environment backdrop for a scrollable route-map UI in a 2D SD anime fantasy RPG. Create a NEW 1536x1024 landscape illustration, exact 3:2 aspect ratio, opaque RGB. Input image 1 is STYLE AND TOP-VIEW CAMERA REFERENCE ONLY, not an edit target. Match its hand-painted 2D SD anime style, soft clean linework, simplified chunky terrain, detailed but gentle natural textures. True vertical TOP-DOWN 90-degree overhead orthographic plan view, no horizon, no sky, no isometric tilt, no visible vertical front facades. Most of the central area must be spacious, quiet and low contrast for an independent route-node overlay; terrain details should be concentrated around the perimeter. No route network, connecting paths, markers, circles, symbols, arrows, labels, text, UI, compass, borders, characters, monsters, buildings or watermark. Primary request: Crimson Crater (홍련 분화구). A volcanic crater region viewed straight down, with rounded dark volcanic rocks and weathered crater rims around the outer area, a few restrained glowing crimson lava fissures and pools at the perimeter, and a broad calm ash-and-basalt central floor. Use charcoal earth and muted warm volcanic tones, with lava as small accents so the route overlay remains readable. Not a village; no vegetation fields or houses.
+```
+
+### white-night-snowfield-route
+
+최종 파일: `public/assets/maps/snow-route-v1.png` (1536×1024, RGB PNG).
+
+```text
+Use case: stylized-concept. Asset type: production environment backdrop for a scrollable route-map UI in a 2D SD anime fantasy RPG. Create a NEW 1536x1024 landscape illustration, exact 3:2 aspect ratio, opaque RGB. Input image 1 is STYLE AND TOP-VIEW CAMERA REFERENCE ONLY, not an edit target. Match its hand-painted 2D SD anime style, soft clean linework, simplified chunky terrain, detailed but gentle natural textures. True vertical TOP-DOWN 90-degree overhead orthographic plan view, no horizon, no sky, no isometric tilt, no visible vertical front facades. Most of the central area must be spacious, quiet and low contrast for an independent route-node overlay; terrain details should be concentrated around the perimeter. No route network, connecting paths, markers, circles, symbols, arrows, labels, text, UI, compass, borders, characters, monsters, buildings or watermark. Primary request: White Night Snowfield (백야 설원). A broad softly lit snowfield under pale lingering midnight-sun light, viewed straight down; snowy boulders, frost-covered conifer canopy tops, a few quiet frozen pools and snow drifts around the edges. The central area is smooth gently textured snow with subtle cool shadows. Soft pale blue-white and light lavender shadows, calm northern atmosphere, no night sky or horizon, no strong glare, no footprints or drawn trails.
+```
+
+### acid-lake-route
+
+최종 파일: `public/assets/maps/desert-route-v1.png` (1536×1024, RGB PNG).
+
+```text
+Use case: stylized-concept. Asset type: production environment backdrop for a scrollable route-map UI in a 2D SD anime fantasy RPG. Create a NEW 1536x1024 landscape illustration, exact 3:2 aspect ratio, opaque RGB. Input image 1 is STYLE AND TOP-VIEW CAMERA REFERENCE ONLY, not an edit target. Match its hand-painted 2D SD anime style, soft clean linework, simplified chunky terrain, detailed but gentle natural textures. True vertical TOP-DOWN 90-degree overhead orthographic plan view, no horizon, no sky, no isometric tilt, no visible vertical front facades. Most of the central area must be spacious, quiet and low contrast for an independent route-node overlay; terrain details should be concentrated around the perimeter. No route network, connecting paths, markers, circles, symbols, arrows, labels, text, UI, compass, borders, characters, monsters, buildings or watermark. Primary request: Acid Lake (산성 호수). A corrosive mineral lake basin viewed straight down, with irregular yellow-green acidic pools around the perimeter, pale sulfur-like mineral rims, weathered gray stone banks and sparse low vapour. The middle is a broad flat muted mineral terrace with soft low-contrast texture for the route overlay. Match the dangerous yet charming anime game environment, not a sandy desert or clear blue sea.
+```
+
+### lightning-plateau-route
+
+최종 파일: `public/assets/maps/beach-route-v1.png` (1536×1024, RGB PNG).
+
+```text
+Use case: stylized-concept. Asset type: production environment backdrop for a scrollable route-map UI in a 2D SD anime fantasy RPG. Create a NEW 1536x1024 landscape illustration, exact 3:2 aspect ratio, opaque RGB. Input image 1 is STYLE AND TOP-VIEW CAMERA REFERENCE ONLY, not an edit target. Match its hand-painted 2D SD anime style, soft clean linework, simplified chunky terrain, detailed but gentle natural textures. True vertical TOP-DOWN 90-degree overhead orthographic plan view, no horizon, no sky, no isometric tilt, no visible vertical front facades. Most of the central area must be spacious, quiet and low contrast for an independent route-node overlay; terrain details should be concentrated around the perimeter. No route network, connecting paths, markers, circles, symbols, arrows, labels, text, UI, compass, borders, characters, monsters, buildings or watermark. Primary request: Lightning Plateau (낙뢰 고원). A windswept highland plateau viewed straight down, with weathered rock outcrops, flattened short grasses, dark storm-scorched patches and a few tiny restrained blue-white electrical arcs around perimeter stones. Broad open central stony grassland, subdued storm daylight in cool gray-green tones. Indicate storm weather through light and terrain, without sky or foreground clouds obscuring the map. No ocean, beach or desert.
+```
