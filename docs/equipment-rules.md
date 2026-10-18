@@ -35,7 +35,7 @@
 
 ## 이미지
 
-내장 imagegen으로 카테고리별 1회씩 생성한 PNG 24개를 `public/assets/equipment/*-v1.png`에 저장한다. 원본 알파를 유지하며 가방과 장착 슬롯에서 사용한다. 기존 부적·구 장비 아이콘은 원래 자료를 계속 사용한다. 생성 프롬프트와 파일 메타데이터는 `docs/equipment-image-prompts.json`에 기록한다.
+내장 imagegen으로 카테고리별 1회씩 생성한 PNG 24개와 부적 PNG 6개의 원본은 `art-workbench/equipment/originals/`에 보관한다. 게임은 `public/assets/equipment/*-v1.webp`의 128×128 무손실 WebP 사본을 가방과 장착 슬롯에서 사용하며 투명 배경을 유지한다. 축소본 규격·해시는 `docs/equipment-runtime-images.json`에 기록한다. 생성 프롬프트와 파일 메타데이터는 `docs/equipment-image-prompts.json`에 기록한다.
 
 ## 검증 및 후속 밸런스
 

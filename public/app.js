@@ -1,3 +1,4 @@
+import { mapSVG } from './map-view.js';
 import { initJournal } from './journal-view.js';
 import { sortInventory } from './inventory-order.js';
 import { initDefenseDetails } from './defense-details.js';
@@ -184,14 +185,31 @@ api('/api/auth/me').then(r => { user = r.user; adminSettings.setUser(user); if (
 window.zwiequestDiagnostics = () => ({ render: world?.diagnostics(), phase: data?.state?.phase, eventSeq: data?.state?.eventSeq, connected });
 
 const mapButton = document.createElement('button'); mapButton.id = 'map-button'; mapButton.className = 'quiet'; mapButton.textContent = '경로 지도'; $('nav').insertBefore(mapButton, $('#restore'));
-const mapDialog = document.createElement('dialog'); mapDialog.id = 'map-dialog'; mapDialog.innerHTML = '<button class="dialog-close" aria-label="지도 닫기">×</button><p class="eyebrow">FORWARD, ALWAYS</p><h2 id="map-title">경로 지도</h2><p id="map-subtitle"></p><div id="map-graph"></div><p class="map-legend">● 현재 위치　● 지나온 길　· 양쪽 경로는 항상 다음 깊이로 이어집니다.</p>'; document.body.append(mapDialog);
-mapDialog.querySelector('.dialog-close').onclick = () => mapDialog.close(); mapButton.onclick = () => { if (!data?.state) return toast('먼저 모험가를 선택하세요.'); renderMap(); mapDialog.showModal(); };
+const mapDialog = document.createElement('dialog'); mapDialog.id = 'map-dialog';
+mapDialog.innerHTML = '<button class="dialog-close" aria-label="지도 닫기">×</button><p class="eyebrow">FORWARD, ALWAYS</p><h2 id="map-title">경로 지도</h2><p id="map-subtitle"></p><div class="map-toolbar"><span>탐험한 경로 · 갈림길 너머는 도착 후 공개</span><button id="map-root">시작점</button><button id="map-current">현재 위치</button><label>배율 <select id="map-scale"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1" selected>100%</option><option value="1.25">125%</option></select></label></div><div id="map-graph" tabindex="0" aria-label="경로 지도 스크롤 영역"></div><p class="map-legend"><span class="current">● 현재 위치</span><span class="visited">● 탐험한 곳</span><span class="unknown">○ 미탐험 갈림길</span><span class="exit">● 체크포인트</span><span class="deadend">● 막다른 길</span><span class="boss">● 보스</span></p>';
+document.body.append(mapDialog);
+let mapRenderKey = '';
+function focusMapNode(id) {
+  const graph = $('#map-graph'), node = [...graph.querySelectorAll('[data-node]')].find(n => n.dataset.node === id);
+  if (!node) return;
+  const bounds = graph.getBoundingClientRect(), target = node.getBoundingClientRect();
+  graph.scrollLeft += target.x + target.width / 2 - bounds.x - graph.clientWidth / 2;
+  graph.scrollTop += target.y + target.height / 2 - bounds.y - graph.clientHeight / 2;
+}
+mapDialog.querySelector('.dialog-close').onclick = () => mapDialog.close();
+mapButton.onclick = () => { if (!data?.state) return toast('먼저 모험가를 선택하세요.'); renderMap(); mapDialog.showModal(); requestAnimationFrame(() => focusMapNode(data.state.currentNodeId)); };
+$('#map-root').onclick = () => focusMapNode(data.state.mapGraph.rootId);
+$('#map-current').onclick = () => focusMapNode(data.state.currentNodeId);
+$('#map-scale').onchange = () => { renderMap(); focusMapNode(data.state.currentNodeId); };
 function renderMap() {
- const s = data?.state; if (!s) return; const map = s.mapGraph, nodes = Object.values(map.nodes), pos = {}, visited = new Set(s.path.flatMap(p => [p.from, p.to]));
- $('#map-title').textContent = map.name + ' · 깊이 ' + s.step + ' / 10'; $('#map-subtitle').textContent = '체크포인트 통과 기록: ' + (s.checkpointHistory.map(c => data.themes.find(t => t.id === c.mapId).name).join(', ') || '아직 없음') + ' · 기록은 이동이나 귀환에 사용되지 않습니다. · 마지막 지점 ' + map.terminalIds.length + '곳';
- for(let d=0; d<=10; d++) { const layer = nodes.filter(n=>n.depth===d); layer.forEach((n,i)=>pos[n.id]={x:28+d*76,y:30+(i+.5)*480/layer.length}); }
- let svg='<svg viewBox="0 0 1060 540" role="img" aria-label="깊이 10의 전진 경로 지도">';
- for(const n of nodes) for(const target of Object.values(n.edges||{})) { const a=pos[n.id],b=pos[target];svg+=`<path d="M${a.x},${a.y} L${b.x},${b.y}" stroke="#486457" stroke-width="1" fill="none"/>`; }
- for(const n of nodes) { const p=pos[n.id],color=n.id===s.currentNodeId?'#efcf80':visited.has(n.id)?'#acdbab':n.kind==='exit'?'#b6a4e2':n.kind==='boss'?'#ea9a87':'#6b9481';svg+=`<g><title>${esc(n.label)}</title><circle cx="${p.x}" cy="${p.y}" r="${n.id===s.currentNodeId?7:4}" fill="${color}"/>${n.depth===10?`<text x="${p.x+12}" y="${p.y+4}" fill="${color}" font-size="11">${esc(n.label)}</text>`:''}</g>`; }
- for(let d=0;d<=10;d++)svg+=`<text x="${28+d*76}" y="530" fill="#9eb7a6" font-size="10">${d}</text>`; $('#map-graph').innerHTML=svg+'</svg>';
+  const s = data?.state; if (!s) return;
+  const scale = Number($('#map-scale').value), key = JSON.stringify([s.mapGraph, s.currentNodeId, s.path, s.exploredNodes, s.checkpointHistory, scale]);
+  if (key === mapRenderKey) return; mapRenderKey = key;
+  $('#map-title').textContent = `${s.mapGraph.name} · 깊이 ${s.step} / ${s.mapGraph.depth}`;
+  $('#map-subtitle').textContent = '체크포인트 통과 기록: ' + (s.checkpointHistory.map(c => data.themes.find(t => t.id === c.mapId)?.name || c.mapId).join(', ') || '아직 없음') + ' · 통과 기록은 이동·귀환에 사용되지 않습니다.';
+  const graph = $('#map-graph'), { scrollLeft, scrollTop } = graph;
+  const previousCurrent = graph.querySelector('.map-node.current')?.dataset.node;
+  graph.dataset.map = s.mapId; graph.innerHTML = mapSVG(s, scale);
+  graph.scrollLeft = scrollLeft; graph.scrollTop = scrollTop;
+  if (mapDialog.open && previousCurrent !== s.currentNodeId) requestAnimationFrame(() => focusMapNode(s.currentNodeId));
 }

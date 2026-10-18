@@ -8,265 +8,289 @@
       "id": "dagger",
       "slot": "weapon",
       "name": "단검",
-      "file": "public/assets/equipment/dagger-v1.png",
+      "file": "art-workbench/equipment/originals/dagger-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A short double-edged steel dagger with a leather grip. Hand-painted anime game item illustration, crisp dark contour, rich metal and leather shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "0982e2bd155d0b411868c8a92f01557639ec913a8710bad1fba7159dcd4c9ad5",
-      "bytes": 756283
+      "bytes": 756283,
+      "runtimeFile": "public/assets/equipment/dagger-v1.webp"
     },
     {
       "id": "shortsword",
       "slot": "weapon",
       "name": "숏소드",
-      "file": "public/assets/equipment/shortsword-v1.png",
+      "file": "art-workbench/equipment/originals/shortsword-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A compact straight steel short sword with a simple crossguard. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "f70e8d8f902ebd5a820651d91a8d0fe0a2532881297e4d21c50dfe56b9780c75",
-      "bytes": 655062
+      "bytes": 655062,
+      "runtimeFile": "public/assets/equipment/shortsword-v1.webp"
     },
     {
       "id": "longsword",
       "slot": "weapon",
       "name": "롱소드",
-      "file": "public/assets/equipment/longsword-v1.png",
+      "file": "art-workbench/equipment/originals/longsword-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An elegant straight steel longsword with a teal leather grip and restrained gold crossguard. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "55c4c1104d6cb2a4a128a9469aed8303926d305f7c6ccdf03813c7a988b71b21",
-      "bytes": 492631
+      "bytes": 492631,
+      "runtimeFile": "public/assets/equipment/longsword-v1.webp"
     },
     {
       "id": "rapier",
       "slot": "weapon",
       "name": "레이피어",
-      "file": "public/assets/equipment/rapier-v1.png",
+      "file": "art-workbench/equipment/originals/rapier-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A slender thrusting rapier with a swept basket guard. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "fddc1cbda0d682f23723c90bce5e72f5fbaf3af12e6242aaecd4300eb883921f",
-      "bytes": 589234
+      "bytes": 589234,
+      "runtimeFile": "public/assets/equipment/rapier-v1.webp"
     },
     {
       "id": "greatsword",
       "slot": "weapon",
       "name": "대검",
-      "file": "public/assets/equipment/greatsword-v1.png",
+      "file": "art-workbench/equipment/originals/greatsword-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A massive broad two-handed greatsword with a long grip. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "57f5f517201671a341a171aa51a8ca20776513203ab4662e55b30be00f5274a7",
-      "bytes": 941247
+      "bytes": 941247,
+      "runtimeFile": "public/assets/equipment/greatsword-v1.webp"
     },
     {
       "id": "handaxe",
       "slot": "weapon",
       "name": "손도끼",
-      "file": "public/assets/equipment/handaxe-v1.png",
+      "file": "art-workbench/equipment/originals/handaxe-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A compact single-bladed hand axe with a short wooden handle. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "ad636d044f513e0ba0f11912a30960776a7a6fe43567fa56d1adb629bb207f12",
-      "bytes": 1163615
+      "bytes": 1163615,
+      "runtimeFile": "public/assets/equipment/handaxe-v1.webp"
     },
     {
       "id": "battleaxe",
       "slot": "weapon",
       "name": "전투도끼",
-      "file": "public/assets/equipment/battleaxe-v1.png",
+      "file": "art-workbench/equipment/originals/battleaxe-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A large double-bladed battle axe with a long reinforced wooden handle. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "bd27e5278dc642d547b7e64f669b832fbb0e3eadfaa9c48c43715fc9092ea82c",
-      "bytes": 1094175
+      "bytes": 1094175,
+      "runtimeFile": "public/assets/equipment/battleaxe-v1.webp"
     },
     {
       "id": "mace",
       "slot": "weapon",
       "name": "메이스",
-      "file": "public/assets/equipment/mace-v1.png",
+      "file": "art-workbench/equipment/originals/mace-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A flanged steel mace with a short dark leather handle. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "24291e1c6dcb2df3efe2fe79fbcf5926990b1188bfb6b1ca7ee2f9c788727215",
-      "bytes": 1012717
+      "bytes": 1012717,
+      "runtimeFile": "public/assets/equipment/mace-v1.webp"
     },
     {
       "id": "warhammer",
       "slot": "weapon",
       "name": "전투망치",
-      "file": "public/assets/equipment/warhammer-v1.png",
+      "file": "art-workbench/equipment/originals/warhammer-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A heavy square-headed warhammer with a reinforced long handle. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "16c90a327b9444888bb49155dc8d3d05be75b346e4151632ce13f05aac180c50",
-      "bytes": 962773
+      "bytes": 962773,
+      "runtimeFile": "public/assets/equipment/warhammer-v1.webp"
     },
     {
       "id": "spear",
       "slot": "weapon",
       "name": "창",
-      "file": "public/assets/equipment/spear-v1.png",
+      "file": "art-workbench/equipment/originals/spear-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A long wooden spear with a distinct leaf-shaped steel spearhead. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "ff76963c72973a42108aad108033d61afdf8bdea8c4d8b7fd260ab944e14bfe2",
-      "bytes": 412800
+      "bytes": 412800,
+      "runtimeFile": "public/assets/equipment/spear-v1.webp"
     },
     {
       "id": "halberd",
       "slot": "weapon",
       "name": "할버드",
-      "file": "public/assets/equipment/halberd-v1.png",
+      "file": "art-workbench/equipment/originals/halberd-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A long polearm halberd with an axe blade, top spike and rear hook. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "72dd3d649d2d89b3f31fda6743e4882312c6fc2c54333e9c79590aa16b033fcc",
-      "bytes": 571712
+      "bytes": 571712,
+      "runtimeFile": "public/assets/equipment/halberd-v1.webp"
     },
     {
       "id": "fire-staff",
       "slot": "weapon",
       "name": "화염 지팡이",
-      "file": "public/assets/equipment/fire-staff-v1.png",
+      "file": "art-workbench/equipment/originals/fire-staff-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A carved wizard staff crowned with a glowing orange flame crystal. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "dd0e718c9c3886f67f7fce239828dc8897a9256a0572df8efc7d3bd036d89943",
-      "bytes": 574284
+      "bytes": 574284,
+      "runtimeFile": "public/assets/equipment/fire-staff-v1.webp"
     },
     {
       "id": "ice-staff",
       "slot": "weapon",
       "name": "냉기 지팡이",
-      "file": "public/assets/equipment/ice-staff-v1.png",
+      "file": "art-workbench/equipment/originals/ice-staff-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A silver-blue wizard staff crowned with a pale blue crystalline snowflake. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "58ad9c2549b1cf427b6e0d284f53ed4eaa069996a3fc9e076a370f8761fe1604",
-      "bytes": 657442
+      "bytes": 657442,
+      "runtimeFile": "public/assets/equipment/ice-staff-v1.webp"
     },
     {
       "id": "lightning-staff",
       "slot": "weapon",
       "name": "번개 지팡이",
-      "file": "public/assets/equipment/lightning-staff-v1.png",
+      "file": "art-workbench/equipment/originals/lightning-staff-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A dark blue wizard staff crowned with a golden forked lightning crystal. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "76c213f9f70035c8712470713231a4e72617743de4890ebff298c83803047dec",
-      "bytes": 600982
+      "bytes": 600982,
+      "runtimeFile": "public/assets/equipment/lightning-staff-v1.webp"
     },
     {
       "id": "corrosion-staff",
       "slot": "weapon",
       "name": "부식 지팡이",
-      "file": "public/assets/equipment/corrosion-staff-v1.png",
+      "file": "art-workbench/equipment/originals/corrosion-staff-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: A dark wooden wizard staff crowned with a luminous green corrosive crystal, no skull. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered diagonally with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "fc4f92a80d514fc8e4616a8efbba1c8d5dab42aa6eac94ecd52e2458a078c64b",
-      "bytes": 765230
+      "bytes": 765230,
+      "runtimeFile": "public/assets/equipment/corrosion-staff-v1.webp"
     },
     {
       "id": "robe",
       "slot": "armor",
       "name": "천옷 / 로브",
-      "file": "public/assets/equipment/robe-v1.png",
+      "file": "art-workbench/equipment/originals/robe-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty flowing violet cloth robe with gold trim, no wearer, full garment. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "38924d50dfde815f0af410473976468890b8b55887832919f52e09b90e493aca",
-      "bytes": 1617437
+      "bytes": 1617437,
+      "runtimeFile": "public/assets/equipment/robe-v1.webp"
     },
     {
       "id": "leather",
       "slot": "armor",
       "name": "가죽 갑옷",
-      "file": "public/assets/equipment/leather-v1.png",
+      "file": "art-workbench/equipment/originals/leather-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty brown leather torso armor with fitted stitched panels and belt. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "7247ade46b8cec09ed7d93aef8dd21112b81bbf5479923f5fe4dd1624a38bdd1",
-      "bytes": 1883986
+      "bytes": 1883986,
+      "runtimeFile": "public/assets/equipment/leather-v1.webp"
     },
     {
       "id": "padded",
       "slot": "armor",
       "name": "덧댄 갑옷",
-      "file": "public/assets/equipment/padded-v1.png",
+      "file": "art-workbench/equipment/originals/padded-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty quilted padded torso armor with thick diamond-stitched teal cloth. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "6c37f3b53ca1472e0f7d1763b3aa5c19797c8330f7258c4de4538d08ea622044",
-      "bytes": 2172463
+      "bytes": 2172463,
+      "runtimeFile": "public/assets/equipment/padded-v1.webp"
     },
     {
       "id": "hide",
       "slot": "armor",
       "name": "생가죽 갑옷",
-      "file": "public/assets/equipment/hide-v1.png",
+      "file": "art-workbench/equipment/originals/hide-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty rugged hide torso armor made of rough tan hide and fur-trimmed shoulders. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "1e1d5855a8df53005254cc6fd65e272d6ca362501e81c32caa71be7ec1f1f8a4",
-      "bytes": 2331134
+      "bytes": 2331134,
+      "runtimeFile": "public/assets/equipment/hide-v1.webp"
     },
     {
       "id": "chainmail",
       "slot": "armor",
       "name": "사슬 갑옷",
-      "file": "public/assets/equipment/chainmail-v1.png",
+      "file": "art-workbench/equipment/originals/chainmail-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty chainmail shirt with clearly interlocking steel rings and leather edging. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "6acd1342566a5433c71e4efa5c48aa9f06c07c20a9c0e1531ee6eb969d12b879",
-      "bytes": 2496602
+      "bytes": 2496602,
+      "runtimeFile": "public/assets/equipment/chainmail-v1.webp"
     },
     {
       "id": "scale",
       "slot": "armor",
       "name": "비늘 갑옷",
-      "file": "public/assets/equipment/scale-v1.png",
+      "file": "art-workbench/equipment/originals/scale-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty torso armor made from overlapping steel scales on dark leather. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "87489726fbdc24b2368c60b70dd4a22aa9a6414309399254ae16099f2b8f1130",
-      "bytes": 1883811
+      "bytes": 1883811,
+      "runtimeFile": "public/assets/equipment/scale-v1.webp"
     },
     {
       "id": "breastplate",
       "slot": "armor",
       "name": "흉갑",
-      "file": "public/assets/equipment/breastplate-v1.png",
+      "file": "art-workbench/equipment/originals/breastplate-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty polished solid steel breastplate with simple gold edging. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "514ab8f3fe972192877f1b0bc510aa5a5ee5ddae36c552fd6e10adc85a60d585",
-      "bytes": 2048397
+      "bytes": 2048397,
+      "runtimeFile": "public/assets/equipment/breastplate-v1.webp"
     },
     {
       "id": "brigandine",
       "slot": "armor",
       "name": "브리건딘",
-      "file": "public/assets/equipment/brigandine-v1.png",
+      "file": "art-workbench/equipment/originals/brigandine-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty burgundy brigandine jacket with orderly visible brass rivets concealing metal plates. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "45a18f639a20b4ebf03acc2a8dacb9ea01f63048862a764af84e37963933b64d",
-      "bytes": 1892454
+      "bytes": 1892454,
+      "runtimeFile": "public/assets/equipment/brigandine-v1.webp"
     },
     {
       "id": "plate",
       "slot": "armor",
       "name": "판금 갑옷",
-      "file": "public/assets/equipment/plate-v1.png",
+      "file": "art-workbench/equipment/originals/plate-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory category icon, square. Subject: An empty heavy full plate torso armor with large articulated steel pauldrons and gold edging. Hand-painted anime game item illustration, crisp dark contour, rich material shading, readable at 48 pixels. A single complete item centered in front three-quarter view with generous transparent margins, isolated on genuinely transparent background. No text, labels, frame, people, hands, ground, or extra items.",
       "width": 1254,
       "height": 1254,
       "sha256": "f93e7a754ac0fa2c8473a07ef9f7b92b1257d72a9aa93272ffc1ab51b91bbe3f",
-      "bytes": 2343671
+      "bytes": 2343671,
+      "runtimeFile": "public/assets/equipment/plate-v1.webp"
     }
   ]
 }

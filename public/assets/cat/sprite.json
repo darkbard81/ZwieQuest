@@ -2175,7 +2175,7 @@
   },
   "outlineRemoval": {
     "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
-    "originalBackup": "sprite-workbench/Cat/original-white-outline-20261017T081151Z",
+    "originalBackup": "art-workbench/sprites/Cat/original-white-outline-20261017T081151Z",
     "rgbPreserved": true,
     "interiorBeyond4pxPreserved": true,
     "frameGeometryAndTimingPreserved": true,

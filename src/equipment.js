@@ -59,7 +59,7 @@ export function generateEquipment({ slot, classId, rng, gradeId, templateId, spe
   if (!g) throw Error('Unknown equipment grade');
   const tier = catalog.grades.indexOf(g);
   const item = { id: randomUUID(), templateId: t.id, rulesVersion: catalog.rulesVersion, slot, gradeId: g.id, tier, rarity: g.name, name: t.name,
-    iconPath: `/assets/equipment/${t.id}-v1.png`, value: catalog.saleBase + tier * catalog.saleGradeStep, stats: {}, special: null };
+    iconPath: `/assets/equipment/${t.id}-v1.webp`, value: catalog.saleBase + tier * catalog.saleGradeStep, stats: {}, special: null };
   const types = Object.keys(catalog.damageTypes).filter(d => d !== 'raw');
   if (slot === 'weapon') {
     item.hitDefense = t.hitDefense; item.damageTypes = [...t.damageTypes];
@@ -113,7 +113,12 @@ export function migrateLegacyEquipment(state, rng) {
   let changed = 0;
   state.inventory = state.inventory.map(old => {
     const list = old.slot === 'weapon' ? EQUIPMENT_CATALOG.weapons : old.slot === 'armor' ? EQUIPMENT_CATALOG.armors : old.slot === 'charm' ? EQUIPMENT_CATALOG.charms : [];
-    if (!['weapon','armor','charm'].includes(old.slot) || list.some(t => t.id === old.templateId)) return old;
+    if (list.some(t => t.id === old.templateId)) {
+      // Refresh only the asset URL; saved rolls, identity and equipment stay intact.
+      old.iconPath = `/assets/equipment/${old.templateId}-v1.webp`;
+      return old;
+    }
+    if (!['weapon','armor','charm'].includes(old.slot)) return old;
     const tier = Math.max(0, Math.min(2, Math.floor(Number(old.tier) || 0)));
     const templateId = old.slot === 'charm' ? undefined : old.slot === 'weapon'
       ? (old.icon === 'staff' ? 'fire-staff' : 'longsword')

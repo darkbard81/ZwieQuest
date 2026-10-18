@@ -1,6 +1,6 @@
 {
   "barbarian": {
-    "source": "sprite-workbench/playback-contract-v1-20261017T092525Z/barbarian",
+    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/barbarian",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -19,11 +19,11 @@
       "reason": "Eyes-open neutral combat wait from original attack video; only cell 00 replaced.",
       "sameNormalization": true
     },
-    "previousSource": "sprite-workbench/Barbarian/battle-ready-20261017T080605Z",
+    "previousSource": "art-workbench/sprites/Barbarian/battle-ready-20261017T080605Z",
     "playbackContract": "shared-v1"
   },
   "ranger": {
-    "source": "sprite-workbench/playback-contract-v1-20261017T092525Z/ranger",
+    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/ranger",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -38,18 +38,18 @@
       "motion": "compact hand-to-brow scouting gesture",
       "frameCount": 24,
       "durationMs": 2000,
-      "sourceRun": "sprite-workbench/Ranger/idle-contract-20261017T092306Z",
+      "sourceRun": "art-workbench/sprites/Ranger/idle-contract-20261017T092306Z",
       "sourceRangeSeconds": [
         0,
         3.1666666666666665
       ],
       "other120FramesUnchanged": true
     },
-    "previousSource": "sprite-workbench/Ranger/idle-scout-smooth-20261017T090415Z",
+    "previousSource": "art-workbench/sprites/Ranger/idle-scout-smooth-20261017T090415Z",
     "playbackContract": "shared-v1"
   },
   "cat": {
-    "source": "sprite-workbench/playback-contract-v1-20261017T092525Z/cat",
+    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/cat",
     "facing": "left",
     "animations": [
       "Front_Idle",
@@ -61,17 +61,17 @@
     ],
     "outlineRemoval": {
       "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
-      "originalBackup": "sprite-workbench/Cat/original-white-outline-20261017T081151Z",
+      "originalBackup": "art-workbench/sprites/Cat/original-white-outline-20261017T081151Z",
       "rgbPreserved": true,
       "interiorBeyond4pxPreserved": true,
       "frameGeometryAndTimingPreserved": true,
       "generationUsed": false
     },
-    "previousSource": "sprite-workbench/Cat/no-white-outline-20261017T081915Z",
+    "previousSource": "art-workbench/sprites/Cat/no-white-outline-20261017T081915Z",
     "playbackContract": "shared-v1"
   },
   "lamia": {
-    "source": "sprite-workbench/playback-contract-v1-20261017T092525Z/lamia",
+    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/lamia",
     "facing": "left",
     "animations": [
       "Front_Idle",
@@ -83,17 +83,17 @@
     ],
     "outlineRemoval": {
       "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
-      "originalBackup": "sprite-workbench/Lamia/original-white-outline-20261017T081151Z",
+      "originalBackup": "art-workbench/sprites/Lamia/original-white-outline-20261017T081151Z",
       "rgbPreserved": true,
       "interiorBeyond4pxPreserved": true,
       "frameGeometryAndTimingPreserved": true,
       "generationUsed": false
     },
-    "previousSource": "sprite-workbench/Lamia/no-white-outline-20261017T081915Z",
+    "previousSource": "art-workbench/sprites/Lamia/no-white-outline-20261017T081915Z",
     "playbackContract": "shared-v1"
   },
   "warrior": {
-    "source": "sprite-workbench/playback-contract-v1-20261017T092525Z/warrior",
+    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/warrior",
     "previousSource": null,
     "facing": "right",
     "animations": [
@@ -107,7 +107,7 @@
     "playbackContract": "shared-v1"
   },
   "wizard": {
-    "source": "sprite-workbench/playback-contract-v1-20261017T092525Z/wizard",
+    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/wizard",
     "previousSource": null,
     "facing": "right",
     "animations": [

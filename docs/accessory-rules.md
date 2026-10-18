@@ -1,6 +1,6 @@
 # 액세서리 규칙
 
-액세서리는 기존 `charm` 슬롯 1개를 사용한다. 직접 ACC·AR·HP 같은 파생값이나 별도 특수 효과를 부여하지 않고, 기본 능력치 6종만 강화한다. 신규 이미지 6개는 내장 image_gen으로 생성했으며 `public/assets/equipment/*-charm-v1.png`에 원본 투명 PNG를 저장한다. 생성 프롬프트와 해시는 `accessory-image-prompts.json`에 기록한다.
+액세서리는 기존 `charm` 슬롯 1개를 사용한다. 직접 ACC·AR·HP 같은 파생값이나 별도 특수 효과를 부여하지 않고, 기본 능력치 6종만 강화한다. 신규 이미지 6개는 내장 image_gen으로 생성했으며 원본 투명 PNG는 `art-workbench/equipment/originals/*-charm-v1.png`에 보관한다. 게임에서는 `public/assets/equipment/*-charm-v1.webp`의 128×128 무손실 WebP 사본을 사용한다. 생성 프롬프트와 해시는 `accessory-image-prompts.json`에 기록한다.
 
 | 종류 | 주 능력치 |
 |---|---|

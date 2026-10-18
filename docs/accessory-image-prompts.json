@@ -6,62 +6,68 @@
     {
       "id": "strength-charm",
       "name": "완력의 부적",
-      "file": "public/assets/equipment/strength-charm-v1.png",
+      "file": "art-workbench/equipment/originals/strength-charm-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory accessory icon, square 1:1. Subject: a bold crimson gemstone pendant in a sturdy gold setting shaped like a clenched gauntlet, representing physical strength. One single complete amulet with a small suspension loop and a short curved cord. Hand-painted anime game item illustration matching polished fantasy weapon inventory art, crisp dark contours, rich metal and faceted gem shading. Strong distinct silhouette readable at 43 pixels. Centered object occupies about 75% of the square, generous transparent margins, warm upper-left highlights. Genuinely transparent background. No text, letters, numbers, labels, UI frame, people, hands, ground, scenery, additional objects or cast shadow outside the object.",
       "sha256": "6ca163238ea5d4fe8c6b0fb7139c98b933572396fa039056d7629bbbb274b2af",
       "bytes": 1154901,
       "width": 1254,
-      "height": 1254
+      "height": 1254,
+      "runtimeFile": "public/assets/equipment/strength-charm-v1.webp"
     },
     {
       "id": "vitality-charm",
       "name": "활력의 부적",
-      "file": "public/assets/equipment/vitality-charm-v1.png",
+      "file": "art-workbench/equipment/originals/vitality-charm-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory accessory icon, square 1:1. Subject: an emerald green heart-shaped gemstone pendant wrapped in gold oak leaves, representing vitality. One single complete amulet with a small suspension loop and a short curved cord. Hand-painted anime game item illustration matching polished fantasy weapon inventory art, crisp dark contours, rich metal and faceted gem shading. Strong distinct silhouette readable at 43 pixels. Centered object occupies about 75% of the square, generous transparent margins, warm upper-left highlights. Genuinely transparent background. No text, letters, numbers, labels, UI frame, people, hands, ground, scenery, additional objects or cast shadow outside the object.",
       "sha256": "560db5299f9d8075c15609c43ef1f27f0f7f317dac51155257e2fa7cd820e928",
       "bytes": 1473572,
       "width": 1254,
-      "height": 1254
+      "height": 1254,
+      "runtimeFile": "public/assets/equipment/vitality-charm-v1.webp"
     },
     {
       "id": "agility-charm",
       "name": "민첩의 부적",
-      "file": "public/assets/equipment/agility-charm-v1.png",
+      "file": "art-workbench/equipment/originals/agility-charm-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory accessory icon, square 1:1. Subject: a slim turquoise teardrop gemstone pendant with a swept silver feather and subtle gold trim, representing agility. One single complete amulet with a small suspension loop and a short curved cord. Hand-painted anime game item illustration matching polished fantasy weapon inventory art, crisp dark contours, rich metal and faceted gem shading. Strong distinct silhouette readable at 43 pixels. Centered object occupies about 75% of the square, generous transparent margins, warm upper-left highlights. Genuinely transparent background. No text, letters, numbers, labels, UI frame, people, hands, ground, scenery, additional objects or cast shadow outside the object.",
       "sha256": "54772cb4fb1be0ec147833d3e817d65f941c5d2215782be088f59ed4d0349f58",
       "bytes": 1257151,
       "width": 1254,
-      "height": 1254
+      "height": 1254,
+      "runtimeFile": "public/assets/equipment/agility-charm-v1.webp"
     },
     {
       "id": "insight-charm",
       "name": "통찰의 부적",
-      "file": "public/assets/equipment/insight-charm-v1.png",
+      "file": "art-workbench/equipment/originals/insight-charm-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory accessory icon, square 1:1. Subject: an amber golden eye-shaped gemstone pendant with an open eye motif in its gold setting, representing keen perception. One single complete amulet with a small suspension loop and a short curved cord. Hand-painted anime game item illustration matching polished fantasy weapon inventory art, crisp dark contours, rich metal and faceted gem shading. Strong distinct silhouette readable at 43 pixels. Centered object occupies about 75% of the square, generous transparent margins, warm upper-left highlights. Genuinely transparent background. No text, letters, numbers, labels, UI frame, people, hands, ground, scenery, additional objects or cast shadow outside the object.",
       "sha256": "8535682a7ef7bad8a730ca1764b7c2d215572fddfb3abb8388338d8a0be2fa33",
       "bytes": 1147939,
       "width": 1254,
-      "height": 1254
+      "height": 1254,
+      "runtimeFile": "public/assets/equipment/insight-charm-v1.webp"
     },
     {
       "id": "wisdom-charm",
       "name": "지혜의 부적",
-      "file": "public/assets/equipment/wisdom-charm-v1.png",
+      "file": "art-workbench/equipment/originals/wisdom-charm-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory accessory icon, square 1:1. Subject: a violet crystal pendant cradled by a gold crescent moon and a small star, representing wisdom. One single complete amulet with a small suspension loop and a short curved cord. Hand-painted anime game item illustration matching polished fantasy weapon inventory art, crisp dark contours, rich metal and faceted gem shading. Strong distinct silhouette readable at 43 pixels. Centered object occupies about 75% of the square, generous transparent margins, warm upper-left highlights. Genuinely transparent background. No text, letters, numbers, labels, UI frame, people, hands, ground, scenery, additional objects or cast shadow outside the object.",
       "sha256": "114f3fd69ba8ef6859b2bd8edb3a04513a6facb2816a191a8e4d23bc55a4e7bb",
       "bytes": 1273439,
       "width": 1254,
-      "height": 1254
+      "height": 1254,
+      "runtimeFile": "public/assets/equipment/wisdom-charm-v1.webp"
     },
     {
       "id": "resolve-charm",
       "name": "의지의 부적",
-      "file": "public/assets/equipment/resolve-charm-v1.png",
+      "file": "art-workbench/equipment/originals/resolve-charm-v1.png",
       "prompt": "Use case: stylized-concept. Asset type: ZwieQuest fantasy RPG inventory accessory icon, square 1:1. Subject: a deep sapphire gemstone pendant in an upright gold shield-shaped setting with a small radiant sun motif, representing resolve. One single complete amulet with a small suspension loop and a short curved cord. Hand-painted anime game item illustration matching polished fantasy weapon inventory art, crisp dark contours, rich metal and faceted gem shading. Strong distinct silhouette readable at 43 pixels. Centered object occupies about 75% of the square, generous transparent margins, warm upper-left highlights. Genuinely transparent background. No text, letters, numbers, labels, UI frame, people, hands, ground, scenery, additional objects or cast shadow outside the object.",
       "sha256": "0858bb583bcd871abaa2a2129f9cdfcdc6509c1e9c1eb56c090056135100bf75",
       "bytes": 1073597,
       "width": 1254,
-      "height": 1254
+      "height": 1254,
+      "runtimeFile": "public/assets/equipment/resolve-charm-v1.webp"
     }
   ]
 }

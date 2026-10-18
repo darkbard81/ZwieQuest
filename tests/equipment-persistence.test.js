@@ -9,6 +9,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { LocalAuth } from '../src/auth.js';
 import { Game } from '../src/game.js';
 import { generateEquipment } from '../src/equipment.js';
+import { generateLegacyMap } from './fixtures/maps-v1.js';
 
 test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved gear, and persists equip/sell', { timeout: 20000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'zwiequest-equipment-'));
@@ -33,6 +34,7 @@ test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved g
     const auth = new LocalAuth(db, false), user = await auth.register('equipment_test', '123456');
     const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
     const game = new Game(config); game.create('warrior'); game.state.remaining = game.state.duration = 600000;
+    game.state.maps=Object.fromEntries(Object.keys(game.state.maps).map(id=>[id,generateLegacyMap(id,()=>0)]));
     const legacy = { id: 'legacy-fixture', slot: 'weapon', classId: 'warrior', name: '여행자의 검', icon: 'sword', tier: 2, rarity: '희귀', value: 40, stats: { power: 6, PEN: 5 } };
     const charm = generateEquipment({slot:'charm',templateId:'wisdom-charm',gradeId:'legendary',rng:()=>2});
     const oldCharm = {id:'old-charm',slot:'charm',name:'새벽의 부적',tier:1,rarity:'고급',icon:'charm',stats:{ACC:2,WIL:1},value:26};
@@ -45,9 +47,16 @@ test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved g
     const oldArmor = game.state.inventory.find(i => i.id === special.id);
     delete oldArmor.stats.DEX; delete oldArmor.dexRulesVersion;
     const expectedArmor = { ...structuredClone(oldArmor), stats: { ...oldArmor.stats, DEX: -1 }, dexRulesVersion: 2 };
+    // Existing inventories still contain the former PNG URLs.
+    for (const item of game.state.inventory) if (item.iconPath) item.iconPath=item.iconPath.replace(/\.webp$/, '.png');
     db.prepare('INSERT INTO account_state VALUES(?,?)').run(user.id, JSON.stringify(game.state)); db.close();
     await start(); await request('/api/auth/login', { username: 'equipment_test', password: '123456' });
     let state = (await request('/api/state')).state;
+    assert.equal(state.mapGraph.version,2);
+    for (const item of state.inventory) {
+      assert.match(item.iconPath,/\.webp$/);
+      const image=await fetch(origin+item.iconPath);assert.equal(image.status,200);assert.match(image.headers.get('content-type'),/image\/webp/);
+    }
     assert.equal(state.tactic, 'normal'); assert.equal(state.battle.ap, 2); assert.equal(state.battle.attacks, 1); assert.equal(state.battle.actor, savedActor);
     const converted = state.inventory.find(i => i.id === legacy.id);assert.equal(converted.templateId,'longsword');assert.equal(converted.gradeId,'excellent');assert.equal(converted.stats.power,undefined);
     const convertedCharm=state.inventory.find(i=>i.id===oldCharm.id);assert.equal(convertedCharm.gradeId,'fine');assert.equal(convertedCharm.accessoryRulesVersion,1);assert.equal(convertedCharm.stats.ACC,undefined);assert.equal(state.equipment.charm,oldCharm.id);
@@ -58,7 +67,8 @@ test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved g
     await request('/api/command', { type: 'SELL', itemId: legacy.id, requestId: randomUUID() });
     await stop(); await start();
     state = (await request('/api/state')).state;
-    assert.equal(state.equipment.charm,charm.id);assert.deepEqual(state.inventory.find(i=>i.id===charm.id),charm);assert.deepEqual(state.inventory.find(i=>i.id===oldCharm.id),convertedCharm);
+    assert.equal(state.mapGraph.version,2);
+    assert.equal(state.equipment.charm,charm.id);assert.deepEqual(state.inventory.find(i=>i.id===charm.id),{...charm,iconPath:charm.iconPath.replace(/\.png$/,'.webp')});assert.deepEqual(state.inventory.find(i=>i.id===oldCharm.id),convertedCharm);
     assert.equal(state.equipment.armor, special.id); assert.equal(state.gold, 40);
     assert.deepEqual(state.inventory.find(i => i.id === special.id), expectedArmor);
     assert.equal(state.inventory.some(i => i.id === legacy.id), false);

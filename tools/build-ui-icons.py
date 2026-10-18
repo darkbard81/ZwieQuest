@@ -1,6 +1,6 @@
 """Trace supplied tiny WebP icons into standalone SVG paths.
 Run with Pillow 13.0.0 and vtracer 0.6.15 installed in a separate asset-tools venv.
-Original uploads and mapping are preserved under art/ui-icons/.
+Original uploads and mapping are preserved under art-workbench/ui-icons/.
 """
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -10,13 +10,13 @@ from PIL import Image
 import vtracer
 
 ROOT=Path(__file__).resolve().parents[1]
-items=json.loads((ROOT/'art/ui-icons/manifest.json').read_text())
+items=json.loads((ROOT/'art-workbench/ui-icons/manifest.json').read_text())
 css=(ROOT/'public/style.css').read_text()
 colors=dict(re.findall(r'\.damage-([a-z]+)\{--damage-color:(#[0-9A-Fa-f]{6})',css))
 out=ROOT/'public/assets/ui-icons';out.mkdir(parents=True,exist_ok=True)
 with TemporaryDirectory() as tmp:
  for item in items:
-  source=ROOT/'art/ui-icons'/item['source']
+  source=ROOT/'art-workbench/ui-icons'/item['source']
   original=Image.open(source).convert('RGBA')
   rgba=original.copy()
   pixels=list(rgba.get_flattened_data())
@@ -51,5 +51,5 @@ with TemporaryDirectory() as tmp:
   result=f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {rgba.width} {rgba.height}" width="24" height="24" role="img" aria-label="{item["name"]}">\n<title>{item["name"]}</title>\n{paths.strip()}\n</svg>\n'
   (out/(item['id']+'.svg')).write_text(result)
   item.update(width=original.width,height=original.height,color=color,sha256=hashlib.sha256(source.read_bytes()).hexdigest())
-(ROOT/'art/ui-icons/manifest.json').write_text(json.dumps(items,ensure_ascii=False,indent=2)+'\n')
+(ROOT/'art-workbench/ui-icons/manifest.json').write_text(json.dumps(items,ensure_ascii=False,indent=2)+'\n')
 print(f'Generated {len(items)} transparent path-only SVG icons.')

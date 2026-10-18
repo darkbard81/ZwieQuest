@@ -1,19 +1,59 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { generateMap, MAP_DEFS, reachable } from '../src/maps.js';
+import { generateMap, MAP_DEFS, MAP_VERSION, reachable, upgradeMap } from '../src/maps.js';
 import { Game } from '../src/game.js';
+import { generateLegacyMap } from './fixtures/maps-v1.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
 function rng(seed){let x=seed;return n=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x%n;};}
 function route(map,target){const queue=[[map.rootId,[]]],seen=new Set();while(queue.length){const [id,path]=queue.shift();if(id===target)return path;if(seen.has(id))continue;seen.add(id);for(const [direction,to]of Object.entries(map.nodes[id].edges||{}))queue.push([to,[...path,direction]]);}throw Error('Unreachable');}
 function traverse(g,path){if(g.state.phase==='HOME')g.advance();for(const direction of path){assert.equal(g.state.phase,'CHOICE_WAIT');g.command({type:'CHOOSE',direction,choiceId:g.state.choiceId});g.advance();let guard=0;while(['BATTLE','TREASURE'].includes(g.state.phase)&&guard++<100)g.advance();assert.ok(guard<100);}}
-test('100 generated worlds: exact depth-10 destinations, all reachable, two forward branches and protected routes intact',()=>{
+function assertTree(map) {
+ const parents=new Map(Object.keys(map.nodes).map(id=>[id,0]));
+ for(const node of Object.values(map.nodes))if(node.edges){
+  assert.notEqual(node.edges.left,node.edges.right);
+  for(const to of Object.values(node.edges)){assert.equal(map.nodes[to].depth,node.depth+1);parents.set(to,parents.get(to)+1);}
+ }
+ assert.equal(reachable(map).size,Object.keys(map.nodes).length);
+ for(const [id,count] of parents)assert.equal(count,id===map.rootId?0:1,id);
+}
+
+test('legacy graph migration preserves every node, destination and selected path without merges',()=>{
+ for(let seed=1;seed<=20;seed++)for(const id of Object.keys(MAP_DEFS)){
+  const old=generateLegacyMap(id,rng(seed));
+  for(const target of old.terminalIds){
+   let from=old.rootId;const path=route(old,target).map(direction=>{const to=old.nodes[from].edges[direction],edge={from,to,direction};from=to;return edge;});
+   const upgraded=upgradeMap(old,path);assertTree(upgraded);assert.equal(upgraded.version,MAP_VERSION);
+   for(const node of Object.values(old.nodes)){const {edges,...before}=node,{edges:afterEdges,...after}=upgraded.nodes[node.id];assert.deepEqual(after,before);}
+   for(const edge of path)assert.equal(upgraded.nodes[edge.from].edges[edge.direction],edge.to);
+   assert.deepEqual(upgraded.terminalIds,old.terminalIds);assert.equal(upgradeMap(upgraded),upgraded);
+   assert.ok(Object.keys(upgraded.nodes).length<=2*Object.keys(old.nodes).length-1);
+  }
+ }
+});
+
+test('version-1 saves preserve in-flight phase, timer, choices, combat, rewards, route and checkpoint history on restart',()=>{
+ for(const phase of ['HOME','CHOICE_WAIT','TRAVEL','BATTLE','TREASURE','DOWNED','RETURN_HOME']){
+  const g=new Game(config,null,rng(7));g.create('warrior');
+  g.state.maps=Object.fromEntries(Object.keys(MAP_DEFS).map(id=>[id,generateLegacyMap(id,rng(7))]));
+  const map=g.state.maps.village;g.state.currentNodeId=map.rootId;g.advance();
+  const target=Object.values(map.nodes).find(n=>n.depth===2&&n.kind==='path');
+  for(const direction of route(map,target.id)){g.choose(direction);if(g.state.step<2)g.advance();}
+  g.state.risk=0;g.beginBattle();g.state.battle.ap=2;g.phase(phase,1234);
+  g.state.lastBossRewardId='saved-reward';g.state.checkpointHistory=[{mapId:'snow',nodeId:g.state.maps.snow.rootId,firstPassedAt:123}];
+  const saved=structuredClone(g.state),restored=new Game(config,structuredClone(saved),()=>{throw Error('Migration must not reroll');});
+  for(const key of ['phase','remaining','duration','phaseStartedAt','choiceId','battle','enemy','hp','gold','xp','level','inventory','equipment','currentNodeId','path','run','runGold','step','lastBossRewardId','checkpointHistory'])assert.deepEqual(restored.state[key],saved[key],`${phase}/${key}`);
+  for(const migrated of Object.values(restored.state.maps))assertTree(migrated);
+  const again=new Game(config,structuredClone(restored.state),()=>{throw Error('Unexpected reroll');});assert.deepEqual(again.state,restored.state);
+ }
+});
+test('100 generated worlds: exact depth-10 destinations, all reachable, distinct branches, exactly one parent and bounded tree size',()=>{
  for(let seed=1;seed<=100;seed++)for(const id of Object.keys(MAP_DEFS)){
   const map=generateMap(id,rng(seed)),all=Object.values(map.nodes),final=all.filter(n=>n.depth===10),seen=reachable(map);
-  assert.equal(seen.size,all.length);assert.equal(map.depth,10);assert.equal(final.length,id==='village'?10:1);
-  if(id==='village'){assert.equal(final.filter(n=>n.kind==='deadend').length,6);assert.deepEqual(final.filter(n=>n.kind==='exit').map(n=>n.region).sort(),['beach','desert','snow','volcano']);}else assert.equal(final[0].kind,'boss');
+  assert.equal(seen.size,all.length);assert.equal(map.depth,10);assert.equal(final.length,id==='village'?10:2);assert.equal(map.version,MAP_VERSION);assert.ok(all.length<=35);assert.ok(all.some(n=>n.kind==='deadend'&&n.depth<10));
+  if(id==='village'){assert.equal(final.filter(n=>n.kind==='deadend').length,6);assert.deepEqual(final.filter(n=>n.kind==='exit').map(n=>n.region).sort(),['beach','desert','snow','volcano']);}else assert.equal(final.filter(n=>n.kind==='boss').length,1);
   for(const node of all){if(node.edges){assert.deepEqual(Object.keys(node.edges).sort(),['left','right']);for(const to of Object.values(node.edges)){assert.equal(map.nodes[to].depth,node.depth+1);assert.ok(seen.has(to));}}else assert.ok(['deadend','exit','boss'].includes(node.kind));}
-  for(const [from,dir,to]of map.protectedEdges)assert.equal(map.nodes[from].edges[dir],to);
+  assertTree(map);
  }
 });
 test('each village exit transfers to its region and checkpoint passage history survives serialized restart',()=>{
@@ -35,6 +75,7 @@ test('each village exit transfers to its region and checkpoint passage history s
 test('regional boss battle rewards once and returns HOME; checkpoint passage records never choose return location',()=>{
  const g=new Game(config,null,rng(4));g.create('wizard');g.rng=n=>Math.min(11,n-1);const village=g.state.maps.village;
  traverse(g,route(village,Object.values(village.nodes).find(n=>n.kind==='exit'&&n.region==='snow').id));
+ g.state.hp=10000;
  const map=g.state.maps.snow;const path=route(map,map.terminalIds[0]);
  for(let i=0;i<path.length;i++){g.command({type:'CHOOSE',direction:path[i],choiceId:g.state.choiceId});g.advance();if(i===path.length-1)break;while(['BATTLE','TREASURE'].includes(g.state.phase))g.advance();}
  assert.equal(g.state.enemy.boss,true);assert.equal(g.state.currentNodeId,map.terminalIds[0]);assert.equal(g.state.step,10);
@@ -59,4 +100,25 @@ test('early and depth-10 dead ends return HOME without removing saved maps',()=>
 });
 test('every region dead end returns HOME and passage history is unique and non-functional',()=>{
  for(const region of ['volcano','snow','desert','beach']){const g=new Game(config,null,rng(1));g.create('warrior');g.rng=n=>Math.min(11,n-1);g.enterRegion(region);const record=structuredClone(g.state.checkpointHistory);g.enterRegion(region);assert.deepEqual(g.state.checkpointHistory,record);const map=g.state.maps[region],dead=Object.values(map.nodes).find(n=>n.kind==='deadend');assert.ok(dead);traverse(g,route(map,dead.id));assert.equal(g.state.phase,'RETURN_HOME');g.advance();assert.equal(g.state.mapId,'village');assert.equal(g.state.currentNodeId,g.state.maps.village.rootId);assert.deepEqual(g.state.checkpointHistory,record);}
+});
+
+test('exploration survives returning home, another run and a save reload without revealing unchosen nodes',()=>{
+ const g=new Game(config,null,rng(7));g.create('warrior');g.advance();
+ const map=g.state.maps.village,root=map.nodes[map.rootId];
+ assert.deepEqual(g.state.exploredNodes.village,[root.id]);
+ g.choose('left');
+ assert.deepEqual(new Set(g.state.exploredNodes.village),new Set([root.id,root.edges.left]));
+ g.finish(true);g.advance();g.advance();
+ assert.deepEqual(g.state.path,[]);
+ const saved=structuredClone(g.state),loaded=new Game(config,saved,rng(7));
+ assert.deepEqual(loaded.state.exploredNodes.village,g.state.exploredNodes.village);
+ loaded.choose('right');assert.ok(loaded.state.exploredNodes.village.includes(root.edges.left));assert.ok(loaded.state.exploredNodes.village.includes(root.edges.right));
+ loaded.enterRegion('snow');assert.deepEqual(loaded.state.exploredNodes.snow,[loaded.state.maps.snow.rootId]);assert.deepEqual(loaded.state.exploredNodes.beach,[]);
+});
+test('saves without exploration recover only retained route and known location',()=>{
+ const g=new Game(config,null,rng(7));g.create('warrior');g.advance();g.choose('left');
+ const saved=structuredClone(g.state);delete saved.exploredNodes;
+ const loaded=new Game(config,saved,()=>{throw Error('No rerolls');});
+ assert.deepEqual(new Set(loaded.state.exploredNodes.village),new Set([saved.maps.village.rootId,saved.currentNodeId]));
+ assert.deepEqual(loaded.state.exploredNodes.snow,[]);
 });

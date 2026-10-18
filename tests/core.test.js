@@ -24,7 +24,7 @@ test('both classes finish unattended map attempts and preserve XP/items', () => 
   for(const cls of ['warrior','wizard']){const g=make(cls,n=>Math.min(n-1,11));const themes=new Set();let count=0;while(g.state.completed<3&&count++<1500){g.tick(20000,1);themes.add(g.state.theme);}assert.equal(g.state.completed,3);assert.ok(themes.has('village'));assert.ok(g.state.level>1);assert.ok(g.state.inventory.length>3);assert.ok(g.state.victories>0);assert.ok(g.state.chests>0);}
 });
 test('branch choices only advance; stale choice rejected; default choice progresses', () => {
-  const g=make();g.advance();let previous=0;for(const direction of Array(10).fill('left')){const choiceId=g.state.choiceId;g.command({type:'CHOOSE',choiceId,direction});assert.equal(g.state.step,++previous);assert.throws(()=>g.command({type:'CHOOSE',choiceId,direction}));while(!['CHOICE_WAIT','RETURN_HOME'].includes(g.state.phase))g.advance();}assert.equal(g.state.phase,'RETURN_HOME');
+  const g=make();g.advance();let previous=0;while(g.state.phase==='CHOICE_WAIT'&&previous<10){const choiceId=g.state.choiceId;g.command({type:'CHOOSE',choiceId,direction:'left'});assert.equal(g.state.step,++previous);assert.throws(()=>g.command({type:'CHOOSE',choiceId,direction:'left'}));while(!['CHOICE_WAIT','RETURN_HOME'].includes(g.state.phase))g.advance();}assert.ok(previous>0);assert.equal(g.state.phase,'RETURN_HOME');
 });
 test('rate switch preserves spent game time; choice timeout is real-time and not extended',()=>{
   const g=make();g.phase('TRAVEL',6000);g.tick(1000,1);g.tick(1000,1.5);assert.equal(g.state.remaining,3500);

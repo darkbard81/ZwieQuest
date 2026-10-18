@@ -2,7 +2,7 @@ import { randomInt, randomUUID } from 'node:crypto';
 import { findAppearance, defaultAppearance } from '../public/appearances.js';
 import { initializeClassProgress, switchClassProgress, equippedClassIds, classProfiles } from './class-progress.js';
 import { attack, stats, statDetails, levelBonus } from './combat.js';
-import { MAP_DEFS, createMaps } from './maps.js';
+import { MAP_DEFS, createMaps, migrateMaps } from './maps.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
 import { availableTactics, validTactic, tacticEffect, validateTactics, COMBAT_RULES_VERSION } from './tactics.js';
 export const THEMES = Object.entries(MAP_DEFS).map(([id, def]) => ({ id, name: def.name, subtitle: def.subtitle }));
@@ -11,6 +11,8 @@ export class Game {
     validateTactics(config); this.config = config; this.state = state; this.rng = n => ((rng(n) % n) + n) % n; this.events = [];
     if (state && !state.maps) { this.installMaps(); this.phase('HOME', config.homeMs); this.log('map', '새 경로 체계로 이동했습니다. 성장과 장비는 유지됩니다.'); }
     if (state) {
+      if (migrateMaps(state)) this.log('map', '경로 지도를 합류 없는 트리로 정리했습니다. 현재 위치와 진행 중인 모험은 유지됩니다.');
+      this.rememberExploration();
       initializeClassProgress(state);
       // Old saves keep their existing class and acquire its default appearance.
       if (!findAppearance(state.appearanceId) || findAppearance(state.appearanceId).classId !== state.classId) state.appearanceId = defaultAppearance(state.classId).id;
@@ -27,7 +29,16 @@ export class Game {
       if (state.phase === 'HOME' && state.mapId !== 'village') this.nextChoice();
     }
   }
-  installMaps() { const s = this.state; s.maps = createMaps(this.rng); s.mapId = 'village'; s.checkpointHistory = []; s.currentNodeId = s.maps.village.rootId; s.theme = 'village'; s.step = 0; s.path = []; s.bossDefeats = s.bossDefeats || 0; s.enemy = null; s.battle = null; }
+  installMaps() { const s = this.state; s.maps = createMaps(this.rng); s.mapId = 'village'; s.checkpointHistory = []; s.currentNodeId = s.maps.village.rootId; s.theme = 'village'; s.step = 0; s.path = []; s.exploredNodes = {}; this.rememberExploration(); s.bossDefeats = s.bossDefeats || 0; s.enemy = null; s.battle = null; }
+  rememberExploration() {
+    const s = this.state;
+    s.exploredNodes ||= {};
+    // Old saves can recover only their retained route, location and checkpoints.
+    const known = [s.currentNodeId, ...(s.path || []).flatMap(p => [p.from, p.to]), ...(s.checkpointHistory || []).map(c => c.nodeId)];
+    for (const [id, map] of Object.entries(s.maps)) {
+      s.exploredNodes[id] = [...new Set([...(s.exploredNodes[id] || []), ...known].filter(nodeId => map.nodes[nodeId]))];
+    }
+  }
   log(type, text, detail = {}) { const e = { seq: ++this.state.eventSeq, at: Date.now(), type, text, ...detail }; this.events.push(e); this.state.lastEvent = e; }
   phase(phase, ms) { Object.assign(this.state, { phase, remaining: ms, duration: ms, phaseStartedAt: Date.now() }); }
   normalSaleItems() {
@@ -58,6 +69,7 @@ export class Game {
     if (target.depth !== node.depth + 1) throw Error('앞으로 가는 경로만 선택할 수 있습니다.');
     s.direction = direction; s.risk = direction === 'left' ? 0 : 1;
     s.path.push({ from: node.id, to: target.id, direction }); s.currentNodeId = target.id; s.step = target.depth; s.choiceId = null;
+    this.rememberExploration();
     this.phase('TRAVEL', this.config.travelMs);
     this.log('travel', `${automatic ? '자동 선택' : '길 선택'} · ${direction === 'left' ? '왼쪽' : '오른쪽'}으로 전진합니다. (${s.step}/10)`);
   }
@@ -72,6 +84,7 @@ export class Game {
     s.currentNodeId = s.maps[region].rootId;
     if (!s.checkpointHistory.some(c => c.mapId === region && c.nodeId === s.currentNodeId)) s.checkpointHistory.push({ mapId: region, nodeId: s.currentNodeId, firstPassedAt: Date.now() });
     s.step = 0; s.path = []; s.enemy = null; s.battle = null;
+    this.rememberExploration();
     this.log('checkpoint', `${MAP_DEFS[region].name}에 도착했습니다. 지역 출발점에 도착하여 체크포인트 통과 이력만 기록했습니다.`);
     this.nextChoice();
   }

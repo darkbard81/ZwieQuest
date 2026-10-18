@@ -1,0 +1,249 @@
+{
+  "width": 128,
+  "height": 128,
+  "format": "WebP",
+  "lossless": true,
+  "conversion": "cwebp -resize 128 128 -lossless -z 9 -exact",
+  "images": [
+    {
+      "original": "art-workbench/equipment/originals/agility-charm-v1.png",
+      "originalSha256": "54772cb4fb1be0ec147833d3e817d65f941c5d2215782be088f59ed4d0349f58",
+      "originalBytes": 1257151,
+      "runtime": "public/assets/equipment/agility-charm-v1.webp",
+      "runtimeSha256": "ced63ca7c9f868c297f44fa1aa814b17e5b395b113680f268384c999f01ee14d",
+      "runtimeBytes": 13904
+    },
+    {
+      "original": "art-workbench/equipment/originals/battleaxe-v1.png",
+      "originalSha256": "bd27e5278dc642d547b7e64f669b832fbb0e3eadfaa9c48c43715fc9092ea82c",
+      "originalBytes": 1094175,
+      "runtime": "public/assets/equipment/battleaxe-v1.webp",
+      "runtimeSha256": "3d58a9713dcd22e351f5b970991b69d449fbeb4a3e8ef84ec87309f2830d1e8a",
+      "runtimeBytes": 11276
+    },
+    {
+      "original": "art-workbench/equipment/originals/breastplate-v1.png",
+      "originalSha256": "514ab8f3fe972192877f1b0bc510aa5a5ee5ddae36c552fd6e10adc85a60d585",
+      "originalBytes": 2048397,
+      "runtime": "public/assets/equipment/breastplate-v1.webp",
+      "runtimeSha256": "90a357dd171bea0bfcaa5ab78628b660f1c03fb56c39d531732c3f83f3867d06",
+      "runtimeBytes": 20586
+    },
+    {
+      "original": "art-workbench/equipment/originals/brigandine-v1.png",
+      "originalSha256": "45a18f639a20b4ebf03acc2a8dacb9ea01f63048862a764af84e37963933b64d",
+      "originalBytes": 1892454,
+      "runtime": "public/assets/equipment/brigandine-v1.webp",
+      "runtimeSha256": "8a018ab7b7c4822f9a221465a145902028363eaf399e39591bbf72b4a0d7876d",
+      "runtimeBytes": 20904
+    },
+    {
+      "original": "art-workbench/equipment/originals/chainmail-v1.png",
+      "originalSha256": "6acd1342566a5433c71e4efa5c48aa9f06c07c20a9c0e1531ee6eb969d12b879",
+      "originalBytes": 2496602,
+      "runtime": "public/assets/equipment/chainmail-v1.webp",
+      "runtimeSha256": "8bbd475f531a24707135b03fbc88336fd6612eacd0a896cd3d5ec676e00684be",
+      "runtimeBytes": 22974
+    },
+    {
+      "original": "art-workbench/equipment/originals/corrosion-staff-v1.png",
+      "originalSha256": "fc4f92a80d514fc8e4616a8efbba1c8d5dab42aa6eac94ecd52e2458a078c64b",
+      "originalBytes": 765230,
+      "runtime": "public/assets/equipment/corrosion-staff-v1.webp",
+      "runtimeSha256": "411c1d2724335197587c48401ebf2cf519aa21668cd108f44f2269bc836df11f",
+      "runtimeBytes": 8914
+    },
+    {
+      "original": "art-workbench/equipment/originals/dagger-v1.png",
+      "originalSha256": "0982e2bd155d0b411868c8a92f01557639ec913a8710bad1fba7159dcd4c9ad5",
+      "originalBytes": 756283,
+      "runtime": "public/assets/equipment/dagger-v1.webp",
+      "runtimeSha256": "67e55598566e6b0bd260dadd0681758365196b6c33b28872cd4ea8c94ce3be2b",
+      "runtimeBytes": 7230
+    },
+    {
+      "original": "art-workbench/equipment/originals/fire-staff-v1.png",
+      "originalSha256": "dd0e718c9c3886f67f7fce239828dc8897a9256a0572df8efc7d3bd036d89943",
+      "originalBytes": 574284,
+      "runtime": "public/assets/equipment/fire-staff-v1.webp",
+      "runtimeSha256": "7985b6b8c52cb1d29878507b2afc02f3a7c9b2051975d0523226aca5168f078b",
+      "runtimeBytes": 7318
+    },
+    {
+      "original": "art-workbench/equipment/originals/greatsword-v1.png",
+      "originalSha256": "57f5f517201671a341a171aa51a8ca20776513203ab4662e55b30be00f5274a7",
+      "originalBytes": 941247,
+      "runtime": "public/assets/equipment/greatsword-v1.webp",
+      "runtimeSha256": "c307b4afd1aa60832fafa674b27c4a5612865f8578b8a384156d9149d60369fe",
+      "runtimeBytes": 8224
+    },
+    {
+      "original": "art-workbench/equipment/originals/halberd-v1.png",
+      "originalSha256": "72dd3d649d2d89b3f31fda6743e4882312c6fc2c54333e9c79590aa16b033fcc",
+      "originalBytes": 571712,
+      "runtime": "public/assets/equipment/halberd-v1.webp",
+      "runtimeSha256": "197302666b8da6460b73ecfef9f737ac230974940f94a3a47aef9c497e7ed131",
+      "runtimeBytes": 6330
+    },
+    {
+      "original": "art-workbench/equipment/originals/handaxe-v1.png",
+      "originalSha256": "ad636d044f513e0ba0f11912a30960776a7a6fe43567fa56d1adb629bb207f12",
+      "originalBytes": 1163615,
+      "runtime": "public/assets/equipment/handaxe-v1.webp",
+      "runtimeSha256": "eb90599410f02ac6acad28c62e124742d837de0d2009481ca80eee9d12aec897",
+      "runtimeBytes": 11200
+    },
+    {
+      "original": "art-workbench/equipment/originals/hide-v1.png",
+      "originalSha256": "1e1d5855a8df53005254cc6fd65e272d6ca362501e81c32caa71be7ec1f1f8a4",
+      "originalBytes": 2331134,
+      "runtime": "public/assets/equipment/hide-v1.webp",
+      "runtimeSha256": "a9f4901e0cc798fe203189ad28bbe2ebaf974170d061a4ec0f44fe91df21a119",
+      "runtimeBytes": 22158
+    },
+    {
+      "original": "art-workbench/equipment/originals/ice-staff-v1.png",
+      "originalSha256": "58ad9c2549b1cf427b6e0d284f53ed4eaa069996a3fc9e076a370f8761fe1604",
+      "originalBytes": 657442,
+      "runtime": "public/assets/equipment/ice-staff-v1.webp",
+      "runtimeSha256": "8f817de01f27ca8aee6f74cbfa49bdf5fd89455f0b36fcc0c4f3ae934e6e3d2e",
+      "runtimeBytes": 8290
+    },
+    {
+      "original": "art-workbench/equipment/originals/insight-charm-v1.png",
+      "originalSha256": "8535682a7ef7bad8a730ca1764b7c2d215572fddfb3abb8388338d8a0be2fa33",
+      "originalBytes": 1147939,
+      "runtime": "public/assets/equipment/insight-charm-v1.webp",
+      "runtimeSha256": "8fb00f811cd51403cfb89c5cece375e3ccb242f77530843223e6c52abc51c2e1",
+      "runtimeBytes": 14670
+    },
+    {
+      "original": "art-workbench/equipment/originals/leather-v1.png",
+      "originalSha256": "7247ade46b8cec09ed7d93aef8dd21112b81bbf5479923f5fe4dd1624a38bdd1",
+      "originalBytes": 1883986,
+      "runtime": "public/assets/equipment/leather-v1.webp",
+      "runtimeSha256": "2e56231f4392f4ae03a991393b72e4ef783a1b09f29ead5b2445571b81586602",
+      "runtimeBytes": 18226
+    },
+    {
+      "original": "art-workbench/equipment/originals/lightning-staff-v1.png",
+      "originalSha256": "76c213f9f70035c8712470713231a4e72617743de4890ebff298c83803047dec",
+      "originalBytes": 600982,
+      "runtime": "public/assets/equipment/lightning-staff-v1.webp",
+      "runtimeSha256": "91e64742102bd76c11630cd4479827d9e94e5b343dc1b61aa7fe82ba7fe9511f",
+      "runtimeBytes": 8068
+    },
+    {
+      "original": "art-workbench/equipment/originals/longsword-v1.png",
+      "originalSha256": "55c4c1104d6cb2a4a128a9469aed8303926d305f7c6ccdf03813c7a988b71b21",
+      "originalBytes": 492631,
+      "runtime": "public/assets/equipment/longsword-v1.webp",
+      "runtimeSha256": "4907e185e0387dce712e9248dccf30506af4a873dbc2872b7a7e3a1cc55805f6",
+      "runtimeBytes": 5332
+    },
+    {
+      "original": "art-workbench/equipment/originals/mace-v1.png",
+      "originalSha256": "24291e1c6dcb2df3efe2fe79fbcf5926990b1188bfb6b1ca7ee2f9c788727215",
+      "originalBytes": 1012717,
+      "runtime": "public/assets/equipment/mace-v1.webp",
+      "runtimeSha256": "a7799589506f4775f85235dc9ce1086a5354b87766fff76f0f41295ce0d38201",
+      "runtimeBytes": 9914
+    },
+    {
+      "original": "art-workbench/equipment/originals/padded-v1.png",
+      "originalSha256": "6c37f3b53ca1472e0f7d1763b3aa5c19797c8330f7258c4de4538d08ea622044",
+      "originalBytes": 2172463,
+      "runtime": "public/assets/equipment/padded-v1.webp",
+      "runtimeSha256": "8ffd0d066d7f62de612282ae770130ae6d1701d9c5b3bc122d0694ca2e024318",
+      "runtimeBytes": 20686
+    },
+    {
+      "original": "art-workbench/equipment/originals/plate-v1.png",
+      "originalSha256": "f93e7a754ac0fa2c8473a07ef9f7b92b1257d72a9aa93272ffc1ab51b91bbe3f",
+      "originalBytes": 2343671,
+      "runtime": "public/assets/equipment/plate-v1.webp",
+      "runtimeSha256": "339bb9448a62150b8327952d8db042c2c813cb594988888fab89d7bc17b224af",
+      "runtimeBytes": 26596
+    },
+    {
+      "original": "art-workbench/equipment/originals/rapier-v1.png",
+      "originalSha256": "fddc1cbda0d682f23723c90bce5e72f5fbaf3af12e6242aaecd4300eb883921f",
+      "originalBytes": 589234,
+      "runtime": "public/assets/equipment/rapier-v1.webp",
+      "runtimeSha256": "5093b5c5ead2ae613818c2c76da573ad4530ba82ad72f4ab503b78445421affc",
+      "runtimeBytes": 6748
+    },
+    {
+      "original": "art-workbench/equipment/originals/resolve-charm-v1.png",
+      "originalSha256": "0858bb583bcd871abaa2a2129f9cdfcdc6509c1e9c1eb56c090056135100bf75",
+      "originalBytes": 1073597,
+      "runtime": "public/assets/equipment/resolve-charm-v1.webp",
+      "runtimeSha256": "17162ae546c3ed314013f01edaa3d44131efab34a868c76772d5b35f1bc997d0",
+      "runtimeBytes": 13918
+    },
+    {
+      "original": "art-workbench/equipment/originals/robe-v1.png",
+      "originalSha256": "38924d50dfde815f0af410473976468890b8b55887832919f52e09b90e493aca",
+      "originalBytes": 1617437,
+      "runtime": "public/assets/equipment/robe-v1.webp",
+      "runtimeSha256": "27a185673941aba00a1e8444d3f6cfaaa28231cf7bdc98633141cd7e8519e116",
+      "runtimeBytes": 20928
+    },
+    {
+      "original": "art-workbench/equipment/originals/scale-v1.png",
+      "originalSha256": "87489726fbdc24b2368c60b70dd4a22aa9a6414309399254ae16099f2b8f1130",
+      "originalBytes": 1883811,
+      "runtime": "public/assets/equipment/scale-v1.webp",
+      "runtimeSha256": "bd1cdd7a28788b7602aafa95a595d680274e0b3e3f20a111cbfebac2747e75fe",
+      "runtimeBytes": 17790
+    },
+    {
+      "original": "art-workbench/equipment/originals/shortsword-v1.png",
+      "originalSha256": "f70e8d8f902ebd5a820651d91a8d0fe0a2532881297e4d21c50dfe56b9780c75",
+      "originalBytes": 655062,
+      "runtime": "public/assets/equipment/shortsword-v1.webp",
+      "runtimeSha256": "29608c0108d6b67a6d265b065302e0ac60772b0cff8868ca336f9bea3cb7e522",
+      "runtimeBytes": 6462
+    },
+    {
+      "original": "art-workbench/equipment/originals/spear-v1.png",
+      "originalSha256": "ff76963c72973a42108aad108033d61afdf8bdea8c4d8b7fd260ab944e14bfe2",
+      "originalBytes": 412800,
+      "runtime": "public/assets/equipment/spear-v1.webp",
+      "runtimeSha256": "97f1afa90f38d2902cb97bcd52c401a21a990a7e47d967ec4b2cc10d15b0447d",
+      "runtimeBytes": 4270
+    },
+    {
+      "original": "art-workbench/equipment/originals/strength-charm-v1.png",
+      "originalSha256": "6ca163238ea5d4fe8c6b0fb7139c98b933572396fa039056d7629bbbb274b2af",
+      "originalBytes": 1154901,
+      "runtime": "public/assets/equipment/strength-charm-v1.webp",
+      "runtimeSha256": "3d60a5ba8ff8f6156fdea327058c17469f2a6849feb518cff32dd114ed615f16",
+      "runtimeBytes": 14512
+    },
+    {
+      "original": "art-workbench/equipment/originals/vitality-charm-v1.png",
+      "originalSha256": "560db5299f9d8075c15609c43ef1f27f0f7f317dac51155257e2fa7cd820e928",
+      "originalBytes": 1473572,
+      "runtime": "public/assets/equipment/vitality-charm-v1.webp",
+      "runtimeSha256": "386bc31f7a6943e55a50b89d2a631ac37ffec3b4e5e5e91d0c488183d63bb5cc",
+      "runtimeBytes": 18060
+    },
+    {
+      "original": "art-workbench/equipment/originals/warhammer-v1.png",
+      "originalSha256": "16c90a327b9444888bb49155dc8d3d05be75b346e4151632ce13f05aac180c50",
+      "originalBytes": 962773,
+      "runtime": "public/assets/equipment/warhammer-v1.webp",
+      "runtimeSha256": "fe736b9c902245362a2625a8febb4f015f014ed900a70d61ce909a5fb1b9844f",
+      "runtimeBytes": 9938
+    },
+    {
+      "original": "art-workbench/equipment/originals/wisdom-charm-v1.png",
+      "originalSha256": "114f3fd69ba8ef6859b2bd8edb3a04513a6facb2816a191a8e4d23bc55a4e7bb",
+      "originalBytes": 1273439,
+      "runtime": "public/assets/equipment/wisdom-charm-v1.webp",
+      "runtimeSha256": "9e9974e4dfdf9cfa82917c8d55aad509bb5cf6d9e31f01ac8a2815b5e3d514d9",
+      "runtimeBytes": 16720
+    }
+  ]
+}

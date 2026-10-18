@@ -111,7 +111,7 @@
       544
     ],
     "sourceVideoFPS": 24,
-    "qualityReport": "sprite-workbench/reextracted-256-20261016/quality.json"
+    "qualityReport": "art-workbench/sprites/reextracted-256-20261016/quality.json"
   },
   "vendor": [
     {
@@ -189,7 +189,7 @@
     {
       "classId": "warrior",
       "action": "Front_Idle",
-      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Front_Idle.mp4",
+      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Front_Idle.mp4",
       "sourceFrameIndices": [
         30,
         32,
@@ -217,13 +217,13 @@
         76
       ],
       "sha256": "127bb54def1753cddbe8f4e0c51ed2754c8715664e8ca513c4c3fc30806edcb0",
-      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Front_Idle.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/warrior/sheets/Front_Idle.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "warrior",
       "action": "Front_Victory",
-      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Front_Victory.mp4",
+      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Front_Victory.mp4",
       "sourceFrameIndices": [
         17,
         19,
@@ -251,13 +251,13 @@
         108
       ],
       "sha256": "0dfc00b80cfc2f3d477f9ff0bd6a2d945761d8d7d286599796082748987e57b5",
-      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Front_Victory.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/warrior/sheets/Front_Victory.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "warrior",
       "action": "Side_Walk",
-      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Side_Walk.mp4",
+      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Side_Walk.mp4",
       "sourceFrameIndices": [
         110,
         111,
@@ -285,13 +285,13 @@
         134
       ],
       "sha256": "32505cf72dcdede03e2bf522744078ae15a70cf1783d98014ecd872503dff15a",
-      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Side_Walk.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/warrior/sheets/Side_Walk.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "warrior",
       "action": "Side_Attack",
-      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Side_Attack.mp4",
+      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Side_Attack.mp4",
       "sourceFrameIndices": [
         34,
         37,
@@ -319,13 +319,13 @@
         97
       ],
       "sha256": "450992218e747a7dbf7683c4e9105baac27b72b08a1d29c6362b35d134136cac",
-      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Side_Attack.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/warrior/sheets/Side_Attack.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "warrior",
       "action": "Side_Down",
-      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Side_Down.mp4",
+      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Side_Down.mp4",
       "sourceFrameIndices": [
         24,
         27,
@@ -353,13 +353,13 @@
         83
       ],
       "sha256": "d26819c06d41e90efe011276ce135380257be9900138cad8113ba7a6d9fda97f",
-      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Side_Down.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/warrior/sheets/Side_Down.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "warrior",
       "action": "Side_Hit",
-      "sourceVideo": "sprite-workbench/Fighter/animations-20261016T010827Z/video/Side_Hit.mp4",
+      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Side_Hit.mp4",
       "sourceFrameIndices": [
         26,
         29,
@@ -387,13 +387,13 @@
         97
       ],
       "sha256": "b1edeb0ace63cd939a81b4c2ce6a4af110b0e0871d8db8714064502deec6e4cc",
-      "source": "sprite-workbench/reextracted-256-20261016/warrior/sheets/Side_Hit.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/warrior/sheets/Side_Hit.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "wizard",
       "action": "Front_Idle",
-      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Front_Idle.mp4",
+      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Front_Idle.mp4",
       "sourceFrameIndices": [
         69,
         70,
@@ -421,13 +421,13 @@
         103
       ],
       "sha256": "fdbe992df854fee94da5f35ee3f1eec50007c398f197cf95c7acb610fdf6e25e",
-      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Front_Idle.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/wizard/sheets/Front_Idle.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "wizard",
       "action": "Front_Victory",
-      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Front_Victory.mp4",
+      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Front_Victory.mp4",
       "sourceFrameIndices": [
         16,
         18,
@@ -455,13 +455,13 @@
         133
       ],
       "sha256": "8202741dbe5999fa824222851b4b6f677634fcb1188d30873e1ed767bc23f805",
-      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Front_Victory.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/wizard/sheets/Front_Victory.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "wizard",
       "action": "Side_Walk",
-      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Side_Walk.mp4",
+      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Side_Walk.mp4",
       "sourceFrameIndices": [
         39,
         40,
@@ -489,13 +489,13 @@
         70
       ],
       "sha256": "1b4040ac8639eb8635dcc0aa480052df45310f9b7e4179074be28615bf3b5b82",
-      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Side_Walk.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/wizard/sheets/Side_Walk.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "wizard",
       "action": "Side_Attack",
-      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Side_Attack.mp4",
+      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Side_Attack.mp4",
       "sourceFrameIndices": [
         68,
         70,
@@ -523,13 +523,13 @@
         123
       ],
       "sha256": "116ff86e52fa02e542f7383bf12e9daafea4400a8f232f09fb15ee23d4dd1aa4",
-      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Side_Attack.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/wizard/sheets/Side_Attack.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "wizard",
       "action": "Side_Down",
-      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Side_Down.mp4",
+      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Side_Down.mp4",
       "sourceFrameIndices": [
         24,
         27,
@@ -557,13 +557,13 @@
         83
       ],
       "sha256": "e75b4b82810c2142d2d1ebb03ce29f07c9ad473352666bcfad12822fa662ef50",
-      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Side_Down.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/wizard/sheets/Side_Down.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     },
     {
       "classId": "wizard",
       "action": "Side_Hit",
-      "sourceVideo": "sprite-workbench/Wizard/animations-20261016T022431Z/video/Side_Hit.mp4",
+      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Side_Hit.mp4",
       "sourceFrameIndices": [
         60,
         62,
@@ -591,7 +591,7 @@
         117
       ],
       "sha256": "f3b2e1dd703625718af68e7f5f6e5eab67dc9b18f6d7364c3b494f58c8f8d412",
-      "source": "sprite-workbench/reextracted-256-20261016/wizard/sheets/Side_Hit.png",
+      "source": "art-workbench/sprites/reextracted-256-20261016/wizard/sheets/Side_Hit.png",
       "generator": "Existing Grok native image_to_video; re-extracted, no new generation"
     }
   ]

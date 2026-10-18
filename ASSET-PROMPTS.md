@@ -44,10 +44,10 @@ Use case: stylized-concept. A production 2D anime fantasy game icon atlas with e
 
 사용자가 제공한 Fighter/Wizard 정면·측면 Base 이미지를 Grok native `image_to_video`로 각각 6초·480p 영상으로 만들었습니다. 정면 Idle·Victory, 측면 Walk·Attack·Down·Hit의 여섯 동작에서 각각 24프레임을 추출했습니다. Fighter Attack은 빈손 타격, Wizard Attack은 빈손 주문 시전입니다. Wizard의 왼쪽 측면 Base는 영상 입력 복사본에서만 좌우 반전했습니다.
 
-- 입력 원본과 생성 프롬프트·영상·개별 시트: `sprite-workbench/Fighter/animations-20261016T010827Z/`, `sprite-workbench/Wizard/animations-20261016T022431Z/` (Git 제외).
+- 입력 원본과 생성 프롬프트·영상·개별 시트: `art-workbench/sprites/Fighter/animations-20261016T010827Z/`, `art-workbench/sprites/Wizard/animations-20261016T022431Z/` (Git 제외).
 - 런타임: `public/assets/{warrior,wizard}/{sprite.png,sprite.json,portrait.png}`.
 - 합본: 2048×4608, 8열×18행, 256×256 RGBA 셀. 기존 128px 시트를 확대한 것이 아니라 보존된 544×544·24fps 영상의 원본 프레임에서 재추출했습니다.
-- 작업 산출물: `sprite-workbench/reextracted-256-20261016/`의 클래스별 6개 시트·GIF·합본과 `preview.html`. 재현 스크립트와 원본 프레임 번호는 같은 폴더에 보관합니다.
+- 작업 산출물: `art-workbench/sprites/reextracted-256-20261016/`의 클래스별 6개 시트·GIF·합본과 `preview.html`. 재현 스크립트와 원본 프레임 번호는 같은 폴더에 보관합니다.
 - 걷기는 반복되는 한 주기를 선택했습니다(전사 110–134, 마법사 39–70, 0-based). 공격 도입부의 회전을 제외하고 실제 타격·시전 구간을 골랐습니다. 승리 동작은 팔을 들고 내리는 전환에 더 많은 프레임을 배정했습니다.
 - 프레임별 크기 변경 없이 클래스 공통 배율과 동작별 고정 발 기준점을 사용합니다. 마법사 시전과 전사 승리 영상의 확대 차이는 동작 전체에 한 가지 고정 배율을 적용해 보정합니다. 마젠타 배경을 분리하고 경계 색만 보정하여 보라색 의상의 불필요한 투명화를 방지했습니다.
 - 288개 셀의 프레임 수·알파·잘림 검사, 원본 타임라인과 추출 시트 검수, 밝고 어두운 배경의 4배 확대 가장자리 검수 및 실제 브라우저 재생 검증을 수행했습니다. `quality.json`과 `evidence/sprite-hq-20261016/`에 결과를 보관합니다.
