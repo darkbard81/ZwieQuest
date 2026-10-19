@@ -4,10 +4,10 @@ import { innRoster } from './inn-roster.js';
 const esc = text => String(text).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 export function initInn({ panel, portrait, countdown, onCommand }) {
   let state = null, receivedAt = 0, rate = 1, connected = false, pending = false, portraitKey = '', rosterKey = '', opening = false;
-  let selectedAppearance = APPEARANCES[0].id, retireId = null, worldReady = false;
+  let selectedAppearance = APPEARANCES[0].id, retireId = null, worldReady = false, departureKey = '', departurePending = false;
   const guestButtons = new Map();
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  panel.innerHTML = '<div class="inn-heading"><strong>여행자의 여관</strong><span id="inn-status"></span></div><div class="inn-actions"><button id="inn-manage">캐릭터 관리</button></div>';
+  panel.innerHTML = '<div class="inn-heading"><strong>여행자의 여관</strong><span id="inn-status"></span></div><div class="inn-actions"><label class="inn-departure" for="inn-start-region">출발 지역 <select id="inn-start-region" aria-label="여관 출발 지역"></select></label><button id="inn-manage">캐릭터 관리</button></div>';
   const guestLayer = document.createElement('div'); guestLayer.id = 'inn-guests'; guestLayer.setAttribute('role', 'group'); guestLayer.setAttribute('aria-label', '캐릭터를 선택하여 출발'); guestLayer.hidden = true;
   panel.before(guestLayer);
   const dialog = document.createElement('dialog'); dialog.id = 'character-dialog'; dialog.setAttribute('aria-labelledby','character-dialog-title');
@@ -42,6 +42,14 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
   dialog.querySelector('.dialog-close').onclick = close; $('#character-manager-done').onclick = close;
   dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
   panel.querySelector('#inn-manage').onclick = open;
+  const departure = panel.querySelector('#inn-start-region');
+  departure.onchange = async () => {
+    const mapId = departure.value;
+    if (!canManage() || mapId === state.departureMapId) return;
+    departurePending = true;
+    try { await send('START_MAP', { mapId }); }
+    finally { departurePending = false; refresh(); }
+  };
   guestLayer.onclick = async event => {
     const button = event.target.closest('button[data-character]');
     if (!button || !canManage() || !worldReady || dialog.open) return;
@@ -85,6 +93,13 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
     const count = state?.characters.length || 0;
     panel.querySelector('#inn-status').textContent = count ? '모험가를 클릭하거나 터치하면 출발합니다' : '첫 캐릭터를 생성해 주세요';
     panel.querySelector('#inn-manage').disabled = !canManage();
+    const starts = state?.availableStarts || [], nextDepartureKey = JSON.stringify(starts);
+    if (nextDepartureKey !== departureKey) {
+      departureKey = nextDepartureKey;
+      departure.innerHTML = starts.map(start => `<option value="${esc(start.id)}">${esc(start.name)}</option>`).join('');
+    }
+    if (!departurePending) departure.value = state?.departureMapId || 'village';
+    departure.disabled = !canManage() || !starts.length;
     guestLayer.hidden = panel.hidden;
     const guests = innRoster(state?.characters);
     const ids = new Set(guests.map(c => c.id));
