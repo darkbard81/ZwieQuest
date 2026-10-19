@@ -28,7 +28,7 @@ test('point budget and allocation cannot double grant across multi-level growth,
  for(const stat of BASE_STATS)cmd(g,'ALLOCATE_STAT',{stat,amount:999});assert.equal(remainingPoints(g.character),4);assert.deepEqual(Object.values(g.character.attributes),Array(6).fill(1));
  for(let i=0;i<4;i++)cmd(g,'ALLOCATE_STAT',{stat:'CON'});const saved=structuredClone(g.state);
  assert.throws(()=>cmd(g,'ALLOCATE_STAT',{stat:'CON'}),/포인트/);assert.throws(()=>cmd(g,'ALLOCATE_STAT',{stat:'HP'}),/기본 능력치/);assert.deepEqual(g.state,saved);
- g.character.xp=400;g.state.risk=0;g.reward('treasure');assert.equal(g.character.level,5);assert.equal(remainingPoints(g.character),2);
+ g.character.xp=376;g.state.risk=0;g.reward('victory');assert.equal(g.character.level,5);assert.equal(remainingPoints(g.character),2);
  const c=structuredClone(g.character);for(let i=0;i<4;i++){const reload=new Game(config,JSON.parse(JSON.stringify(g.state)));assert.deepEqual(reload.character,c);assert.equal(reload.snapshot().attributePoints,2);}
 });
 test('common stats use invested plus equipped attributes, base defenses and ACC 10, common HP and no class mastery',()=>{

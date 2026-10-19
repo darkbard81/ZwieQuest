@@ -18,7 +18,7 @@
 .world-arrow:focus-visible{outline:3px solid #fff1bc;outline-offset:3px;background:#173b3244}
 #world.choosing .scene-top,#world.choosing .scene-bottom,#world.choosing .scene-notice{display:none}
 
-/* Safe viewport owns layout; the game canvas keeps its original size and density. */
+/* Safe viewport owns layout; the renderer retains its logical size and density. */
 :root{--safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px)}
 html,body{min-width:0;min-height:0;overflow:hidden}
 #viewport-shell{position:fixed;top:var(--safe-top);left:var(--safe-left);width:calc(100% - var(--safe-left) - var(--safe-right));height:calc(var(--viewport-height,100dvh) - var(--safe-top) - var(--safe-bottom));overflow:auto;overscroll-behavior:contain}
@@ -103,6 +103,7 @@ nav{gap:7px}.quiet{padding:7px 9px;font-size:11px}.connection{font-size:10px;pad
 #world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) #biome-tag,#world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) #biome-sub{display:none}
 #world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) .scene-top h2{font-size:16px;margin:0}
 .enemy-hud{left:334px;top:164px;width:128px}
+.enemy-hud.template-monster{left:310px;top:84px}
 #world[data-phase="TREASURE"] .scene-notice{top:auto;bottom:42px}
 
 /* Category art and five independent equipment grades. */
@@ -261,11 +262,8 @@ main{padding-top:12px}
 .bestiary-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; }
 .bestiary-heading h2 { font-size:17px; margin:0; }
 #bestiary-count, .bestiary-intro, #bestiary-empty { color:var(--muted); font-size:12px; line-height:1.7; }
-.bestiary-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr)); gap:10px; margin-top:16px; }
-.bestiary-card { display:flex; flex-direction:column; align-items:center; min-width:0; border:1px solid var(--line); border-radius:9px; padding:8px; background:#233b32; }
-.bestiary-card img { width:128px; height:128px; max-width:100%; object-fit:contain; }
-.bestiary-card strong { font-size:12px; margin:5px 0; }
-.bestiary-card small { color:var(--muted); font-size:10px; }
+.bestiary-grid { display:grid; grid-template-columns:repeat(auto-fill,45px); gap:8px; margin-top:16px; }
+.bestiary-card { padding:0; min-width:0; }
 .bestiary-card:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
 #bestiary-dialog { width:900px; max-width:95vw; max-height:90dvh; overflow:auto; padding:24px; }
 #bestiary-title { font-size:24px; margin:6px 0 18px; }
@@ -287,3 +285,11 @@ main{padding-top:12px}
   .bestiary-facts { background:#11251feb; padding:16px; }
   .info-tabs [role=tab] { padding-left:8px; padding-right:8px; }
 }
+
+/* Stacked layout scales canvas and DOM overlays together, including hit targets. */
+#viewport-shell[data-stacked=true] :is(.topbar,main){min-width:0}
+#viewport-shell[data-stacked=true] .window{min-width:0}
+#viewport-shell[data-stacked=true] .world-window{width:100%;height:var(--world-height,422px)}
+#viewport-shell[data-stacked=true] #world{transform:scale(var(--world-scale,1));transform-origin:top left}
+#viewport-shell[data-stacked=true] #combat-controls{width:100%}
+#viewport-shell[data-stacked=true] nav{flex-wrap:wrap}

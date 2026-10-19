@@ -156,7 +156,7 @@ export class Game {
     if (!this.character) throw Error('출전 캐릭터가 없습니다.');
     const generated = !boss && !treasure && s.enemy?.generationVersion === 1;
     const rewards = generated ? monsterRewards(s.enemy, this.character.level, this.config.xpPerLevel) : {
-      xp: (boss ? tune.bossXP : treasure ? tune.treasureXP : tune.battleXP) + s.risk * tune.riskXP,
+      xp: treasure ? 0 : (boss ? tune.bossXP : tune.battleXP) + s.risk * tune.riskXP,
       gold: (boss ? tune.bossGold : treasure ? tune.treasureGold : tune.battleGold) + s.risk * tune.riskGold, canDrop: true };
     const { xp, gold } = rewards;
     if (generated && s.bestiary[s.enemy.variationId]) s.bestiary[s.enemy.variationId].defeats++;
@@ -167,8 +167,8 @@ export class Game {
       ? ['weapon', 'armor', 'charm'][this.rng(3)] : null;
     const item = slot ? this.item(slot) : null;
     if (item) s.inventory.push(item);
-    s.lastReward = { kind, goldOnly: generated && !rewards.canDrop, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
-    this.log(kind, `${boss ? '보스 격파' : treasure ? '보물 발견' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : generated && !rewards.canDrop ? ' · 하위 레벨 몬스터: 골드만 획득' : ' · 장비 없음'}`, { xp, gold, itemId: item?.id || null, characterId: this.character.id });
+    s.lastReward = { kind, goldOnly: treasure || (generated && !rewards.canDrop), itemId: item?.id || null, itemName: item?.name || null, xp, gold };
+    this.log(kind, treasure ? `보물 발견 · 금화 +${gold}` : `${boss ? '보스 격파' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : generated && !rewards.canDrop ? ' · 하위 레벨 몬스터: 골드만 획득' : ' · 장비 없음'}`, { xp, gold, itemId: item?.id || null, characterId: this.character.id });
     while (this.character.xp >= this.character.level * this.config.xpPerLevel) {
       this.character.xp -= this.character.level * this.config.xpPerLevel; this.character.level++;
       this.log('level', `레벨 ${this.character.level}! 최대 HP 증가${levelBonus(this.character.level) !== levelBonus(this.character.level - 1) ? ' · 전투 숙련 +1' : ''}`);

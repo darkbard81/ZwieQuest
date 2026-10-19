@@ -9,6 +9,8 @@ export function initWindows() {
     availableHeight = Math.max(0, shell.clientHeight - chromeHeight - 20);
     layout = desktopLayout(shell.clientWidth - 32, availableHeight, controls.getBoundingClientRect().height);
     desktop.style.setProperty('--details-height', layout.details + 'px');
+    desktop.style.setProperty('--world-height', layout.worldHeight + 'px');
+    desktop.style.setProperty('--world-scale', String(layout.worldScale));
   }
   let z = 10, ready = false, activeLayoutKey = '';
   const readLayout = key => { try { return JSON.parse(localStorage.getItem(key) || '{}') || {}; } catch { return {}; } };
@@ -68,7 +70,10 @@ export function initWindows() {
       // Measure the expanded border box before CSS reduces it to the header.
       if (collapsed) w.dataset.expandedHeight = String(w.getBoundingClientRect().height);
       w.classList.toggle('collapsed', collapsed);
-      if (!collapsed) w.style.height = validHeight(w.dataset.expandedHeight, Number(w.dataset.defaultHeight)) + 'px';
+      if (!collapsed) {
+        if (layout.stacked) w.style.removeProperty('height');
+        else w.style.height = validHeight(w.dataset.expandedHeight, Number(w.dataset.defaultHeight)) + 'px';
+      }
       w.querySelector('.minimize').textContent = collapsed ? '+' : '−'; w.querySelector('.minimize').setAttribute('aria-expanded', String(!collapsed)); extent(); save();
     });
     new ResizeObserver(() => { if (ready) { extent(); save(); } }).observe(w);

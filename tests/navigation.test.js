@@ -69,7 +69,7 @@ test('automatic route waits for encounters, resumes after combat/treasure, and a
  for (const encounter of ['battle','treasure']) {
   const g=make();reveal(g);const map=g.state.maps.village,target=targetAt(map,3);
   g.advance();g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:target});
-  g.rng=n=>n===10000?(encounter==='battle'?0:1250):Math.min(11,n-1);g.advance();
+  g.rng=n=>n===10000?(encounter==='battle'?0:2000):Math.min(11,n-1);g.advance();
   assert.equal(g.state.phase,encounter==='battle'?'BATTLE':'TREASURE');assert.equal(g.state.step,1);assert.ok(g.state.autoRoute);
   if(encounter==='battle'){g.character.hp=10000;g.state.enemy.hp=1;g.state.enemy.DEF=-100;g.state.enemy.AR=0;g.state.battle.actor='hero';g.battleAction();assert.equal(g.state.phase,'TREASURE');}
   g.rng=quiet;g.advance();assert.equal(g.state.phase,'TRAVEL');assert.equal(g.state.step,2);
@@ -89,14 +89,14 @@ test('labels use depth and stable left-to-right indexes for paths and dead ends 
  assert.match(mapSVG(g.snapshot()),/role="button" tabindex="0" aria-label="미탐험까지 자동 이동"/);
 });
 
-test('exclusive encounter roll covers exactly 12.5% battle, 12.5% treasure and 75% pass', () => {
+test('exclusive encounter roll covers exactly 20% battle, 5% treasure and 75% pass', () => {
  const counts={battle:0,treasure:0,pass:0};
  for(let roll=0;roll<10000;roll++) counts[rollEncounter(n=>{assert.equal(n,10000);return roll;})]++;
- assert.deepEqual(counts,{battle:1250,treasure:1250,pass:7500});
+ assert.deepEqual(counts,{battle:2000,treasure:500,pass:7500});
 });
 
 test('every map rolls on arrival, ignores old fixed assignments, and never rerolls a saved encounter on reload', () => {
- for(const mapId of ['village','volcano','snow','desert','beach'])for(const [roll,phase] of [[0,'BATTLE'],[1249,'BATTLE'],[1250,'TREASURE'],[2499,'TREASURE'],[2500,'CHOICE_WAIT'],[9999,'CHOICE_WAIT']]) {
+ for(const mapId of ['village','volcano','snow','desert','beach'])for(const [roll,phase] of [[0,'BATTLE'],[1999,'BATTLE'],[2000,'TREASURE'],[2499,'TREASURE'],[2500,'CHOICE_WAIT'],[9999,'CHOICE_WAIT']]) {
   const g=make();if(mapId==='village')g.advance();else g.enterRegion(mapId);
   g.choose('left');g.state.maps[mapId].nodes[g.state.currentNodeId].event='battle';
   g.rng=n=>n===10000?roll:0;g.advance();assert.equal(g.state.phase,phase);
@@ -105,7 +105,7 @@ test('every map rolls on arrival, ignores old fixed assignments, and never rerol
   assert.ok(Object.values(restored.state.maps[mapId].nodes).every(n=>!Object.hasOwn(n,'event')));
  }
  const g=make();g.advance();g.choose('left');const arrival=structuredClone(g.state);
- for(const [roll,phase] of [[0,'BATTLE'],[1250,'TREASURE'],[2500,'CHOICE_WAIT']]) {g.state=structuredClone(arrival);g.rng=()=>roll;g.advance();assert.equal(g.state.phase,phase);}
+ for(const [roll,phase] of [[0,'BATTLE'],[2000,'TREASURE'],[2500,'CHOICE_WAIT']]) {g.state=structuredClone(arrival);g.rng=()=>roll;g.advance();assert.equal(g.state.phase,phase);}
 });
 
 test('dead ends, exits and bosses keep their terminal behavior without rolling ordinary encounters', () => {

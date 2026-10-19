@@ -110,8 +110,8 @@ export async function createWorld(container) {
     if (object.visible) {
       const monsterTexture = s.phase === 'BATTLE' ? monsterTextures.get(monsterAssetURL(s.enemy?.img_path)) : null;
       object.texture = monsterTexture || cells[s.phase === 'TREASURE' ? 0 : { village: 1, volcano: 2, beach: 3, desert: 2, snow: 3 }[s.theme]];
-      object.width = object.height = monsterTexture ? 154 : s.enemy?.boss ? 112 : 84;
-      object.position.set(398, 317 + (s.phase === 'BATTLE' && !reduced ? Math.sin(now / 280) * 3 : 0));
+      object.width = object.height = monsterTexture ? 196 : s.enemy?.boss ? 112 : 84;
+      object.position.set(monsterTexture ? 374 : 398, (monsterTexture ? 330 : 317) + (s.phase === 'BATTLE' && !reduced ? Math.sin(now / 280) * 3 : 0));
       object.tint = s.phase === 'BATTLE' && s.battle?.lastHit?.actor === 'hero' && Date.now() - s.battle.lastHit.at < 160 ? 0xffd4aa : 0xffffff;
     }
     if (feedback.visible) {

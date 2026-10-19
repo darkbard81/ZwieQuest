@@ -52,8 +52,12 @@ test('legacy items are replaced once, preserve equipped IDs and new gear, and ne
  const saved=structuredClone(migrated.state),again=new Game(g.config,structuredClone(saved),()=>{throw Error('Unexpected reroll');});assert.deepEqual(again.state,saved);
  }
 });
-test('fresh starter gear uses the current catalog; treasure grants no equipment',()=>{
+test('fresh starter gear uses the current catalog; treasure grants only gold at every risk',()=>{
  for(const cls of ['warrior','wizard']){const g=make(cls);assert.equal(g.state.inventory.length,2);assert.deepEqual(g.state.inventory.map(i=>i.slot),['weapon','armor']);assert.ok(g.state.inventory.every(i=>i.templateId));assert.ok(g.state.inventory.filter(i=>i.slot!=='skill').every(i=>i.gradeId==='normal'));assert.equal(g.character.equipment.charm,undefined);
-  g.state.risk=0;g.rng=()=>{throw Error('Treasure must not roll equipment');};const before=structuredClone(g.state.inventory);g.reward('treasure');assert.deepEqual(g.state.inventory,before);assert.equal(g.state.lastReward.itemId,null);assert.equal(g.state.lastReward.xp,g.config.balance.treasureXP);assert.equal(g.state.gold,g.config.balance.treasureGold);assert.equal(g.state.chests,1);
+  g.rng=()=>{throw Error('Treasure must not roll equipment');};const before=structuredClone(g.state.inventory);g.character.xp=39;
+  for(const [index,risk] of [0,3,10].entries()){
+   g.state.risk=risk;const gold=g.state.gold,expected=g.config.balance.treasureGold+risk*g.config.balance.riskGold;g.reward('treasure');
+   assert.deepEqual(g.state.inventory,before);assert.equal(g.state.lastReward.itemId,null);assert.equal(g.state.lastReward.xp,0);assert.equal(g.state.lastReward.goldOnly,true);assert.equal(g.character.xp,39);assert.equal(g.character.level,1);assert.equal(g.state.gold,gold+expected);assert.equal(g.state.chests,index+1);assert.equal(g.events.at(-1).text,`보물 발견 · 금화 +${expected}`);
+  }
  }
 });

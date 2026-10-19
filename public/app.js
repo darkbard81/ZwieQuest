@@ -82,8 +82,9 @@ function receive(next) {
   $('#scene-location').textContent = s.phase === 'HOME' ? `${theme.name} · ${s.mapId === 'village' ? 'HOME' : '출발점'}` : theme.name;
   $('#scene-direction').textContent = s.phase === 'TRAVEL' ? `${s.direction === 'left' ? '←' : '→'} 새로운 길을 향해` : '성장은 자동으로, 선택은 자유롭게';
   $('#enemy-hud').hidden = !s.enemy || s.phase !== 'BATTLE';
+  $('#enemy-hud').classList.toggle('template-monster', Boolean(s.enemy?.img_path));
   if (s.enemy) $('#enemy-hud').innerHTML = `${esc(s.enemy.name)}${s.enemy.level ? ` Lv.${s.enemy.level}` : ''} · ${s.enemy.hp}/${s.enemy.maxHp}<div class="meter"><div style="width:${100 * s.enemy.hp / s.enemy.maxHp}%"></div></div>`;
-  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : `${s.lastReward?.kind === 'treasure' ? '보물상자에서' : '전투 보상으로'} ${s.lastReward?.goldOnly ? '하위 레벨 몬스터의 금화만 얻었어요.' : '경험치와 금화를 얻었어요.'}`) : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
+  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.kind === 'treasure' ? `보물상자에서 금화 ${s.lastReward.gold}개를 얻었어요.` : s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : s.lastReward?.goldOnly ? '하위 레벨 몬스터의 금화만 얻었어요.' : '전투 보상으로 경험치와 금화를 얻었어요.') : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
   $('#return-overlay').hidden = s.phase !== 'RETURN_HOME';
   if (s.phase === 'RETURN_HOME') $('#return-overlay').innerHTML = `<small>JOURNEY COMPLETE</small><h2>${s.lastSummary?.downed ? '무사히 돌아왔어요' : s.lastSummary?.reason === 'boss' ? '수호자를 넘어섰어요' : '길 끝에서, 다시 출발'}</h2><p>${s.run}번째 여행 · ${theme.name}</p><strong>+ ${s.lastSummary.gold} G</strong><p>성장과 전리품을 안전하게 저장했습니다.<br>마을의 집(HOME)으로 돌아갑니다.</p>`;
   if ($('#map-dialog')?.open) renderMap();

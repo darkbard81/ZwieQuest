@@ -36,7 +36,7 @@ export function initBestiary(panel) {
       if (key !== previousKey) {
         previousKey = key;
         const focused = grid.contains(document.activeElement) ? document.activeElement.dataset.variation : null;
-        grid.innerHTML = rows.map(entry => `<button class="bestiary-card" type="button" data-variation="${esc(entry.variationId)}" aria-label="${esc(entry.name)} 상세 보기"><img src="${monsterAssetURL(entry.sample.icon_path)}" alt="" width="128" height="128" loading="lazy"><strong>${esc(entry.name)}</strong><small>조우 ${entry.encounters} · 처치 ${entry.defeats}</small></button>`).join('');
+        grid.innerHTML = rows.map(entry => `<button class="bestiary-card item-icon" type="button" data-variation="${esc(entry.variationId)}" title="${esc(entry.name)}" aria-label="${esc(entry.name)} 상세 보기"><img class="equipment-icon" src="${monsterAssetURL(entry.sample.icon_path)}" alt="" width="43" height="43" loading="lazy"></button>`).join('');
         if (focused) [...grid.children].find(button => button.dataset.variation === focused)?.focus();
       }
       empty.hidden = rows.length > 0;
