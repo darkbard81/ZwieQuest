@@ -32,10 +32,10 @@ test('HTTP: registration, isolation, ownership, idempotency, offline events, res
   const armor=create.body.state.equipment.armor;
   const wizard=await req('/api/command',{type:'CLASS',classId:'wizard',requestId:randomUUID()},a.cookie);
   assert.equal(wizard.status,200);assert.equal(wizard.body.state.level,1);assert.equal(wizard.body.state.xp,0);assert.deepEqual(wizard.body.state.equipment,{});
-  assert.equal((await req('/api/command',{type:'TACTIC',tactic:'heal',requestId:randomUUID()},a.cookie)).status,200);
+  assert.equal((await req('/api/command',{type:'UNEQUIP',itemId:create.body.state.skillSlots[0],requestId:randomUUID()},a.cookie)).status,200);
   assert.equal((await req('/api/command',{type:'EQUIP',itemId:armor,requestId:randomUUID()},a.cookie)).status,200);
   const restored=await req('/api/command',{type:'APPEARANCE',appearanceId:'cat',requestId:randomUUID()},a.cookie);
-  assert.deepEqual(restored.body.state.equipment,create.body.state.equipment);assert.equal(restored.body.state.tactic,'normal');
+  assert.deepEqual(restored.body.state.equipment,create.body.state.equipment);assert.ok(restored.body.state.skillSlots.every(id=>id===null));
   assert.deepEqual(restored.body.state.equipmentUsers[armor].sort(),['warrior','wizard']);
   const item=create.body.state.inventory.find(i=>i.slot==='weapon');
   assert.equal((await req('/api/command',{type:'UNEQUIP',itemId:item.id,requestId:randomUUID()},a.cookie)).status,200);
@@ -49,7 +49,7 @@ test('HTTP: registration, isolation, ownership, idempotency, offline events, res
   await sleep(21000);const after=db.prepare('SELECT MAX(seq) AS seq FROM user_events WHERE user_id=?').get(a.body.user.id).seq;assert.ok(after>initial,'events accumulated in DB without login');
   await stop();const state=JSON.parse(db.prepare('SELECT body FROM account_state WHERE user_id=?').get(a.body.user.id).body);const count=db.prepare('SELECT COUNT(*) n FROM user_events WHERE user_id=?').get(a.body.user.id).n;await sleep(1800);assert.equal(db.prepare('SELECT COUNT(*) n FROM user_events WHERE user_id=?').get(a.body.user.id).n,count);db.close();
   await start();const login=await req('/api/auth/login',{username:'test_alpha',password});const resumed=(await req('/api/state',undefined,login.cookie)).body.state;assert.equal(resumed.eventSeq,state.eventSeq);assert.ok(resumed.remaining>state.remaining-1200,'stopped time not replayed');assert.equal(resumed.gold,state.gold);assert.equal(resumed.appearanceId,'cat');
-  assert.equal(resumed.classProfiles.wizard.tactic,'heal');assert.equal(resumed.classProfiles.wizard.equipment.armor,armor);assert.equal(resumed.classProfiles.wizard.level,1);
+  assert.ok(resumed.skillSlots.every(id=>id===null));assert.equal(resumed.classProfiles.wizard.equipment.armor,armor);assert.equal(resumed.classProfiles.wizard.level,1);
   const check=new DatabaseSync(join(dir,'zwiequest.sqlite'));const u=check.prepare('SELECT * FROM users WHERE id=?').get(a.body.user.id);assert.notEqual(u.password_hash,password);assert.equal(u.password_hash.length,128);assert.equal(check.prepare('SELECT COUNT(*) n FROM account_state').get().n,2);check.close();
  }finally{if(child)await stop();rmSync(dir,{recursive:true,force:true});}
 });

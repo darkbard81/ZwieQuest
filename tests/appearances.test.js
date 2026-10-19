@@ -13,10 +13,11 @@ test('six appearances share progress within their class, with a fresh Wizard pro
   const before = structuredClone(game.state);
   for (const appearance of APPEARANCES) {
     game.command({ type: 'APPEARANCE', appearanceId: appearance.id });
+    assert.deepEqual(game.state.inventory, before.inventory);
     const state = game.snapshot();
     assert.equal(state.appearanceId, appearance.id);
     assert.equal(state.classId, appearance.id === 'wizard' ? 'wizard' : 'warrior');
-    for (const key of ['gold', 'inventory', 'remaining', 'duration', 'phaseStartedAt']) assert.deepEqual(state[key], before[key], key);
+    for (const key of ['gold', 'remaining', 'duration', 'phaseStartedAt']) assert.deepEqual(state[key], before[key], key);
     assert.equal(state.level, state.classId === 'wizard' ? 1 : before.level);
     assert.equal(state.xp, state.classId === 'wizard' ? 0 : before.xp);
     assert.deepEqual(state.equipment, state.classId === 'wizard' ? {} : before.equipment);
@@ -47,12 +48,12 @@ test('save reload restores appearance, old saves migrate, invalid and expired re
   assert.equal(reloaded.state.appearanceId, 'lamia');
 });
 
-test('same-class appearance retains tactic and HP; Wizard transition resets incompatible tactic only', () => {
-  const game = make(); game.state.tactic = 'assault'; game.state.hp = 20;
+test('appearance and class changes preserve skill slots and cannot heal', () => {
+  const game = make();  game.state.hp = 20;
   game.command({ type: 'APPEARANCE', appearanceId: 'ranger' });
-  assert.equal(game.state.tactic, 'assault'); assert.equal(game.state.hp, 20);
+  assert.ok(game.state.skillSlots[0]); assert.equal(game.state.hp, 20);
   game.command({ type: 'APPEARANCE', appearanceId: 'wizard' });
-  assert.equal(game.state.tactic, 'normal');
+  assert.equal(game.state.hp, 20); assert.ok(game.state.skillSlots[0]);
   game.command({ type: 'CLASS', classId: 'warrior' });
   assert.equal(game.state.appearanceId, 'warrior');
 });

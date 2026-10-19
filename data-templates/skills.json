@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "maxEquipped": 6,
+  "skills": [
+    {
+      "id": "heal",
+      "name": "회복",
+      "icon": "💚",
+      "description": "최대 체력의 (10% + 유효 지능 × 5%)를 회복합니다. 최대 체력을 넘지 않습니다. 전투당 최대 2회 사용합니다.",
+      "enabled": true,
+      "grantOnCreate": true,
+      "equipByDefault": true,
+      "effect": {
+        "type": "heal",
+        "maxHpRate": 0.1,
+        "intelligenceRate": 0.05
+      },
+      "cooldown": {
+        "baseMs": 20000,
+        "dexterityReductionRate": 0.05,
+        "minimumMs": 0
+      },
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 2
+    },
+    {
+      "id": "dagger-mastery",
+      "name": "단검숙련",
+      "icon": "🗡️",
+      "description": "유지 효과 예시: 전투 중 ON 상태에서 단검 카테고리 무기를 사용하면 명중 수치 +1. 기본 지급하지 않습니다.",
+      "enabled": false,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesTurn": false,
+      "effect": {
+        "type": "accuracyBonus",
+        "amount": 1,
+        "weaponCategories": [
+          "dagger"
+        ]
+      },
+      "cooldown": {
+        "baseMs": 0,
+        "dexterityReductionRate": 0,
+        "minimumMs": 0
+      }
+    }
+  ]
+}

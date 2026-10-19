@@ -6,7 +6,7 @@ import { sortInventory } from './inventory-order.js';
 import { initDefenseDetails } from './defense-details.js';
 import { initInn } from './inn-view.js';
 import { appearanceFor } from './appearances.js';
-import { tacticDescription, roundStatus } from './tactics-view.js';
+import { initSkills, skillDescription } from './skills-view.js';
 import { itemIconHTML, itemDetailsHTML } from './equipment-view.js';
 import { createWorld } from './render.js';
 import { initWindows } from './windows.js';
@@ -27,6 +27,7 @@ const defenseDetails = initDefenseDetails($('#stats'), $('#defense-details'));
 const clientId = crypto.randomUUID(); let lastHeartbeat = 0;
 let world, choicePending = false;
 const combatFeed = createCombatFeed();
+const skills = initSkills({ bar: $('#skill-bar'), slots: $('#skill-slots'), summary: $('#skill-summary'), status: $('#battle-status'), onUse: (itemId, battleId, turn, button, mode, enabled) => command(mode === 'toggle' ? 'TOGGLE_SKILL' : 'USE_SKILL', { itemId, battleId, turn, ...(mode === 'toggle' ? { enabled } : {}) }, button) });
 const inn = initInn({ panel: $('#inn-selection'), portrait: $('#portrait'), countdown: $('#rest-countdown'), onSelect: (appearanceId, button) => command('APPEARANCE', { appearanceId }, button) });
 function updateInn() { inn.update(data?.state, receivedAt, data?.rate || 1, connected && !!user); }
 createWorld($('#world')).then(w => { world = w; if (data?.state) w.update(data.state); }).catch(e => { $('#render-error').hidden = false; $('#render-error').textContent = '게임 화면을 불러오지 못했습니다. 새로고침해 주세요. ' + e.message; console.error(e); });
@@ -56,6 +57,7 @@ function receive(next) {
   $('#connection').classList.remove('lost'); $('#connection').innerHTML = `<i></i>${next.mode === 'ONLINE' ? '온라인' : '오프라인'} · ${next.rate}×`;
   $('#server-status').textContent = 'SERVER LIVE · SAVED';
   updateInn();
+  skills.update(next.state, next.serverTime, receivedAt, connected);
   const s = next.state; $('#world').dataset.phase = s?.phase || 'HOME'; updateChoices();
   if (!s) { world?.update(null); if (user && !$('#welcome').open) $('#welcome').showModal(); return; }
   if ($('#welcome').open) $('#welcome').close(); world?.update(s); world?.playEvents(combatEvents);
@@ -76,15 +78,6 @@ function receive(next) {
   renderInventory(s);
   $('#scene-location').textContent = s.phase === 'HOME' ? `${theme.name} · ${s.mapId === 'village' ? 'HOME' : '출발점'}` : theme.name;
   $('#scene-direction').textContent = s.phase === 'TRAVEL' ? `${s.direction === 'left' ? '←' : '→'} 새로운 길을 향해` : '성장은 자동으로, 선택은 자유롭게';
-  const tacticOptions = s.availableTactics || [{ id: 'normal', name: '일반' }];
-  const optionKey = tacticOptions.map(t => t.id).join(',');
-  if ($('#tactic').dataset.options !== optionKey) {
-    $('#tactic').innerHTML = tacticOptions.map(t => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('');
-    $('#tactic').dataset.options = optionKey;
-  }
-  $('#tactic').value = s.tactic;
-  $('#tactic-summary').textContent = tacticDescription(tacticOptions.find(t => t.id === s.tactic));
-  $('#battle-status').textContent = roundStatus(s);
   $('#enemy-hud').hidden = !s.enemy || s.phase !== 'BATTLE';
   if (s.enemy) $('#enemy-hud').innerHTML = `${esc(s.enemy.name)} · ${s.enemy.hp}/${s.enemy.maxHp}<div class="meter"><div style="width:${100 * s.enemy.hp / s.enemy.maxHp}%"></div></div>`;
   $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : `${s.lastReward?.kind === 'treasure' ? '보물상자에서' : '전투 보상으로'} 경험치와 금화를 얻었어요.`) : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
@@ -117,14 +110,16 @@ function renderEquipment(s) {
   }
 }
 function renderInventory(s) {
-  const key = JSON.stringify([s.inventory, s.equipment, s.equipmentUsers, s.classId, filter]); if (key === inventoryKey) return; inventoryKey = key;
+  const key = JSON.stringify([s.inventory.map(({cooldown, ...item}) => item), s.equipment, s.skillSlots, s.equipmentUsers, s.classId, filter]); if (key === inventoryKey) return; inventoryKey = key;
   $('#item-count').textContent = `${s.inventory.length}개`;
   const sale = s.normalSale || { count: 0, gold: 0 };
   $('#sell-normal').textContent = `일반 일괄 판매 (${sale.count}개 · ${sale.gold} G)`;
   $('#sell-normal').disabled = !sale.count;
   const items = sortInventory(s, filter);
   $('#inventory-list').innerHTML = items.length ? items.map(item => {
-    const equipped = Object.values(s.equipment).includes(item.id);
+    const skill = item.slot === 'skill';
+    const equipped = skill ? s.skillSlots.includes(item.id) : Object.values(s.equipment).includes(item.id);
+    if (skill) return `<article class="item skill-item"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3>${esc(item.name)}${equipped ? '<span class="equipped">장착</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${esc(item.id)}" ${!equipped && (!item.enabled || s.skillSlots.every(Boolean)) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button></div></div><p>${esc(item.description)}<br>${esc(skillDescription(item))}<br>공용 스킬 · 최대 6개 장착 · 판매 불가</p></div></article>`;
     const users = s.equipmentUsers?.[item.id] || (equipped ? [s.classId] : []);
     const names = users.map(id => s.classProfiles?.[id]?.name || id).join('·');
     return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3><span class="rarity">${esc(item.rarity)}</span> ${esc(item.name)}${users.length ? `<span class="equipped">${esc(names)} 장착</span>` : ''}${item.special ? ' <span class="item-special">특수</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}">${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${users.length ? `disabled title="${esc(names)} 직업에서 장착을 해제해 주세요"` : ''}>판매 ${item.value} G</button></div></div><p>${itemDetailsHTML(item)}</p></div></article>`;
@@ -152,16 +147,15 @@ async function choose(direction) {
 }
 for (const direction of ['left', 'right']) $(`#choose-${direction}`).onclick = () => choose(direction);
 addEventListener('keydown', e => { if (e.repeat || !['ArrowLeft', 'ArrowRight'].includes(e.key) || e.target.closest('input,textarea,select,dialog,[role=tablist]') || document.querySelector('dialog[open]') || data?.state?.phase !== 'CHOICE_WAIT') return; e.preventDefault(); $(`#choose-${e.key === 'ArrowLeft' ? 'left' : 'right'}`).click(); });
-$('#tactic').onchange = e => command('TACTIC', { tactic: e.target.value });
 $('#class-switch').onclick = () => { const w = $('#world-window'); if (w.classList.contains('collapsed')) w.querySelector('.minimize').click(); inn.focus(); };
 $$('[data-class]').forEach(b => b.onclick = () => command('CREATE', { classId: b.dataset.class }, b));
 $('#welcome').addEventListener('cancel', e => e.preventDefault());
 $('#help-button').onclick = () => $('#help').showModal(); $$('#help .dialog-close').forEach(b => b.onclick = () => $('#help').close());
 async function presence(active = true) { if (!user) return; if (active) lastHeartbeat = Date.now(); try { await api('/api/presence', { clientId, active }); } catch (e) { if (active) $('#connection').classList.add('lost'); } }
-function disconnect() { source?.close(); source = null; connected = false; world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
+function disconnect() { source?.close(); source = null; connected = false; skills.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
 async function connect() {
   disconnect();
-  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
+  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; skills.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
 }
 setInterval(() => { if (user) presence(); }, 4000);
 addEventListener('pagehide', () => { if (user) fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, active: false }), keepalive: true }); });

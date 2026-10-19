@@ -45,7 +45,7 @@ export function initInn({ panel, portrait, countdown, onSelect }) {
         const label = `${profile.name} Lv.${profile.level}`;
         const small = button.querySelector('small');
         if (small.textContent !== label) small.textContent = label;
-        if (meta) button.title = profile.started ? `${profile.name}의 저장된 성장·장비·전술을 사용합니다.` : '새 직업: 1레벨 · 경험치 0 · 장비 미착용 · 일반 전술';
+        if (meta) button.title = profile.started ? `${profile.name}의 저장된 성장·장비을 사용합니다.` : '새 직업: 1레벨 · 경험치 0 · 장비 미착용';
       }
     }
     refreshPortrait();

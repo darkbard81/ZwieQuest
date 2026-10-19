@@ -1,5 +1,4 @@
 import { Game } from './game.js';
-import { stats } from './combat.js';
 
 // Called only after the server has checked the account's stored administrator role.
 export function prepareAdminGame(game, revealAgain = false) {
@@ -21,7 +20,6 @@ export function regenerateAdminMaps(game) {
   if (!game.state) throw Error('지도를 재생성할 모험가가 없습니다.');
   game.installMaps();
   Object.assign(game.state, { choiceId: null, pendingBossReturn: false, lastBossRewardId: null, lastReward: null, risk: 0 });
-  game.state.hp = stats(game.state, game.config).maxHp;
   game.phase('HOME', game.config.homeMs);
   prepareAdminGame(game, true);
   game.log('map', '관리자 지도 재생성 · 성장과 장비를 유지하고 새 지도의 마을에서 다시 출발합니다.');

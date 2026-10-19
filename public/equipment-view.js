@@ -1,9 +1,11 @@
+import { skillIconHTML } from './skills-view.js';
 import { statLabelHTML } from './labels.js';
 import { damageTagHTML } from './damage-tags.js';
 export { damageNames } from './damage-tags.js';
 const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const signed = n => n > 0 ? `+${n}` : String(n);
 export function itemIconHTML(item, empty = 'armor') {
+  if (item?.slot === 'skill') return skillIconHTML(item);
   if (/^\/assets\/equipment\/[a-z]+(?:-[a-z]+)*-v1\.(?:webp|png)$/.test(item?.iconPath || '')) return `<img class="equipment-icon" src="${item.iconPath.replace(/\.png$/, '.webp')}" alt="${esc(item.name)}" width="43" height="43" loading="lazy">`;
   const icon = ['sword', 'staff', 'armor', 'charm'].includes(item?.icon) ? item.icon : empty === 'weapon' ? 'sword' : empty;
   return `<span class="icon ${esc(icon)}" aria-hidden="true"></span>`;

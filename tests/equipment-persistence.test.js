@@ -53,11 +53,11 @@ test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved g
     await start(); await request('/api/auth/login', { username: 'equipment_test', password: '123456' });
     let state = (await request('/api/state')).state;
     assert.equal(state.mapGraph.version,2);
-    for (const item of state.inventory) {
+    for (const item of state.inventory.filter(i => i.slot !== 'skill')) {
       assert.match(item.iconPath,/\.webp$/);
       const image=await fetch(origin+item.iconPath);assert.equal(image.status,200);assert.match(image.headers.get('content-type'),/image\/webp/);
     }
-    assert.equal(state.tactic, 'normal'); assert.equal(state.battle.ap, 2); assert.equal(state.battle.attacks, 1); assert.equal(state.battle.actor, savedActor);
+    assert.equal(state.tactic, undefined); assert.equal(state.battle.ap, 2); assert.equal(state.battle.attacks, 1); assert.equal(state.battle.actor, savedActor);
     const converted = state.inventory.find(i => i.id === legacy.id);assert.equal(converted.templateId,'longsword');assert.equal(converted.gradeId,'excellent');assert.equal(converted.stats.power,undefined);
     const convertedCharm=state.inventory.find(i=>i.id===oldCharm.id);assert.equal(convertedCharm.gradeId,'fine');assert.equal(convertedCharm.accessoryRulesVersion,1);assert.equal(convertedCharm.stats.ACC,undefined);assert.equal(state.equipment.charm,oldCharm.id);
     await request('/api/command',{type:'EQUIP',itemId:charm.id,requestId:randomUUID()});

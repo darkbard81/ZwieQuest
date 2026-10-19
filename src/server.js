@@ -4,6 +4,7 @@ import { resolve, dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { Game, THEMES } from './game.js';
+import { initializeBattleSkills } from './skills.js';
 import { LocalAuth } from './auth.js';
 import { AccountAdmin, forgetAccount } from './admin.js';
 import { prepareAdminGame, resetGameProgress } from './account-progress.js';
@@ -19,7 +20,14 @@ const db = new DatabaseSync(join(dataDir, 'zwiequest.sqlite'));
 db.exec('PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON; CREATE TABLE IF NOT EXISTS account_state(user_id TEXT PRIMARY KEY,body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS user_events(user_id TEXT NOT NULL,seq INTEGER NOT NULL,at INTEGER NOT NULL,body TEXT NOT NULL,PRIMARY KEY(user_id,seq)); CREATE TABLE IF NOT EXISTS requests(user_id TEXT NOT NULL,id TEXT NOT NULL,body TEXT NOT NULL,PRIMARY KEY(user_id,id));');
 const auth = new LocalAuth(db, origin.startsWith('https://'));
 const accountAdmin = new AccountAdmin(db);
-const games = new Map(db.prepare('SELECT * FROM account_state').all().map(r => [r.user_id, new Game(config, JSON.parse(r.body))]));
+const games = new Map(db.prepare('SELECT * FROM account_state').all().map(r => {
+  const state = JSON.parse(r.body);
+  if (state.battle && !state.battle.skillUseCounts) {
+    const events = db.prepare('SELECT body FROM user_events WHERE user_id=? ORDER BY seq DESC LIMIT 5000').all(r.user_id).reverse().map(row => JSON.parse(row.body));
+    initializeBattleSkills(state.battle, events);
+  }
+  return [r.user_id, new Game(config, state)];
+}));
 const clients = new Map(), presence = new Map(), commandRates = new Map();
 let lastTick = performance.now(), lastPersist = performance.now(), lastBroadcast = 0, stopping = false;
 function getGame(id) {

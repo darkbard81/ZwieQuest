@@ -6,11 +6,12 @@ import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
 import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
 import { rollEncounter } from './encounters.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
-import { availableTactics, validTactic, tacticEffect, validateTactics, COMBAT_RULES_VERSION } from './tactics.js';
+import { initializeSkills, skillItemView, equipSkill, useSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
+const COMBAT_RULES_VERSION = 3;
 export const THEMES = Object.entries(MAP_DEFS).map(([id, def]) => ({ id, name: def.name, subtitle: def.subtitle }));
 export class Game {
   constructor(config, state = null, rng = n => randomInt(n)) {
-    validateTactics(config); this.config = config; this.state = state; this.rng = n => ((rng(n) % n) + n) % n; this.events = [];
+    this.config = config; this.state = state; this.rng = n => ((rng(n) % n) + n) % n; this.events = [];
     if (state && !state.maps) { this.installMaps(); this.phase('HOME', config.homeMs); this.log('map', '새 경로 체계로 이동했습니다. 성장과 장비는 유지됩니다.'); }
     if (state) {
       state.progressId ||= randomUUID();
@@ -27,10 +28,15 @@ export class Game {
       const replaced = migrateLegacyEquipment(state, this.rng);
       migrateArmorDEX(state.inventory);
       if (replaced) state.hp = Math.min(state.hp, stats(state, config).maxHp);
-      if (!validTactic(state.tactic, state.classId, config)) state.tactic = 'normal';
-      if (state.battle && state.battle.rulesVersion !== COMBAT_RULES_VERSION) {
-        // Finish the already-started round with its saved actor/AP. Never replay or reserve AP on load.
-        Object.assign(state.battle, { rulesVersion: COMBAT_RULES_VERSION, roundTactic: 'normal', roundEffects: {}, heroReservedAP: 0, tacticUsed: false });
+      initializeSkills(state);
+      delete state.tactic;
+      for (const profile of Object.values(state.inactiveClasses)) delete profile.tactic;
+      if (state.battle) {
+        // Preserve the saved actor, AP, attacks and HP; never replay an action.
+        state.battle.id ||= randomUUID();
+        state.battle.skillUsed ??= false;
+        state.battle.rulesVersion = COMBAT_RULES_VERSION;
+        for (const key of ['roundTactic', 'roundEffects', 'heroReservedAP', 'tacticUsed']) delete state.battle[key];
       }
       state.combatRulesVersion = COMBAT_RULES_VERSION;
       // Older saves paused at regional entrances as HOME. Resume the same journey.
@@ -50,7 +56,7 @@ export class Game {
   log(type, text, detail = {}) { const e = { seq: ++this.state.eventSeq, at: Date.now(), type, text, ...detail }; this.events.push(e); this.state.lastEvent = e; }
   phase(phase, ms) { Object.assign(this.state, { phase, remaining: ms, duration: ms, phaseStartedAt: Date.now() }); }
   normalSaleItems() {
-    return this.state.inventory.filter(item => item.gradeId === 'normal' && !equippedClassIds(this.state, item.id).length);
+    return this.state.inventory.filter(item => item.slot !== 'skill' && item.gradeId === 'normal' && !equippedClassIds(this.state, item.id).length);
   }
   item(kind, tier) {
     return generateEquipment({ slot: kind, rng: this.rng, gradeId: tier == null ? undefined : EQUIPMENT_CATALOG.grades[tier]?.id });
@@ -62,11 +68,12 @@ export class Game {
   create(classId) {
     if (!this.config.classes[classId]) throw Error('알 수 없는 클래스입니다.');
     if (this.state) throw Error('이미 모험가가 있습니다. HOME에서 직업을 변경하세요.');
-    this.state = { classId, progressId: randomUUID(), level: 1, xp: 0, gold: 0, hp: 1, inventory: [], equipment: {}, run: 0, step: 0, eventSeq: 0, version: 0, completed: 0, victories: 0, chests: 0, theme: 'village', direction: 'right', tactic: 'normal', combatRulesVersion: COMBAT_RULES_VERSION, path: [], lastSummary: null };
+    this.state = { classId, progressId: randomUUID(), level: 1, xp: 0, gold: 0, hp: 1, inventory: [], equipment: {}, run: 0, step: 0, eventSeq: 0, version: 0, completed: 0, victories: 0, chests: 0, theme: 'village', direction: 'right', combatRulesVersion: COMBAT_RULES_VERSION, path: [], lastSummary: null };
     this.installMaps();
     initializeClassProgress(this.state);
     this.state.appearanceId = defaultAppearance(classId).id;
     for (const kind of ['weapon', 'armor']) { const i = this.starter(kind); this.state.inventory.push(i); this.state.equipment[kind] = i.id; }
+    initializeSkills(this.state);
     this.state.hp = stats(this.state, this.config).maxHp;
     this.phase('HOME', this.config.homeMs); this.log('home', '새로운 모험가가 여관에 도착했습니다. 곧 자동으로 출발합니다.');
   }
@@ -122,11 +129,9 @@ export class Game {
     s.lastReward = { kind, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
     this.log(kind, `${boss ? '보스 격파' : treasure ? '보물 발견' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : ' · 장비 없음'}`, { xp, gold, itemId: item?.id || null });
     while (s.xp >= s.level * this.config.xpPerLevel) {
-      s.xp -= s.level * this.config.xpPerLevel; const oldMax = stats(s, this.config).maxHp; s.level++;
-      s.hp += stats(s, this.config).maxHp - oldMax;
+      s.xp -= s.level * this.config.xpPerLevel; s.level++;
       this.log('level', `레벨 ${s.level}! 최대 HP 증가${levelBonus(s.level) !== levelBonus(s.level - 1) ? ' · 전투 숙련 +1' : ''}`);
     }
-    s.hp = Math.min(stats(s, this.config).maxHp, s.hp + (treasure ? tune.treasureHeal : tune.battleHeal));
     s.enemy = null; s.battle = null; this.phase('TREASURE', this.config.treasureMs);
   }
   beginBattle(boss = false) {
@@ -136,49 +141,27 @@ export class Game {
     s.enemy = { boss, name: boss ? MAP_DEFS[s.mapId].boss : names[s.theme], hp: maxHp, maxHp, damageTypes: ['blunt'], typeModifiers: {}, STR: 1, ACC: 3 + lb, DEF: 3 + lb, REF: 4 + lb, WIL: 2 + lb, FOR: 4 + lb, AR: 2 + s.risk, PEN: 2, DEX: this.config.initiative.enemyDEX + (boss ? 1 : 0), base: Math.floor((tune.enemyDamage + s.risk * tune.enemyRiskDamage) * (boss ? tune.bossDamageMultiplier : 1)) };
     const heroDEX = stats(s, this.config).DEX;
     const first = heroDEX > s.enemy.DEX ? 'hero' : heroDEX < s.enemy.DEX ? 'enemy' : this.config.initiative.tieWinner;
-    s.battle = { turn: 1, actor: first, firstActor: first, ap: 3, attacks: 0, lastHit: null, rulesVersion: COMBAT_RULES_VERSION };
+    s.battle = { id: randomUUID(), skillUsed: false, skillUseCounts: {}, skillToggles: {}, turn: 1, actor: first, firstActor: first, ap: 3, attacks: 0, lastHit: null, rulesVersion: COMBAT_RULES_VERSION };
     this.phase('BATTLE', this.config.battleActionMs); this.log('battle', `${s.enemy.name} 등장! ${first === 'hero' ? '모험가' : '몬스터'} 선공 (DEX ${heroDEX}:${s.enemy.DEX})으로 시작합니다.`);
     this.startRound();
   }
   startRound() {
     const s = this.state, b = s.battle;
-    b.roundTactic = s.tactic; b.roundEffects = {}; b.heroReservedAP = 0; b.tacticUsed = false;
+    b.skillUsed = false;
     b.actor = b.firstActor; b.ap = 3; b.attacks = 0;
-    if (b.roundTactic === 'defend') {
-      b.roundEffects = tacticEffect('defend', stats(s, this.config).INT, this.config);
-      b.heroReservedAP = this.config.tactics.defend.cost; b.tacticUsed = true;
-      if (b.actor === 'hero') b.ap -= b.heroReservedAP;
-      this.log('tactic', `라운드 ${b.turn} · 방어태세: ${b.heroReservedAP} AP 예약, AR +${b.roundEffects.AR} (이번 라운드)`, { tacticId: 'defend', round: b.turn, cost: b.heroReservedAP, reserved: true, effects: { ...b.roundEffects } });
-    }
   }
   endAction() {
     const b = this.state.battle;
     if (b.ap === 0) {
       const next = b.actor === 'hero' ? 'enemy' : 'hero';
       if (next === b.firstActor) { b.turn++; this.startRound(); }
-      else { b.actor = next; b.ap = next === 'hero' ? 3 - b.heroReservedAP : 3; b.attacks = 0; }
+      else { b.actor = next; b.ap = 3; b.attacks = 0; }
     }
     this.phase('BATTLE', this.config.battleActionMs);
   }
   battleAction() {
     const s = this.state, b = s.battle, hero = stats(s, this.config), enemy = s.enemy, tune = this.config.balance;
     const isHero = b.actor === 'hero', attacker = isHero ? hero : enemy, defender = isHero ? enemy : hero;
-    if (isHero && b.roundTactic !== 'normal' && !b.tacticUsed) {
-      const id = b.roundTactic, tactic = this.config.tactics[id], effect = tacticEffect(id, hero.INT, this.config);
-      if (b.ap < tactic.cost) throw Error('전술에 필요한 AP가 부족합니다.');
-      b.ap -= tactic.cost; b.tacticUsed = true;
-      let description;
-      if (id === 'heal') {
-        const healed = Math.min(effect.heal, Math.max(0, hero.maxHp - s.hp)); s.hp += healed;
-        description = `HP +${healed} (최대 ${effect.heal})`;
-        this.log('tactic', `라운드 ${b.turn} · 회복: ${description}, ${tactic.cost} AP`, { tacticId: id, round: b.turn, cost: tactic.cost, healed });
-      } else {
-        Object.assign(b.roundEffects, effect);
-        description = id === 'assault' ? `ACC +${effect.ACC}` : `다음 1회 피해 +${Math.round(effect.damageRate * 100)}% (빗나가도 소모)`;
-        this.log('tactic', `라운드 ${b.turn} · ${tactic.name}: ${description}, ${tactic.cost} AP`, { tacticId: id, round: b.turn, cost: tactic.cost, effects: { ...effect } });
-      }
-      this.endAction(); return;
-    }
     const weapon = isHero ? s.inventory.find(i => i.id === s.equipment.weapon) : null;
     const modern = weapon && Array.isArray(weapon.damageTypes), raw = modern && weapon.damageTypes.includes('raw');
     const target = isHero ? weaponDefense(weapon) : (enemy.hitDefense || 'DEF');
@@ -187,18 +170,16 @@ export class Game {
     const base = modern ? (raw ? weapon.fixedDamage : rollWeaponDamage(weapon, this.rng))
       : isHero ? (weapon ? (legacyMagic ? tune.wizardBasic : tune.warriorBasic) + hero.power : 1) : enemy.base;
     const damageTypes = modern ? weapon.damageTypes : isHero ? [!weapon ? 'blunt' : legacyMagic ? 'fire' : 'slash'] : (enemy.damageTypes || ['blunt']);
-    const tacticDamageRate = isHero ? b.roundEffects.damageRate || 0 : 0;
-    const result = attack({ roll: this.rng(20) + 1, acc: attacker.ACC - Math.min(10, b.attacks * 5) + (isHero ? b.roundEffects.ACC || 0 : 0), defense: defender[target], str: attacker.STR, base,
-      pen: attacker.PEN, ar: defender.AR + (isHero ? 0 : b.roundEffects.AR || 0), damageTypes, typeModifiers: defender.typeModifiers,
-      damageRate: modern ? weapon.damageRate || 0 : 0, tacticDamageRate, fixedDamage: raw ? weapon.fixedDamage : undefined });
-    if (isHero) delete b.roundEffects.damageRate; // The attempt consumes burst even on a miss or Raw attack.
+    const result = attack({ roll: this.rng(20) + 1, acc: attacker.ACC + (isHero ? maintainedSkillBonuses(s).ACC : 0) - Math.min(10, b.attacks * 5), defense: defender[target], str: attacker.STR, base,
+      pen: attacker.PEN, ar: defender.AR, damageTypes, typeModifiers: defender.typeModifiers,
+      damageRate: modern ? weapon.damageRate || 0 : 0, fixedDamage: raw ? weapon.fixedDamage : undefined });
     const ability = isHero ? '일반 공격' : '몸통 박치기';
     if (isHero) enemy.hp = Math.max(0, enemy.hp - result.damage); else s.hp = Math.max(0, s.hp - result.damage);
     b.ap--; b.attacks++;
-    b.lastHit = { ...result, actor: b.actor, ability, target, attackerName: isHero ? '모험가' : enemy.name, defenderName: isHero ? enemy.name : '모험가', at: Date.now(), cost: 1, ap: b.ap, round: b.turn, tacticId: b.roundTactic };
+    b.lastHit = { ...result, actor: b.actor, ability, target, attackerName: isHero ? '모험가' : enemy.name, defenderName: isHero ? enemy.name : '모험가', at: Date.now(), cost: 1, ap: b.ap, round: b.turn };
     this.log('hit', `${b.lastHit.attackerName} → ${b.lastHit.defenderName} · ${result.label}! ${DAMAGE_NAMES[result.damageType]} 피해 ${result.damage}`, { hit: b.lastHit });
     if (enemy.hp <= 0) { this.reward(enemy.boss ? 'boss' : 'victory'); return; }
-    if (s.hp <= 0) { b.roundEffects = {}; this.phase('DOWNED', this.config.downedMs); this.log('downed', '잠시 쓰러졌습니다. 장비와 금화는 안전합니다. 여관으로 귀환합니다.'); return; }
+    if (s.hp <= 0) { this.phase('DOWNED', this.config.downedMs); this.log('downed', '잠시 쓰러졌습니다. 장비와 금화는 안전합니다. 여관으로 귀환합니다.'); return; }
     this.endAction();
   }
   finish(downed, reason = 'deadend') {
@@ -212,6 +193,7 @@ export class Game {
     const s = this.state;
     switch (s.phase) {
       case 'HOME':
+        s.hp = stats(s, this.config).maxHp;
         s.mapId = availableStarts(s).includes(s.departureMapId) ? s.departureMapId : 'village';
         s.run++; s.runGold = s.gold; s.step = 0; s.path = []; s.pendingBossReturn = false;
         s.theme = s.mapId; s.currentNodeId = s.maps[s.mapId].rootId;
@@ -236,8 +218,8 @@ export class Game {
       case 'TREASURE': if (s.pendingBossReturn) { s.pendingBossReturn = false; this.finish(false, 'boss'); } else this.nextChoice(); break;
       case 'DOWNED': this.finish(true); break;
       case 'RETURN_HOME':
-        s.hp = stats(s, this.config).maxHp; s.mapId = 'village'; s.theme = 'village'; s.currentNodeId = s.maps.village.rootId; s.step = 0;
-        this.phase('HOME', this.config.homeMs); this.log('home', '집(HOME)에서 체력을 회복했습니다. 다음 여행을 준비합니다.'); break;
+        s.mapId = 'village'; s.theme = 'village'; s.currentNodeId = s.maps.village.rootId; s.step = 0;
+        this.phase('HOME', this.config.homeMs); this.log('home', '여관에 도착했습니다. 다음 여행을 시작할 때 체력을 회복합니다.'); break;
     }
   }
   tick(elapsed, rate) {
@@ -275,8 +257,22 @@ export class Game {
       s.inventory = s.inventory.filter(item => !ids.has(item.id)); s.gold += gold;
       this.log('sell', `일반 아이템 ${items.length}개 일괄 판매 · 금화 +${gold}`, { count: items.length, gold });
     }
+    else if (cmd.type === 'USE_SKILL') {
+      const result = useSkill(s, s.inventory.find(i => i.id === cmd.itemId), stats(s, this.config), cmd);
+      this.log('skill', `${result.round == null ? '비전투' : `라운드 ${result.round}`} · ${result.name}: HP +${result.healed}`, result);
+    }
+    else if (cmd.type === 'TOGGLE_SKILL') {
+      const result = toggleSkill(s, s.inventory.find(i => i.id === cmd.itemId), stats(s, this.config), cmd);
+      if (result) this.log('skill-toggle', `${result.name} · ${result.enabled ? 'ON' : 'OFF'}`, result);
+    }
     else if (['EQUIP', 'UNEQUIP', 'SELL'].includes(cmd.type)) {
       const item = s.inventory.find(i => i.id === cmd.itemId); if (!item) throw Error('이미 판매했거나 없는 아이템입니다.');
+      if (item.slot === 'skill') {
+        if (cmd.type === 'SELL') throw Error('습득한 스킬은 판매할 수 없습니다.');
+        equipSkill(s, item, cmd.type === 'UNEQUIP', cmd.slotIndex);
+        this.log('equip', `${item.name} 스킬 ${cmd.type === 'UNEQUIP' ? '장착 해제' : '장착'}`);
+        return;
+      }
       if (cmd.type === 'EQUIP') { s.equipment[item.slot] = item.id; this.log('equip', `${item.name} 장착 · 다음 공격부터 적용됩니다.`); }
       else if (cmd.type === 'UNEQUIP') { if (s.equipment[item.slot] !== item.id) throw Error('장착 중인 아이템이 아닙니다.'); delete s.equipment[item.slot]; this.log('equip', `${item.name} 장착 해제`); }
       else {
@@ -285,7 +281,7 @@ export class Game {
         s.inventory = s.inventory.filter(i => i.id !== item.id); s.gold += item.value; this.log('sell', `${item.name} 판매 · 금화 +${item.value}`);
       }
       s.hp = Math.min(s.hp, stats(s, this.config).maxHp);
-    } else if (cmd.type === 'TACTIC') { if (!validTactic(cmd.tactic, s.classId, this.config)) throw Error('잘못된 전술입니다.'); s.tactic = cmd.tactic; this.log('tactic', `${this.config.tactics[cmd.tactic].name} 선택 · ${s.phase === 'BATTLE' ? '다음 라운드부터' : '다음 전투부터'} 적용됩니다.`); }
+    }
     else if (cmd.type === 'CLASS' || cmd.type === 'APPEARANCE') {
       if (s.phase !== 'HOME') throw Error('직업 변경은 여관에서 가능합니다.');
       if (s.remaining <= 0) throw Error('선택 시간이 지났습니다.');
@@ -295,26 +291,24 @@ export class Game {
       if (s.appearanceId === appearance.id) return;
       const classChanged = switchClassProgress(s, appearance.classId);
       s.appearanceId = appearance.id;
-      if (!validTactic(s.tactic, s.classId, this.config)) s.tactic = 'normal';
-      if (classChanged) s.hp = stats(s, this.config).maxHp;
-      this.log('class', `${appearance.name} 외형 선택 · ${this.config.classes[s.classId].name} Lv.${s.level}. 직업별 성장·장비·전술을 불러왔습니다. 인벤토리와 금화는 공용입니다.`);
+      if (classChanged) s.hp = Math.min(s.hp, stats(s, this.config).maxHp);
+      this.log('class', `${appearance.name} 외형 선택 · ${this.config.classes[s.classId].name} Lv.${s.level}. 직업별 성장·장비을 불러왔습니다. 인벤토리·금화·스킬은 공용입니다.`);
     } else throw Error('지원하지 않는 명령입니다.');
   }
   snapshot() {
     if (!this.state) return null;
     const { maps, ...state } = this.state;
     const { values: hero, defenses: defenseBreakdown } = statDetails(this.state, this.config);
-    const roundEffects = state.phase === 'BATTLE' ? { ...state.battle.roundEffects } : {};
     const weapon = state.inventory.find(i => i.id === state.equipment.weapon);
     return { ...structuredClone(state),
       normalSale: this.normalSaleItems().reduce((total, item) => ({ count: total.count + 1, gold: total.gold + item.value }), { count: 0, gold: 0 }),
       classProfiles: classProfiles(state, this.config),
       equipmentUsers: Object.fromEntries(state.inventory.map(i => [i.id, equippedClassIds(state, i.id)])),
-      inventory: structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : i),
+      inventory: structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : i.slot === 'skill' ? skillItemView(i, state, hero) : i),
       availableStarts: availableStarts(this.state).map(id => ({ id, name: maps[id].name })),
       mapGraph: structuredClone(maps[navigationPosition(this.state).mapId]), currentNode: structuredClone(maps[state.mapId].nodes[state.currentNodeId]),
-      stats: hero, defenseBreakdown, combatStats: { ...hero, AR: hero.AR + (roundEffects.AR || 0), ACC: hero.ACC + (roundEffects.ACC || 0) },
-      hitDefense: weaponDefense(weapon), availableTactics: availableTactics(state.classId, this.config).map(t => ({ ...t, effect: tacticEffect(t.id, hero.INT, this.config) })),
+      stats: hero, defenseBreakdown, combatStats: { ...hero, ACC: hero.ACC + maintainedSkillBonuses(this.state).ACC },
+      hitDefense: weaponDefense(weapon),
       xpNext: state.level * this.config.xpPerLevel };
   }
 }

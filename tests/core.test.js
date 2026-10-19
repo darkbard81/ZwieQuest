@@ -39,7 +39,7 @@ test('three AP and attack penalties reset each turn',()=>{
   g.battleAction();assert.equal(g.state.battle.ap,2);assert.equal(g.state.battle.attacks,1);const first=g.state.battle.lastHit.margin;g.battleAction();assert.equal(g.state.battle.lastHit.margin,first-5);assert.equal(g.state.battle.ap,1);g.battleAction();assert.equal(g.state.battle.lastHit.margin,first-10);assert.equal(g.state.battle.actor,'enemy');assert.equal(g.state.battle.ap,3);for(let i=0;i<3;i++)g.battleAction();assert.equal(g.state.battle.actor,'hero');assert.equal(g.state.battle.attacks,0);
 });
 test('downed preserves possessions and returns home; no inventory silent cap',()=>{
-  const g=make();g.state.step=1;g.state.run=1;g.state.runGold=0;g.state.risk=0;g.beginBattle();g.state.hp=1;g.state.battle.actor='enemy';g.state.enemy.ACC=100;g.battleAction();assert.equal(g.state.phase,'DOWNED');g.advance();g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.state.hp,stats(g.state,config).maxHp);
+  const g=make();g.state.step=1;g.state.run=1;g.state.runGold=0;g.state.risk=0;g.beginBattle();g.state.hp=1;g.state.battle.actor='enemy';g.state.enemy.ACC=100;g.battleAction();assert.equal(g.state.phase,'DOWNED');g.advance();g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.state.hp,0);g.advance();assert.equal(g.state.hp,stats(g.state,config).maxHp);
   const count=g.state.inventory.length;g.rng=()=>0;for(let i=0;i<120;i++)g.reward('victory');assert.equal(g.state.inventory.length,count+120);
 });
 test('DEX initiative and configured tie policy determine first actor',()=>{

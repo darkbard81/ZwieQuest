@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {Game} from '../src/game.js';
 import {stats} from '../src/combat.js';
-import {tacticEffect} from '../src/tactics.js';
+import {skillValues,SKILL_CATALOG} from '../src/skills.js';
 import {BASE_STATS,EQUIPMENT_CATALOG as c,generateEquipment,validateCatalog} from '../src/equipment.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
 const make=(cls='wizard')=>{const g=new Game(structuredClone(config),null,()=>0);g.create(cls);g.state.risk=0;return g;};
@@ -35,10 +35,11 @@ test('DEX offsets plate penalty and changes next initiative; CON swaps never cre
  g.config.initiative.enemyDEX=0;g.beginBattle();assert.equal(g.state.battle.firstActor,'enemy');equip(g,charm('agility-charm','excellent'));assert.equal(stats(g.state,g.config).DEX,1);assert.equal(g.state.battle.firstActor,'enemy');g.beginBattle();assert.equal(g.state.battle.firstActor,'hero');
  const con=charm('vitality-charm','excellent');g.state.hp=20;equip(g,con);assert.equal(g.state.hp,20);g.state.hp=stats(g.state,g.config).maxHp;g.command({type:'UNEQUIP',itemId:con.id});assert.equal(g.state.hp,stats(g.state,g.config).maxHp);const hp=g.state.hp;g.command({type:'EQUIP',itemId:con.id});assert.equal(g.state.hp,hp);
 });
-test('INT accessory increases actual class tactics; STR boosts actual weapon damage',()=>{
- for(const [cls,tactic] of [['warrior','defend'],['warrior','assault'],['wizard','heal'],['wizard','burst']]){
-  const g=make(cls);equip(g,charm('wisdom-charm','excellent'));g.state.tactic=tactic;g.config.initiative.enemyDEX=-10;g.beginBattle();g.state.hp=1;const effect=tacticEffect(tactic,config.classes[cls].base.INT+2,g.config);
-  if(tactic!=='defend')g.battleAction();if(tactic==='heal')assert.equal(g.state.hp,1+effect.heal);else assert.deepEqual(g.state.battle.roundEffects,effect);
+test('INT accessory increases manual healing; STR boosts actual weapon damage',()=>{
+ for(const cls of ['warrior','wizard']) {
+  const g=make(cls);equip(g,charm('wisdom-charm','excellent'));g.config.initiative.enemyDEX=-10;g.beginBattle();g.state.hp=1;
+  const effect=skillValues(SKILL_CATALOG.skills[0],stats(g.state,g.config));
+  g.command({type:'USE_SKILL',itemId:g.state.skillSlots[0],battleId:g.state.battle.id,turn:g.state.battle.turn});assert.equal(g.state.hp,1+effect.heal);
  }
  const a=make('warrior'),b=make('warrior');equip(b,charm('strength-charm','excellent'));
  for(const g of [a,b]){g.config.initiative.enemyDEX=-10;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=10000;g.state.enemy.DEF=-30;g.state.enemy.AR=0;g.rng=()=>11;g.battleAction();}
@@ -52,7 +53,7 @@ test('legacy items are replaced once, preserve equipped IDs and new gear, and ne
  }
 });
 test('fresh starter gear uses the current catalog; treasure grants no equipment',()=>{
- for(const cls of ['warrior','wizard']){const g=make(cls);assert.equal(g.state.inventory.length,2);assert.deepEqual(g.state.inventory.map(i=>i.slot),['weapon','armor']);assert.ok(g.state.inventory.every(i=>i.templateId));assert.ok(g.state.inventory.every(i=>i.gradeId==='normal'));assert.equal(g.state.equipment.charm,undefined);
+ for(const cls of ['warrior','wizard']){const g=make(cls);assert.equal(g.state.inventory.length,3);assert.deepEqual(g.state.inventory.map(i=>i.slot),['weapon','armor','skill']);assert.ok(g.state.inventory.every(i=>i.templateId));assert.ok(g.state.inventory.filter(i=>i.slot!=='skill').every(i=>i.gradeId==='normal'));assert.equal(g.state.equipment.charm,undefined);
   g.state.risk=0;g.rng=()=>{throw Error('Treasure must not roll equipment');};const before=structuredClone(g.state.inventory);g.reward('treasure');assert.deepEqual(g.state.inventory,before);assert.equal(g.state.lastReward.itemId,null);assert.equal(g.state.lastReward.xp,g.config.balance.treasureXP);assert.equal(g.state.gold,g.config.balance.treasureGold);assert.equal(g.state.chests,1);
  }
 });

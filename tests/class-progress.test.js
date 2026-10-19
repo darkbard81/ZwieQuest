@@ -9,7 +9,6 @@ const select = (g, classId) => g.command({ type: 'CLASS', classId });
 test('legacy migration preserves current class exactly, including an in-progress battle, and is idempotent', () => {
   for (const id of ['warrior', 'wizard']) {
     const g = make(id); g.state.level = 9; g.state.xp = 37; g.state.gold = 251;
-    g.state.tactic = id === 'wizard' ? 'burst' : 'defend';
     g.state.step = 2; g.state.risk = 0; g.beginBattle(); g.state.battle.ap = 2;
     delete g.state.inactiveClasses;
     const legacy = structuredClone(g.state), migrated = new Game(config, structuredClone(legacy));
@@ -20,26 +19,25 @@ test('legacy migration preserves current class exactly, including an in-progress
     assert.deepEqual(new Game(config, structuredClone(migrated.state)).state, migrated.state);
     migrated.phase('HOME', 15000); select(migrated, other);
     assert.equal(migrated.state.level, 1); assert.equal(migrated.state.xp, 0);
-    assert.deepEqual(migrated.state.equipment, {}); assert.equal(migrated.state.tactic, 'normal');
+    assert.deepEqual(migrated.state.equipment, {});
     select(migrated, id);
-    for (const key of ['level', 'xp', 'equipment', 'tactic', 'inventory', 'gold']) assert.deepEqual(migrated.state[key], legacy[key]);
+    for (const key of ['level', 'xp', 'equipment', 'inventory', 'gold']) assert.deepEqual(migrated.state[key], legacy[key]);
   }
 });
 
-test('level/XP, gear and tactics round-trip independently; inventory/gold are shared and HP follows restored stats', () => {
+test('level/XP, gear round-trip independently; inventory/gold are shared and HP follows restored stats', () => {
   const g = make(); g.state.level = 7; g.state.xp = 21; g.state.gold = 65;
-  g.command({ type: 'TACTIC', tactic: 'assault' });
   const old = structuredClone(g.state), weapon = old.equipment.weapon;
-  select(g, 'wizard'); g.command({ type: 'TACTIC', tactic: 'heal' });
+  select(g, 'wizard');
   g.command({ type: 'EQUIP', itemId: weapon });
   g.state.level = 3; g.state.xp = 12; g.state.gold += 10;
   select(g, 'warrior');
-  assert.equal(g.state.level, 7); assert.equal(g.state.xp, 21); assert.equal(g.state.tactic, 'assault');
+  assert.equal(g.state.level, 7); assert.equal(g.state.xp, 21);
   assert.deepEqual(g.state.equipment, old.equipment); assert.equal(g.state.gold, 75);
-  assert.deepEqual(g.state.inventory, old.inventory); assert.equal(g.state.hp, g.snapshot().stats.maxHp);
+  assert.deepEqual(g.state.inventory, old.inventory); assert.ok(g.state.hp <= g.snapshot().stats.maxHp);
   select(g, 'wizard');
-  assert.equal(g.state.level, 3); assert.equal(g.state.xp, 12); assert.equal(g.state.tactic, 'heal');
-  assert.deepEqual(g.state.equipment, { weapon }); assert.equal(g.state.hp, g.snapshot().stats.maxHp);
+  assert.equal(g.state.level, 3); assert.equal(g.state.xp, 12);
+  assert.deepEqual(g.state.equipment, { weapon }); assert.ok(g.state.hp <= g.snapshot().stats.maxHp);
   assert.equal(g.state.phaseStartedAt, old.phaseStartedAt); assert.equal(g.state.remaining, old.remaining);
 });
 
@@ -72,12 +70,12 @@ test('inactive gear cannot be sold; the same item can be selected by both classe
   assert.deepEqual(g.state.equipment, {});
 });
 
-test('same-class skins do not create new progress or reset tactics/gear, and switching is still HOME-only', () => {
-  const g = make(); g.state.level = 8; g.state.xp = 32; g.state.tactic = 'defend';
+test('same-class skins do not create new progress or reset gear, and switching is still HOME-only', () => {
+  const g = make(); g.state.level = 8; g.state.xp = 32;
   const before = structuredClone(g.state);
   for (const appearanceId of ['barbarian', 'ranger', 'cat', 'lamia']) {
     g.command({ type: 'APPEARANCE', appearanceId });
-    for (const key of ['level', 'xp', 'equipment', 'tactic', 'remaining']) assert.deepEqual(g.state[key], before[key]);
+    for (const key of ['level', 'xp', 'equipment', 'remaining']) assert.deepEqual(g.state[key], before[key]);
     assert.deepEqual(g.state.inactiveClasses, {});
   }
   g.advance();

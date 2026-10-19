@@ -1,11 +1,11 @@
 // Active progress stays in the existing combat fields. Only inactive classes
 // are stored here, so there is never a second, stale copy of active progress.
 export function captureProgress(state) {
-  return { level: state.level, xp: state.xp, equipment: { ...state.equipment }, tactic: state.tactic };
+  return { level: state.level, xp: state.xp, equipment: { ...state.equipment } };
 }
 
 export function newProgress() {
-  return { level: 1, xp: 0, equipment: {}, tactic: 'normal' };
+  return { level: 1, xp: 0, equipment: {} };
 }
 
 export function initializeClassProgress(state) {
