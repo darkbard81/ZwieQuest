@@ -247,3 +247,11 @@ main{padding-top:12px}
 #stats .attribute-heading b { display:inline; font-size:12px; }
 #stats .attribute-heading small { text-align:left; }
 #stats .base-stats button { flex:1; }
+
+/* Transparent, keyboard-accessible targets sit directly over the idle sprites. */
+#inn-guests { position:absolute; inset:0; pointer-events:none; }
+.inn-guest { position:absolute; display:flex; align-items:flex-end; justify-content:center; padding:4px; pointer-events:auto; background:transparent; border:1px solid transparent; border-radius:18px; touch-action:manipulation; }
+.inn-guest-name { max-width:100%; padding:4px 7px; border-radius:6px; background:#241f1cdd; color:#f5dfb4; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.inn-guest:disabled { opacity:1; cursor:default; }
+.inn-guest:not(:disabled):hover, .inn-guest:focus-visible { background:linear-gradient(transparent 55%, #eac58422); border-color:#eac58499; outline:2px solid #eac584; outline-offset:1px; }
+.inn-guest:not(:disabled):hover .inn-guest-name, .inn-guest:focus-visible .inn-guest-name { color:#fff2ce; background:#655035; }

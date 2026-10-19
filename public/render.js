@@ -1,6 +1,7 @@
 import { createTravelCamera } from './travel-camera.js';
 import { REGIONS } from './regions.js';
-import { createHeroAnimator } from './hero-animation.js';
+import { createHeroAnimator, sampleAnimationFrame } from './hero-animation.js';
+import { innRoster } from './inn-roster.js';
 import { APPEARANCES, appearanceFor, appearanceAssets, mirrorAppearance } from './appearances.js';
 const { Assets, CanvasRenderer, Container, Graphics, Rectangle, Sprite, Text, Texture, VERSION, autoDetectRenderer } = globalThis.PIXI;
 
@@ -35,6 +36,13 @@ export async function createWorld(container) {
   const object = new Sprite(cells[0]); object.anchor.set(.5, 1); object.visible = false;
   const hero = new Sprite(heroes.warrior.frames.Front_Idle_00);
   stage.addChild(background, shadow, object, hero);
+  const innGuests = Array.from({ length: 3 }, () => {
+    const shade = new Graphics().ellipse(0, 0, 34, 6).fill({ color: 0x183d38, alpha: .22 });
+    const sprite = new Sprite(heroes.warrior.frames.Front_Idle_00);
+    shade.visible = sprite.visible = false;
+    stage.addChild(shade, sprite);
+    return { sprite, shade, characterId: null, frame: 0 };
+  });
   // One reusable label: new hits replace the old label instead of building a queue.
   const feedback = new Text({ text: '', resolution: 2, style: {
     fontFamily: ['Noto Sans KR', 'Noto Sans CJK KR', 'sans-serif'], fontSize: 40, fontWeight: '900',
@@ -66,7 +74,21 @@ export async function createWorld(container) {
     background.position.set(cameraView.x, 0);
     const appearance = appearanceFor(s), h = heroes[appearance.id], meta = h.meta;
     const motion = animator.sample(now, reduced);
-    hero.visible = shadow.visible = !!s.activeCharacterId;
+    hero.visible = shadow.visible = s.phase !== 'HOME' && !!s.activeCharacterId;
+    const guests = s.phase === 'HOME' ? innRoster(s.characters) : [];
+    for (const [index, view] of innGuests.entries()) {
+      const guest = guests[index];
+      view.sprite.visible = view.shade.visible = !!guest;
+      view.characterId = guest?.id || null;
+      if (!guest) continue;
+      const art = heroes[appearanceFor(guest).id], m = art.meta;
+      view.frame = sampleAnimationFrame('Front_Idle', now, reduced);
+      view.sprite.texture = art.frames[m.animations.Front_Idle.frameNames[view.frame]];
+      view.sprite.anchor.set(m.anchor.x / m.frameWidth, m.anchor.y / m.frameHeight);
+      view.sprite.scale.set(guest.size / m.frameHeight);
+      view.sprite.position.set(guest.x, guest.y);
+      view.shade.position.set(guest.x, guest.y);
+    }
     hero.texture = h.frames[meta.animations[motion.action].frameNames[motion.frame]];
     hero.anchor.set(meta.anchor.x / meta.frameWidth, meta.anchor.y / meta.frameHeight);
     const size = (s.phase === 'HOME' ? 154 : 192) / meta.frameHeight;
@@ -120,6 +142,7 @@ export async function createWorld(container) {
       feedback: { visible: feedback.visible, label: feedback.text, target: feedbackTarget, count: feedbackCount,
         bounds: feedback.visible ? { x: feedback.x - feedback.width / 2, y: feedback.y - feedback.height / 2, width: feedback.width, height: feedback.height } : null },
       background: state?.phase === 'HOME' ? 'pub' : state?.theme, camera: cameraView, heroDisplay: { cellSize: state?.phase === 'HOME' ? 154 : 192, x: hero.x, y: hero.y, mirrored: hero.scale.x < 0 }, objectDisplay: { x: object.x, y: object.y, width: object.width, visible: object.visible },
+      innCharacters: innGuests.filter(v => v.sprite.visible).map(v => ({ characterId: v.characterId, action: 'Front_Idle', frame: v.frame, x: v.sprite.x, y: v.sprite.y })),
       framesRendered, animation: currentAnimation, displayObjects: stage.children.length, fps, width: renderer.canvas.width, height: renderer.canvas.height }; }
   };
 }

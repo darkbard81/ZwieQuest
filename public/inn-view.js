@@ -1,11 +1,15 @@
 import { APPEARANCES, appearanceFor, appearanceAssets, restRemaining } from './appearances.js';
 import { sampleAnimationFrame } from './hero-animation.js';
+import { innRoster } from './inn-roster.js';
 const esc = text => String(text).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 export function initInn({ panel, portrait, countdown, onCommand }) {
   let state = null, receivedAt = 0, rate = 1, connected = false, pending = false, portraitKey = '', rosterKey = '', opening = false;
-  let selectedAppearance = APPEARANCES[0].id, retireId = null;
+  let selectedAppearance = APPEARANCES[0].id, retireId = null, worldReady = false;
+  const guestButtons = new Map();
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  panel.innerHTML = '<div class="inn-heading"><strong>여행자의 여관</strong><span id="inn-status"></span></div><div class="inn-actions"><button id="inn-manage">캐릭터 관리</button><button id="inn-resume">자동 출발 재개</button><button id="inn-depart" class="primary">지금 출발</button></div>';
+  panel.innerHTML = '<div class="inn-heading"><strong>여행자의 여관</strong><span id="inn-status"></span></div><div class="inn-actions"><button id="inn-manage">캐릭터 관리</button></div>';
+  const guestLayer = document.createElement('div'); guestLayer.id = 'inn-guests'; guestLayer.setAttribute('role', 'group'); guestLayer.setAttribute('aria-label', '캐릭터를 선택하여 출발'); guestLayer.hidden = true;
+  panel.before(guestLayer);
   const dialog = document.createElement('dialog'); dialog.id = 'character-dialog'; dialog.setAttribute('aria-labelledby','character-dialog-title');
   dialog.innerHTML = `<button type="button" class="dialog-close" aria-label="캐릭터 관리 닫기">×</button><p class="eyebrow">TRAVELERS AT THE INN</p><h2 id="character-dialog-title">함께 떠날 모험가</h2><p class="muted">한 번의 모험에 한 명만 출전합니다. 관리 중에는 자동 출발을 멈춥니다.</p><div id="character-roster" class="character-roster"></div><form id="character-create"><h3>새 모험가 <small id="character-capacity"></small></h3><label for="character-name">이름</label><input id="character-name" name="name" required maxlength="20" autocomplete="off" placeholder="1~20자"><p class="muted">외형은 능력치에 영향을 주지 않습니다.</p><div class="appearance-list" role="group" aria-label="새 캐릭터 외형"></div><p>기본 능력치 0 · 자유 배분 10점<br>일반 단검 · 일반 가죽갑옷 · 회복 스킬</p><button type="submit" class="primary" id="character-create-submit">캐릭터 생성</button></form><form id="character-retire" hidden><h3 id="character-retire-title"></h3><p>성장·스킬은 삭제됩니다. 공용 소지품·금화·지도는 보존됩니다.</p><label for="character-retire-name">확인을 위해 캐릭터 이름을 입력하세요</label><input id="character-retire-name" autocomplete="off"><button type="submit" class="danger">은퇴 확정</button><button type="button" id="character-retire-cancel">취소</button></form><p id="character-manager-status" role="status"></p><button type="button" id="character-manager-done">관리 완료</button>`;
   document.body.append(dialog);
@@ -38,21 +42,26 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
   dialog.querySelector('.dialog-close').onclick = close; $('#character-manager-done').onclick = close;
   dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
   panel.querySelector('#inn-manage').onclick = open;
-  panel.querySelector('#inn-resume').onclick = () => send('RESUME_HOME', { characterId: state.activeCharacterId });
-  panel.querySelector('#inn-depart').onclick = () => send('DEPART', { characterId: state.activeCharacterId });
+  guestLayer.onclick = async event => {
+    const button = event.target.closest('button[data-character]');
+    if (!button || !canManage() || !worldReady || dialog.open) return;
+    const characterId = button.dataset.character;
+    pending = true; refresh();
+    try {
+      // Keep both requests under one input lock. DEPART rejects a selection changed by another tab.
+      if (await onCommand('SELECT_CHARACTER', { characterId })) await onCommand('DEPART', { characterId });
+    } finally { pending = false; refresh(); }
+  };
   $('#character-create').onsubmit = async event => {
     event.preventDefault();
     if (await send('CREATE_CHARACTER', { name: $('#character-name').value, appearanceId: selectedAppearance })) {
-      $('#character-name').value = ''; $('#character-manager-status').textContent = '생성 완료 · 출전할 캐릭터를 선택한 후 관리 창을 닫고 출발하세요.';
+      $('#character-name').value = ''; $('#character-manager-status').textContent = '생성 완료 · 관리 창을 닫고 모험의 창에서 캐릭터를 클릭하면 출발합니다.';
     }
   };
   $('#character-roster').onclick = async event => {
     const button = event.target.closest('button[data-character]'); if (!button || !canManage()) return;
-    if (button.dataset.action === 'select') await send('SELECT_CHARACTER', { characterId: button.dataset.character });
-    else {
-      const c = state.characters.find(c => c.id === button.dataset.character); if (!c) return;
-      retireId = c.id; $('#character-retire-title').textContent = `${c.name} 은퇴`; $('#character-retire-name').value = ''; $('#character-retire').hidden = false; $('#character-retire-name').focus();
-    }
+    const c = state.characters.find(c => c.id === button.dataset.character); if (!c) return;
+    retireId = c.id; $('#character-retire-title').textContent = `${c.name} 은퇴`; $('#character-retire-name').value = ''; $('#character-retire').hidden = false; $('#character-retire-name').focus();
   };
   $('#character-retire-cancel').onclick = () => { retireId = null; $('#character-retire').hidden = true; };
   $('#character-retire').onsubmit = async event => {
@@ -74,10 +83,26 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
     panel.hidden = !state || state.phase !== 'HOME'; countdown.hidden = panel.hidden;
     if (panel.hidden && dialog.open) close();
     const count = state?.characters.length || 0;
-    panel.querySelector('#inn-status').textContent = count ? `${state.name} · ${count}/3명` : '첫 캐릭터를 생성해 주세요';
+    panel.querySelector('#inn-status').textContent = count ? '모험가를 클릭하거나 터치하면 출발합니다' : '첫 캐릭터를 생성해 주세요';
     panel.querySelector('#inn-manage').disabled = !canManage();
-    panel.querySelector('#inn-resume').hidden = !state?.homePaused;
-    for (const id of ['inn-resume','inn-depart']) panel.querySelector('#'+id).disabled = !canManage() || !state?.activeCharacterId;
+    guestLayer.hidden = panel.hidden;
+    const guests = innRoster(state?.characters);
+    const ids = new Set(guests.map(c => c.id));
+    for (const [id, button] of guestButtons) if (!ids.has(id)) { button.remove(); guestButtons.delete(id); }
+    for (const c of guests) {
+      let button = guestButtons.get(c.id);
+      if (!button) {
+        button = document.createElement('button'); button.type = 'button'; button.className = 'inn-guest'; button.dataset.character = c.id;
+        const label = document.createElement('span'); label.className = 'inn-guest-name'; button.append(label);
+        guestButtons.set(c.id, button); guestLayer.append(button);
+      }
+      button.style.left = `${c.x - c.targetWidth / 2}px`; button.style.top = `${c.targetTop}px`;
+      button.style.width = `${c.targetWidth}px`; button.style.height = `${c.targetHeight}px`;
+      button.disabled = !canManage() || !worldReady;
+      button.setAttribute('aria-label', `${c.name} · 레벨 ${c.level} · 선택하여 출발`);
+      button.title = `${c.name} 선택하여 출발`;
+      button.firstChild.textContent = `${c.name} · Lv.${c.level}`;
+    }
     for (const view of views) { view.button.disabled = !canManage() || count >= 3; view.button.setAttribute('aria-pressed', String(view.appearance.id === selectedAppearance)); }
     $('#character-create-submit').disabled = !canManage() || count >= 3;
     $('#character-name').disabled = !canManage() || count >= 3;
@@ -85,7 +110,7 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
     $('#character-retire button[type=submit]').disabled = !canManage();
     const key = JSON.stringify([state?.characters.map(c=>[c.id,c.name,c.appearanceId,c.level,c.xp,c.hp,c.maxHp,c.attributePoints]), state?.activeCharacterId, canManage()]);
     if (key !== rosterKey) {
-      $('#character-roster').innerHTML = count ? state.characters.map(c => `<article class="character-card${c.id === state.activeCharacterId ? ' selected' : ''}"><div><strong>${esc(c.name)}</strong><small>${esc(appearanceFor(c).name)} · Lv.${c.level} · HP ${c.hp}/${c.maxHp} · 미사용 ${c.attributePoints}점</small></div><div><button type="button" data-action="select" data-character="${esc(c.id)}" ${!canManage() || c.id === state.activeCharacterId ? 'disabled' : ''}>${c.id === state.activeCharacterId ? '출전 선택됨' : '출전 선택'}</button><button type="button" class="danger" data-action="retire" data-character="${esc(c.id)}" ${!canManage() ? 'disabled' : ''}>은퇴</button></div></article>`).join('') : '<p class="muted">아직 캐릭터가 없습니다. 아래에서 첫 모험가를 생성하세요.</p>';
+      $('#character-roster').innerHTML = count ? state.characters.map(c => `<article class="character-card${c.id === state.activeCharacterId ? ' selected' : ''}"><div><strong>${esc(c.name)}</strong><small>${esc(appearanceFor(c).name)} · Lv.${c.level} · HP ${c.hp}/${c.maxHp} · 미사용 ${c.attributePoints}점</small></div><div><button type="button" class="danger" data-action="retire" data-character="${esc(c.id)}" ${!canManage() ? 'disabled' : ''}>은퇴</button></div></article>`).join('') : '<p class="muted">아직 캐릭터가 없습니다. 아래에서 첫 모험가를 생성하세요.</p>';
       rosterKey = key;
     }
     refreshPortrait();
@@ -100,5 +125,5 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
     }
   }
   requestAnimationFrame(frame);
-  return { update(next, at, speed, online) { state=next; receivedAt=at; rate=speed; connected=online; refresh(); }, focus:open };
+  return { setWorldReady() { worldReady = true; refresh(); }, update(next, at, speed, online) { state=next; receivedAt=at; rate=speed; connected=online; refresh(); }, focus:open };
 }
