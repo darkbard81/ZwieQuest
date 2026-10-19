@@ -264,8 +264,9 @@ main{padding-top:12px}
 .bestiary-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; }
 .bestiary-heading h2 { font-size:17px; margin:0; }
 #bestiary-count, .bestiary-intro, #bestiary-empty { color:var(--muted); font-size:12px; line-height:1.7; }
-.bestiary-grid { display:grid; grid-template-columns:repeat(auto-fill,45px); gap:8px; margin-top:16px; }
-.bestiary-card { padding:0; min-width:0; }
+.bestiary-grid { display:grid; grid-template-columns:repeat(auto-fill,66px); gap:8px; margin-top:16px; }
+.bestiary-card { width:66px; height:66px; padding:0; min-width:0; }
+.bestiary-card .equipment-icon { width:64px; height:64px; }
 .bestiary-card:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
 #bestiary-dialog { width:900px; max-width:95vw; max-height:90dvh; overflow:auto; padding:24px; }
 #bestiary-title { font-size:24px; margin:6px 0 18px; }
@@ -295,3 +296,11 @@ main{padding-top:12px}
 #viewport-shell[data-stacked=true] #world{transform:scale(var(--world-scale,1));transform-origin:top left}
 #viewport-shell[data-stacked=true] #combat-controls{width:100%}
 #viewport-shell[data-stacked=true] nav{flex-wrap:wrap}
+
+.inventory-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.inventory-hide-others{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);cursor:pointer}
+.inventory-hide-others input{width:16px;height:16px;margin:0;accent-color:var(--mint);cursor:pointer}
+
+.hero-world-hp{position:absolute;left:118px;top:135px;width:96px;height:8px;border:1px solid #dce9cc99;border-radius:5px;background:#10251fe6;overflow:hidden;pointer-events:none}
+.hero-world-hp>div{height:100%;width:0;background:linear-gradient(90deg,#648f75,#a4c79d);transition:width .2s}
+@media(prefers-reduced-motion:reduce){.hero-world-hp>div{transition:none}}

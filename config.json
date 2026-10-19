@@ -1,6 +1,6 @@
 {
   "onlineRate": 1,
-  "offlineRate": 1.5,
+  "offlineRate": 2,
   "presenceGraceMs": 12000,
   "homeMs": 15000,
   "travelMs": 6000,

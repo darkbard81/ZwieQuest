@@ -22,6 +22,10 @@ const esc = text => String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const phases = { HOME: '여관에서 휴식', TRAVEL: '길 위를 걷는 중', CHOICE_WAIT: '갈림길 선택', BATTLE: '자동 전투', TREASURE: '전리품 획득', RETURN_HOME: '탐험 완료', DOWNED: '안전 귀환 준비' };
 const slotNames = { weapon: '무기', armor: '방어구', charm: '부적' };
 let data = null, receivedAt = 0, user = null, source = null, connected = false, filter = 'all', inventoryKey = '', journalSeq = -1, toastTimer, authMode = 'login';
+const hideOthersKey = 'zwiequest-hide-other-equipment';
+let hideOtherEquipment = false;
+try { hideOtherEquipment = localStorage.getItem(hideOthersKey) === 'true'; } catch {}
+$('#hide-other-equipment').checked = hideOtherEquipment;
 const equipmentViews = new Map();
 let statsHTML = '';
 const defenseDetails = initDefenseDetails($('#stats'), $('#defense-details'));
@@ -62,6 +66,7 @@ function receive(next) {
   updateInn();
   skills.update(next.state, next.serverTime, receivedAt, connected);
   const s = next.state; $('#world').dataset.phase = s?.phase || 'HOME'; updateChoices();
+  $('#hero-world-hp').hidden = s?.phase !== 'BATTLE' || !s?.activeCharacterId;
   if (!s) { world?.update(null); return; }
   world?.update(s); world?.playEvents(combatEvents);
   const theme = next.themes.find(t => t.id === s.theme);
@@ -70,6 +75,10 @@ function receive(next) {
   $('#journey-summary').textContent = `완료한 여행 ${s.completed}회 · 승리 ${s.victories}회 · 보물 ${s.chests}개`; $('#gold-total').textContent = s.gold.toLocaleString();
   $('#class-label').textContent = s.activeCharacterId ? appearanceFor(s).name + ' 외형' : '여관'; $('#hero-name').textContent = s.name || '첫 모험가를 생성하세요'; $('#hero-level').textContent = s.activeCharacterId ? `Lv. ${s.level} · ${user?.username || '모험가'}` : '여관의 캐릭터 관리에서 시작합니다';
   $('#hp-label').textContent = `${s.hp} / ${s.stats.maxHp}`; $('#hp-fill').style.width = `${s.stats.maxHp ? 100 * s.hp / s.stats.maxHp : 0}%`;
+  const worldMaxHp = Math.max(1, s.stats.maxHp || 0), worldHp = Math.max(0, Math.min(worldMaxHp, s.hp || 0));
+  $('#hero-world-hp-fill').style.width = `${100 * worldHp / worldMaxHp}%`;
+  $('#hero-world-hp').setAttribute('aria-valuemax', String(worldMaxHp));
+  $('#hero-world-hp').setAttribute('aria-valuenow', String(worldHp));
   $('#xp-label').textContent = `${s.xp} / ${s.xpNext}`; $('#xp-fill').style.width = `${100 * s.xp / s.xpNext}%`;
   const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${(s.combatStats || s.stats)[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="attribute-heading">능력치 배분 <b>남은 ${s.attributePoints}점</b></div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<button type="button" data-stat="${k}" ${!s.activeCharacterId || !s.attributePoints || !connected ? 'disabled' : ''} aria-label="${statNames[k]} 1점 배분">${statLabelHTML(k)} <b>${s.stats[k]}</b></button>`).join('')}</div>`;
   // Preserve hovered defense badges across unchanged server snapshots.
@@ -114,12 +123,12 @@ function renderEquipment(s) {
   }
 }
 function renderInventory(s) {
-  const key = JSON.stringify([s.inventory.map(({cooldown, ...item}) => item), s.equipment, s.skillSlots, s.equipmentUsers, s.characters.map(c=>[c.id,c.name]), s.activeCharacterId, filter]); if (key === inventoryKey) return; inventoryKey = key;
-  $('#item-count').textContent = `${s.inventory.length}개`;
+  const key = JSON.stringify([s.inventory.map(({cooldown, ...item}) => item), s.equipment, s.skillSlots, s.equipmentUsers, s.characters.map(c=>[c.id,c.name]), s.activeCharacterId, filter, hideOtherEquipment]); if (key === inventoryKey) return; inventoryKey = key;
+  const items = sortInventory(s, filter, hideOtherEquipment);
+  $('#item-count').textContent = hideOtherEquipment ? `${items.length} / ${s.inventory.length}개` : `${s.inventory.length}개`;
   const sale = s.normalSale || { count: 0, gold: 0 };
   $('#sell-normal').textContent = `일반 일괄 판매 (${sale.count}개 · ${sale.gold} G)`;
   $('#sell-normal').disabled = !sale.count;
-  const items = sortInventory(s, filter);
   $('#inventory-list').innerHTML = items.length ? items.map(item => {
     const skill = item.slot === 'skill';
     const equipped = skill ? s.skillSlots.includes(item.id) : Object.values(s.equipment).includes(item.id);
@@ -127,14 +136,19 @@ function renderInventory(s) {
     const users = s.equipmentUsers?.[item.id] || (equipped ? [s.activeCharacterId] : []);
     const names = users.map(id => s.characters.find(c=>c.id === id)?.name || id).join('·');
     return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3><span class="rarity">${esc(item.rarity)}</span> ${esc(item.name)}${users.length ? `<span class="equipped">${esc(names)} 장착</span>` : ''}${item.special ? ' <span class="item-special">특수</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}" ${!s.activeCharacterId || (!equipped && users.length) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${users.length ? `disabled title="${esc(names)} 캐릭터에서 장착을 해제해 주세요"` : ''}>판매 ${item.value} G</button></div></div><p>${itemDetailsHTML(item)}</p></div></article>`;
-  }).join('') : '<p class="muted">아직 발견한 장비가 없어요. 여행을 조금 더 지켜보세요.</p>';
+  }).join('') : `<p class="muted">${s.inventory.length ? '현재 필터에 표시할 아이템이 없습니다.' : '아직 발견한 장비가 없어요. 여행을 조금 더 지켜보세요.'}</p>`;
 }
 $('#inventory-list').addEventListener('click', e => { const b = e.target.closest('[data-action]'); if (b) command(b.dataset.action, { itemId: b.dataset.item }, b); });
 $('#sell-normal').onclick = e => command('SELL_NORMAL', {}, e.currentTarget);
+$('#hide-other-equipment').onchange = event => {
+  hideOtherEquipment = event.target.checked;
+  try { localStorage.setItem(hideOthersKey, String(hideOtherEquipment)); } catch {}
+  if (data?.state) renderInventory(data.state);
+};
 $$('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; $$('[data-filter]').forEach(a => a.classList.toggle('active', a === b)); if (data?.state) renderInventory(data.state); });
 function canChoose() {
   const s = data?.state;
-  return !!(user && connected && !choicePending && s?.phase === 'CHOICE_WAIT' && s.choiceId && s.remaining > performance.now() - receivedAt);
+  return !!(user && connected && !choicePending && s?.phase === 'CHOICE_WAIT' && s.choiceId && s.remaining > (performance.now() - receivedAt) * (data?.rate || 1));
 }
 function updateChoices() {
   const available = canChoose();

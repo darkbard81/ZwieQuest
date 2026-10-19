@@ -19,8 +19,13 @@ export function refreshMapNames(map) {
 }
 export const MAP_VERSION = 2;
 // Generation rules are independent of the saved graph format. Existing trees stay intact.
-export const MAP_GENERATION_VERSION = 3;
+export const MAP_GENERATION_VERSION = 4;
 const directions = ['left', 'right'];
+
+export function maxNodes(d) {
+  if (d <= 4) return 2 ** d;
+  return 30 - 2 * d;
+}
 
 function shuffle(items, rng) {
   const result = [...items];
@@ -48,8 +53,8 @@ export function generateMap(id, rng) {
     let continuing = layer.length;
     if (d === depth - 1) continuing = destinations.length / 2;
     else if (d >= 4) {
-      // The NEXT layer includes both continuing paths and dead ends in its depth*4 cap.
-      const maximum = Math.min(layer.length, (d + 1) * 2);
+      // Count both continuing paths and dead ends against the NEXT layer cap.
+      const maximum = Math.min(layer.length, Math.floor(maxNodes(d + 1) / 2));
       // Keep several routes alive, and reserve enough capacity for every destination.
       const minimum = Math.max(Math.ceil(maximum / 2), Math.ceil(destinations.length / 2 ** (depth - d)));
       continuing = minimum + rng(maximum - minimum + 1);

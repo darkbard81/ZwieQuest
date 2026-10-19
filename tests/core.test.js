@@ -26,9 +26,26 @@ test('both classes finish unattended map attempts and preserve XP/items', () => 
 test('branch choices only advance; stale choice rejected; default choice progresses', () => {
   const g=make();g.character.attributes.CON=100;g.character.attributes.STR=100;g.advance();let previous=0;while(g.state.phase==='CHOICE_WAIT'&&previous<10){const choiceId=g.state.choiceId;g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'});assert.equal(g.state.step,++previous);assert.throws(()=>g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'}));while(!['CHOICE_WAIT','RETURN_HOME'].includes(g.state.phase))g.advance();}assert.ok(previous>0);assert.equal(g.state.phase,'RETURN_HOME');
 });
-test('rate switch preserves spent game time; choice timeout is real-time and not extended',()=>{
-  const g=make();g.phase('TRAVEL',6000);g.tick(1000,1);g.tick(1000,1.5);assert.equal(g.state.remaining,3500);
-  g.phase('CHOICE_WAIT',9000);g.tick(1000,1);g.tick(1000,1.5);assert.equal(g.state.remaining,7000);
+test('online/offline rates preserve spent game time for every phase including choices and combat',()=>{
+  assert.equal(config.onlineRate,1);assert.equal(config.offlineRate,2);
+  const g=make();
+  for(const phase of ['HOME','TRAVEL','CHOICE_WAIT','BATTLE','TREASURE','DOWNED','RETURN_HOME']){
+    g.phase(phase,9000);g.tick(1000,config.onlineRate);g.tick(1000,config.offlineRate);
+    assert.equal(g.state.remaining,6000,phase);
+    g.tick(1000,config.onlineRate);assert.equal(g.state.remaining,5000,phase);
+  }
+});
+test('offline choices expire at 4.5 seconds and combat actions at 0.55 seconds; online keeps original timing',()=>{
+  for(const rate of [config.onlineRate,config.offlineRate]){
+    const g=make();g.advance();assert.equal(g.state.phase,'CHOICE_WAIT');
+    g.tick(config.choiceMs/rate-1,rate);assert.equal(g.state.phase,'CHOICE_WAIT');
+    g.tick(1,rate);assert.equal(g.state.phase,'TRAVEL');assert.equal(g.state.step,1);
+    g.beginBattle();g.character.hp=10000;g.state.enemy.hp=g.state.enemy.maxHp=10000;
+    const hits=g.events.filter(e=>e.type==='hit').length;
+    g.tick(config.battleActionMs/rate-1,rate);assert.equal(g.events.filter(e=>e.type==='hit').length,hits);
+    g.tick(1,rate);assert.equal(g.events.filter(e=>e.type==='hit').length,hits+1);
+    assert.equal(g.state.remaining,config.battleActionMs);
+  }
 });
 test('equipment during battle affects next attack; HP swaps cannot heal; equipped sale rejected',()=>{
   const g=make();g.state.run=1;g.state.step=1;g.state.risk=0;g.beginBattle();while(g.state.battle.actor!=='hero')g.battleAction();const before=stats(g.state,config);const item=g.item('weapon',2);g.state.inventory.push(item);g.command({characterId: g.character?.id, type:'EQUIP',itemId:item.id});assert.ok(stats(g.state,config).PEN>before.PEN);g.battleAction();assert.equal(g.state.battle.lastHit.pen,stats(g.state,config).PEN);

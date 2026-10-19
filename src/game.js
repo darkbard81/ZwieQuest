@@ -273,7 +273,7 @@ export class Game {
   tick(elapsed, rate) {
     if (!this.state || (this.state.phase === 'HOME' && (!this.character || this.state.homePaused))) return false;
     // One actual scheduled event per tick. No replay of stopped-server time.
-    this.state.remaining -= elapsed * (this.state.phase === 'CHOICE_WAIT' ? 1 : rate);
+    this.state.remaining -= elapsed * rate;
     if (this.state.remaining <= 0) { this.advance(); return true; } return false;
   }
   command(cmd) {

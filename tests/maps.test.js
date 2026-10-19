@@ -5,6 +5,7 @@ import { generateMap, MAP_DEFS, MAP_VERSION, MAP_GENERATION_VERSION, reachable, 
 import { Game } from '../src/game.js';
 import { generateLegacyMap } from './fixtures/maps-v1.js';
 import { generatePreviousMap } from './fixtures/maps-v2.js';
+const depthCaps=[1,2,4,8,16,20,18,16,14,12,10];
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
 function rng(seed){let x=seed;return n=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x%n;};}
 function route(map,target){const queue=[[map.rootId,[]]],seen=new Set();while(queue.length){const [id,path]=queue.shift();if(id===target)return path;if(seen.has(id))continue;seen.add(id);for(const [direction,to]of Object.entries(map.nodes[id].edges||{}))queue.push([to,[...path,direction]]);}throw Error('Unreachable');}
@@ -37,6 +38,8 @@ test('version-1 and version-2 saves preserve in-flight phase, timer, choices, co
  for(const generateSavedMap of [generateLegacyMap,generatePreviousMap])for(const phase of ['HOME','CHOICE_WAIT','TRAVEL','BATTLE','TREASURE','DOWNED','RETURN_HOME']){
   const g=new Game(config,null,rng(7));g.create({name: '모험가', appearanceId: 'warrior'});g.state.homePaused=false;
   g.state.maps=Object.fromEntries(Object.keys(MAP_DEFS).map(id=>[id,generateSavedMap(id,rng(7))]));
+  // Keep the migration setup independent of encounter rolls and generator RNG consumption.
+  g.rng=n=>n===10000?9999:Math.min(11,n-1);
   const map=g.state.maps.village;g.state.currentNodeId=map.rootId;g.advance();
   const target=Object.values(map.nodes).find(n=>n.depth===2&&n.kind==='path');
   for(const direction of route(map,target.id)){g.choose(direction);if(g.state.step<2)g.advance();}
@@ -49,14 +52,15 @@ test('version-1 and version-2 saves preserve in-flight phase, timer, choices, co
   const again=new Game(config,structuredClone(restored.state),()=>{throw Error('Unexpected reroll');});assert.deepEqual(again.state,restored.state);
  }
 });
-test('all five maps over 100 seeds share full early branching, depth*4 caps including dead ends, and reachable depth-10 destinations',()=>{
+test('all five maps over 100 seeds share full early branching, tapering depth caps including dead ends, and reachable depth-10 destinations',()=>{
  for(let seed=1;seed<=100;seed++)for(const id of Object.keys(MAP_DEFS)){
   const map=generateMap(id,rng(seed)),all=Object.values(map.nodes),final=all.filter(n=>n.depth===10),seen=reachable(map);
   assert.equal(seen.size,all.length);assert.equal(map.depth,10);assert.equal(final.length,id==='village'?10:2);assert.equal(map.version,MAP_VERSION);assert.equal(map.generationVersion,MAP_GENERATION_VERSION);assert.ok(all.every(n=>!Object.hasOwn(n,'event')));
   for(let d=0;d<=10;d++){
    const row=all.filter(n=>n.depth===d);
+   if(d<=4)assert.equal(row.length,depthCaps[d]);
    if(d<=3){assert.equal(row.length,2**d);assert.ok(row.every(n=>n.edges),`${id}/${seed}: early dead end at ${d}`);}
-   else assert.ok(row.length>0&&row.length<=d*4,`${id}/${seed}: ${row.length} total nodes at ${d}`);
+   else assert.ok(row.length>0&&row.length<=depthCaps[d],`${id}/${seed}: ${row.length} total nodes at ${d}`);
   }
   assert.ok(all.some(n=>n.kind==='deadend'&&n.depth>=4&&n.depth<10));
   assert.ok(all.filter(n=>n.kind==='exit'||n.kind==='boss').every(n=>n.depth===10));
@@ -75,10 +79,24 @@ test('seed changes branch counts as well as placement; same seed reproduces maps
   assert.ok(shapes.size>1,`${id} always generates the same layer widths`);
   for(const random of [()=>0,n=>n-1]){
    const map=generateMap(id,random);assertTree(map);
-   for(let d=1;d<=10;d++)assert.ok(Object.values(map.nodes).filter(n=>n.depth===d).length<=d*4);
+   for(let d=1;d<=10;d++)assert.ok(Object.values(map.nodes).filter(n=>n.depth===d).length<=depthCaps[d]);
    assert.equal(Object.values(map.nodes).filter(n=>n.kind===(id==='village'?'exit':'boss')).length,id==='village'?4:1);
   }
  }
+});
+test('generation-3 saved trees above the new cap retain their geometry and exploration on reload',()=>{
+ const g=new Game(config,null,n=>n-1);g.create({name:'모험가',appearanceId:'warrior'});
+ for(const map of Object.values(g.state.maps))map.generationVersion=3;
+ const map=g.state.maps.village,parent=Object.values(map.nodes).find(n=>n.depth===5&&!n.edges);
+ parent.kind='path';parent.label='기존 경로';delete parent.sideBranch;parent.edges={};
+ for(const direction of ['left','right']){
+  const id=`saved-v3:${direction}`;
+  map.nodes[id]={id,depth:6,kind:'deadend',label:'막다른 길',sideBranch:true};parent.edges[direction]=id;
+ }
+ assertTree(map);assert.equal(Object.values(map.nodes).filter(n=>n.depth===6).length,20);
+ g.state.exploredNodes.village.push(parent.id,parent.edges.left);
+ const saved=structuredClone(g.state),restored=new Game(config,structuredClone(saved),()=>{throw Error('Saved maps must not reroll');});
+ assert.deepEqual(restored.state.maps,saved.maps);assert.deepEqual(restored.state.exploredNodes,saved.exploredNodes);
 });
 test('each village exit transfers to its region and checkpoint passage history survives serialized restart',()=>{
  for(const region of ['volcano','snow','desert','beach']){
