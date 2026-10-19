@@ -1,6 +1,7 @@
 import { createTravelCamera } from './travel-camera.js';
 import { REGIONS } from './regions.js';
 import { createHeroAnimator, sampleAnimationFrame } from './hero-animation.js';
+import { monsterAssetURL } from './monster-assets.js';
 import { innRoster } from './inn-roster.js';
 import { APPEARANCES, appearanceFor, appearanceAssets, mirrorAppearance } from './appearances.js';
 const { Assets, CanvasRenderer, Container, Graphics, Rectangle, Sprite, Text, Texture, VERSION, autoDetectRenderer } = globalThis.PIXI;
@@ -53,6 +54,13 @@ export async function createWorld(container) {
   const clearFeedback = () => { feedback.visible = false; feedbackTarget = null; };
   const animator = createHeroAnimator();
   const camera = createTravelCamera();
+  const monsterTextures = new Map(), monsterLoading = new Set();
+  function loadMonster(enemy) {
+    const url = monsterAssetURL(enemy?.img_path);
+    if (!url || monsterTextures.has(url) || monsterLoading.has(url)) return;
+    monsterLoading.add(url);
+    Assets.load(url).then(texture => { monsterTextures.set(url, texture); }).catch(error => { console.warn('몬스터 이미지 불러오기 실패', error); }).finally(() => monsterLoading.delete(url));
+  }
   const clearTransient = () => { clearFeedback(); animator.clear(); };
   document.addEventListener('visibilitychange', clearTransient);
   let currentAnimation = null;
@@ -100,8 +108,9 @@ export async function createWorld(container) {
     hero.tint = motion.hurt ? 0xffdddd : 0xffffff; shadow.position.set(x, groundY);
     object.visible = s.phase === 'BATTLE' || s.phase === 'TREASURE';
     if (object.visible) {
-      object.texture = cells[s.phase === 'TREASURE' ? 0 : { village: 1, volcano: 2, beach: 3, desert: 2, snow: 3 }[s.theme]];
-      object.width = object.height = s.enemy?.boss ? 112 : 84;
+      const monsterTexture = s.phase === 'BATTLE' ? monsterTextures.get(monsterAssetURL(s.enemy?.img_path)) : null;
+      object.texture = monsterTexture || cells[s.phase === 'TREASURE' ? 0 : { village: 1, volcano: 2, beach: 3, desert: 2, snow: 3 }[s.theme]];
+      object.width = object.height = monsterTexture ? 154 : s.enemy?.boss ? 112 : 84;
       object.position.set(398, 317 + (s.phase === 'BATTLE' && !reduced ? Math.sin(now / 280) * 3 : 0));
       object.tint = s.phase === 'BATTLE' && s.battle?.lastHit?.actor === 'hero' && Date.now() - s.battle.lastHit.at < 160 ? 0xffd4aa : 0xffffff;
     }
@@ -120,7 +129,7 @@ export async function createWorld(container) {
   }
   requestAnimationFrame(frame);
   return {
-    update(value) { const now = performance.now(); camera.update(value, now); state = value; animator.update(value, now); if (!['BATTLE', 'TREASURE', 'DOWNED'].includes(value?.phase)) clearFeedback(); },
+    update(value) { const now = performance.now(); camera.update(value, now); state = value; loadMonster(value?.enemy); animator.update(value, now); if (!['BATTLE', 'TREASURE', 'DOWNED'].includes(value?.phase)) clearFeedback(); },
     clearFeedback,
     clearTransient,
     playEvents(events) {
@@ -141,7 +150,7 @@ export async function createWorld(container) {
       renderer: renderer.name, isPixiRenderer: renderer instanceof CanvasRenderer || renderer.name === 'webgl',
       feedback: { visible: feedback.visible, label: feedback.text, target: feedbackTarget, count: feedbackCount,
         bounds: feedback.visible ? { x: feedback.x - feedback.width / 2, y: feedback.y - feedback.height / 2, width: feedback.width, height: feedback.height } : null },
-      background: state?.phase === 'HOME' ? 'pub' : state?.theme, camera: cameraView, heroDisplay: { cellSize: state?.phase === 'HOME' ? 154 : 192, x: hero.x, y: hero.y, mirrored: hero.scale.x < 0 }, objectDisplay: { x: object.x, y: object.y, width: object.width, visible: object.visible },
+      background: state?.phase === 'HOME' ? 'pub' : state?.theme, camera: cameraView, heroDisplay: { cellSize: state?.phase === 'HOME' ? 154 : 192, x: hero.x, y: hero.y, mirrored: hero.scale.x < 0 }, objectDisplay: { x: object.x, y: object.y, width: object.width, visible: object.visible, image: monsterTextures.has(monsterAssetURL(state?.enemy?.img_path)) ? monsterAssetURL(state.enemy.img_path) : null },
       innCharacters: innGuests.filter(v => v.sprite.visible).map(v => ({ characterId: v.characterId, action: 'Front_Idle', frame: v.frame, x: v.sprite.x, y: v.sprite.y })),
       framesRendered, animation: currentAnimation, displayObjects: stage.children.length, fps, width: renderer.canvas.width, height: renderer.canvas.height }; }
   };

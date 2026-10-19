@@ -10,7 +10,7 @@ const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url
 const make = (cls = 'wizard') => { const c = structuredClone(config); c.initiative.enemyDEX = -10; const g = new Game(c, null, () => 0); g.create({name: '모험가', appearanceId: cls});g.state.homePaused=false; g.state.risk = 0; return g; };
 const item = g => g.character.skills.find(i => i.slot === 'skill');
 const command = g => ({ type: 'USE_SKILL', characterId:g.character.id, itemId: item(g).id, battleId: g.state.battle.id, turn: g.state.battle.turn });
-const battle = g => { g.beginBattle(); g.state.enemy.hp = 100000; g.state.enemy.base = 0; g.character.hp = 1; };
+const battle = g => { g.beginBattle(); g.state.enemy.hp = 100000; g.state.enemy.weapon.damageMin = g.state.enemy.weapon.damageMax = 0; g.character.hp = 1; };
 
 test('JSON validates duplicate IDs, unknown effects, invalid coefficients and fixed six-slot policy', () => {
   for (const mutate of [c => c.skills.push(c.skills[0]), c => c.skills[0].effect.type = 'unknown', c => c.skills[0].cooldown.baseMs = -1, c => c.maxEquipped = 7]) {

@@ -4,6 +4,7 @@ import { attack, stats, statDetails, levelBonus } from './combat.js';
 import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
 import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
 import { rollEncounter } from './encounters.js';
+import { generateMonster, monsterRewards, recordMonsterEncounter } from './monsters.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
 import { initializeSkills, initializeBattleSkills, skillItemView, equipSkill, useSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
 const COMBAT_RULES_VERSION = 4;
@@ -15,6 +16,8 @@ export class Game {
     if (state && !state.maps) { this.installMaps(); this.phase('HOME', config.homeMs); this.log('map', '새 경로 체계로 이동했습니다. 성장과 장비는 유지됩니다.'); }
     if (state) {
       state.progressId ||= randomUUID();
+      state.bestiary ||= {};
+      if (state.enemy?.generationVersion === 1 && !state.bestiary[state.enemy.variationId]) recordMonsterEncounter(state, state.enemy);
       if (migrateMaps(state)) this.log('map', '경로 지도를 합류 없는 트리로 정리했습니다. 현재 위치와 진행 중인 모험은 유지됩니다.');
       for (const map of Object.values(state.maps)) refreshMapNames(map);
       this.rememberExploration();
@@ -69,7 +72,7 @@ export class Game {
   get character() { return activeCharacter(this.state); }
   createAccount() {
     this.state = { characterVersion: CHARACTER_VERSION, characters: [], activeCharacterId: null, homePaused: true,
-      progressId: randomUUID(), gold: 0, inventory: [], run: 0, step: 0, eventSeq: 0, version: 0,
+      progressId: randomUUID(), bestiary: {}, gold: 0, inventory: [], run: 0, step: 0, eventSeq: 0, version: 0,
       completed: 0, victories: 0, chests: 0, theme: 'village', direction: 'right', combatRulesVersion: COMBAT_RULES_VERSION, path: [], lastSummary: null };
     this.installMaps(); this.phase('HOME', this.config.homeMs);
   }
@@ -84,7 +87,7 @@ export class Game {
     const s = this.state;
     if (s.characters.length >= MAX_CHARACTERS) throw Error('캐릭터는 최대 3명까지 보유할 수 있습니다.');
     const character = newCharacter(name, appearanceId);
-    for (const [slot, templateId] of [['weapon', 'dagger'], ['armor', 'leather']]) {
+    for (const [slot, templateId] of [['weapon', 'dagger'], ['armor', 'robe']]) {
       const item = generateEquipment({ slot, templateId, gradeId: 'normal', specials: false, rng: this.rng });
       s.inventory.push(item); character.equipment[slot] = item.id;
     }
@@ -151,16 +154,21 @@ export class Game {
     if (boss && s.lastBossRewardId === bossRewardId) return;
     if (boss) { s.lastBossRewardId = bossRewardId; s.bossDefeats++; s.pendingBossReturn = true; }
     if (!this.character) throw Error('출전 캐릭터가 없습니다.');
-    const xp = (boss ? tune.bossXP : treasure ? tune.treasureXP : tune.battleXP) + s.risk * tune.riskXP, gold = (boss ? tune.bossGold : treasure ? tune.treasureGold : tune.battleGold) + s.risk * tune.riskGold;
+    const generated = !boss && !treasure && s.enemy?.generationVersion === 1;
+    const rewards = generated ? monsterRewards(s.enemy, this.character.level, this.config.xpPerLevel) : {
+      xp: (boss ? tune.bossXP : treasure ? tune.treasureXP : tune.battleXP) + s.risk * tune.riskXP,
+      gold: (boss ? tune.bossGold : treasure ? tune.treasureGold : tune.battleGold) + s.risk * tune.riskGold, canDrop: true };
+    const { xp, gold } = rewards;
+    if (generated && s.bestiary[s.enemy.variationId]) s.bestiary[s.enemy.variationId].defeats++;
     this.character.xp += xp; s.gold += gold;
     if (treasure) s.chests++; else s.victories++;
     // One shared 25% roll, then equal weapon / armor / accessory odds.
-    const slot = !treasure && chance(this.rng, EQUIPMENT_CATALOG.dropPercent)
+    const slot = !treasure && rewards.canDrop && chance(this.rng, EQUIPMENT_CATALOG.dropPercent)
       ? ['weapon', 'armor', 'charm'][this.rng(3)] : null;
     const item = slot ? this.item(slot) : null;
     if (item) s.inventory.push(item);
-    s.lastReward = { kind, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
-    this.log(kind, `${boss ? '보스 격파' : treasure ? '보물 발견' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : ' · 장비 없음'}`, { xp, gold, itemId: item?.id || null, characterId: this.character.id });
+    s.lastReward = { kind, goldOnly: generated && !rewards.canDrop, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
+    this.log(kind, `${boss ? '보스 격파' : treasure ? '보물 발견' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : generated && !rewards.canDrop ? ' · 하위 레벨 몬스터: 골드만 획득' : ' · 장비 없음'}`, { xp, gold, itemId: item?.id || null, characterId: this.character.id });
     while (this.character.xp >= this.character.level * this.config.xpPerLevel) {
       this.character.xp -= this.character.level * this.config.xpPerLevel; this.character.level++;
       this.log('level', `레벨 ${this.character.level}! 최대 HP 증가${levelBonus(this.character.level) !== levelBonus(this.character.level - 1) ? ' · 전투 숙련 +1' : ''}`);
@@ -169,14 +177,19 @@ export class Game {
   }
   beginBattle(boss = false) {
     if (!this.character) throw Error('출전 캐릭터가 없습니다.');
-    const s = this.state, lb = levelBonus(this.character.level), names = { village: '이끼 슬라임', volcano: '잿불 정령', beach: '파도 정령', desert: '모래 정령', snow: '서리 정령' };
-    const tune = this.config.balance;
-    const maxHp = Math.floor((tune.enemyHP + s.step * tune.enemyHPPerStep + this.character.level * tune.enemyHPPerLevel + s.risk * tune.enemyRiskHP) * (boss ? tune.bossHPMultiplier : 1));
-    s.enemy = { boss, name: boss ? MAP_DEFS[s.mapId].boss : names[s.theme], hp: maxHp, maxHp, damageTypes: ['blunt'], typeModifiers: {}, STR: 1, ACC: 3 + lb, DEF: 3 + lb, REF: 4 + lb, WIL: 2 + lb, FOR: 4 + lb, AR: 2 + s.risk, PEN: 2, DEX: this.config.initiative.enemyDEX + (boss ? 1 : 0), base: Math.floor((tune.enemyDamage + s.risk * tune.enemyRiskDamage) * (boss ? tune.bossDamageMultiplier : 1)) };
+    const s = this.state;
+    if (boss) {
+      const lb = levelBonus(this.character.level), tune = this.config.balance;
+      const maxHp = Math.floor((tune.enemyHP + s.step * tune.enemyHPPerStep + this.character.level * tune.enemyHPPerLevel + s.risk * tune.enemyRiskHP) * tune.bossHPMultiplier);
+      s.enemy = { boss: true, name: MAP_DEFS[s.mapId].boss, hp: maxHp, maxHp, damageTypes: ['blunt'], typeModifiers: {}, STR: 1, ACC: 3 + lb, DEF: 3 + lb, REF: 4 + lb, WIL: 2 + lb, FOR: 4 + lb, AR: 2 + s.risk, PEN: 2, DEX: this.config.initiative.enemyDEX + 1, base: Math.floor((tune.enemyDamage + s.risk * tune.enemyRiskDamage) * tune.bossDamageMultiplier) };
+    } else {
+      s.enemy = generateMonster(s.mapId, this.rng);
+      recordMonsterEncounter(s, s.enemy);
+    }
     const heroDEX = stats(s, this.config).DEX;
     const first = heroDEX > s.enemy.DEX ? 'hero' : heroDEX < s.enemy.DEX ? 'enemy' : this.config.initiative.tieWinner;
     s.battle = { id: randomUUID(), skillUsed: false, skillUseCounts: {}, skillToggles: {}, turn: 1, actor: first, firstActor: first, ap: 3, attacks: 0, lastHit: null, rulesVersion: COMBAT_RULES_VERSION };
-    this.phase('BATTLE', this.config.battleActionMs); this.log('battle', `${s.enemy.name} 등장! ${first === 'hero' ? '모험가' : '몬스터'} 선공 (DEX ${heroDEX}:${s.enemy.DEX})으로 시작합니다.`);
+    this.phase('BATTLE', this.config.battleActionMs); this.log('battle', `${s.enemy.name}${s.enemy.level ? ` Lv.${s.enemy.level}` : ''} 등장! ${first === 'hero' ? '모험가' : '몬스터'} 선공 (DEX ${heroDEX}:${s.enemy.DEX})으로 시작합니다.`);
     this.startRound();
   }
   startRound() {
@@ -196,7 +209,7 @@ export class Game {
   battleAction() {
     const s = this.state, b = s.battle, hero = stats(s, this.config), enemy = s.enemy, tune = this.config.balance;
     const isHero = b.actor === 'hero', attacker = isHero ? hero : enemy, defender = isHero ? enemy : hero;
-    const weapon = isHero ? s.inventory.find(i => i.id === this.character.equipment.weapon) : null;
+    const weapon = isHero ? s.inventory.find(i => i.id === this.character.equipment.weapon) : enemy.weapon;
     const modern = weapon && Array.isArray(weapon.damageTypes), raw = modern && weapon.damageTypes.includes('raw');
     const target = isHero ? weaponDefense(weapon) : (enemy.hitDefense || 'DEF');
     // Old weapons retain their saved damage/power. Their weapon family, never the current class, chooses the legacy base.

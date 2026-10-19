@@ -302,7 +302,7 @@
   "armors": [
     {
       "id": "robe",
-      "name": "천옷 / 로브",
+      "name": "로브",
       "slot": "armor",
       "AR": 3,
       "typeModifiers": {},

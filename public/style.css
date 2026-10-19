@@ -255,3 +255,35 @@ main{padding-top:12px}
 .inn-guest:disabled { opacity:1; cursor:default; }
 .inn-guest:not(:disabled):hover, .inn-guest:focus-visible { background:linear-gradient(transparent 55%, #eac58422); border-color:#eac58499; outline:2px solid #eac584; outline-offset:1px; }
 .inn-guest:not(:disabled):hover .inn-guest-name, .inn-guest:focus-visible .inn-guest-name { color:#fff2ce; background:#655035; }
+
+/* The field journal shares the route map's modal palette. */
+.bestiary-content { padding:16px; }
+.bestiary-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.bestiary-heading h2 { font-size:17px; margin:0; }
+#bestiary-count, .bestiary-intro, #bestiary-empty { color:var(--muted); font-size:12px; line-height:1.7; }
+.bestiary-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(128px,1fr)); gap:10px; margin-top:16px; }
+.bestiary-card { display:flex; flex-direction:column; align-items:center; min-width:0; border:1px solid var(--line); border-radius:9px; padding:8px; background:#233b32; }
+.bestiary-card img { width:128px; height:128px; max-width:100%; object-fit:contain; }
+.bestiary-card strong { font-size:12px; margin:5px 0; }
+.bestiary-card small { color:var(--muted); font-size:10px; }
+.bestiary-card:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+#bestiary-dialog { width:900px; max-width:95vw; max-height:90dvh; overflow:auto; padding:24px; }
+#bestiary-title { font-size:24px; margin:6px 0 18px; }
+#bestiary-detail { display:grid; grid-template-columns:45% 55%; min-height:450px; border:1px solid var(--line); border-radius:10px; background-color:#11251f; background-image:linear-gradient(90deg,#11251f22,#11251f44 38%,#11251ff2 57%),var(--monster-image,none); background-repeat:no-repeat; background-size:100% 100%, 52% auto; background-position:center,left center; overflow:hidden; }
+.bestiary-lore { align-self:end; padding:18px; margin:12px; background:#11251fdf; border-radius:8px; font-size:12px; line-height:1.8; }
+.bestiary-facts { padding:22px; font-size:12px; line-height:1.8; }
+.bestiary-facts h3 { margin:4px 0; font-size:18px; }
+.bestiary-facts h3 span { color:var(--gold); font-size:13px; }
+.bestiary-facts h4 { margin:12px 0 4px; color:var(--gold); }
+.bestiary-facts p { margin:6px 0; }
+.monster-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; }
+.monster-stats>div { background:#294237cc; border-radius:4px; padding:3px 5px; }
+.monster-stats b { float:right; }
+.bestiary-history { margin-top:16px; border-top:1px solid var(--line); padding-top:10px; color:var(--muted); }
+@media(max-width:650px) {
+  #bestiary-dialog { padding:18px; }
+  #bestiary-detail { grid-template-columns:1fr; background-image:linear-gradient(#11251f00 220px,#11251f 340px),var(--monster-image,none); background-size:100% 100%, 300px auto; background-position:center,center top; }
+  .bestiary-lore { margin-top:270px; }
+  .bestiary-facts { background:#11251feb; padding:16px; }
+  .info-tabs [role=tab] { padding-left:8px; padding-right:8px; }
+}

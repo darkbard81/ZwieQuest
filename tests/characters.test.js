@@ -14,7 +14,8 @@ test('account starts at inn with no characters, no auto departure; 1 to 3 charac
  const g=make();for(let n=0;n<20;n++)g.tick(100000,1.5);assert.equal(g.state.phase,'HOME');assert.equal(g.state.run,0);assert.equal(g.snapshot().activeCharacterId,null);
  for(let n=0;n<3;n++){const c=create(g,'동일 외형 '+n);assert.match(c.id,/^[0-9a-f-]{36}$/);assert.equal(c.level,1);assert.deepEqual(Object.values(c.attributes),[0,0,0,0,0,0]);assert.equal(remainingPoints(c),10);assert.equal(c.hp,10);assert.equal(c.skills.length,1);assert.equal(c.skillSlots[0],c.skills[0].id);}
  assert.equal(new Set(g.state.characters.flatMap(c=>[...Object.values(c.equipment),...c.skills.map(i=>i.id)])).size,9);
- assert.equal(g.state.inventory.length,6);assert.ok(g.state.inventory.every(i=>['dagger','leather'].includes(i.templateId)&&i.gradeId==='normal'&&!i.special));
+ for(const c of g.state.characters){const armor=g.state.inventory.find(i=>i.id===c.equipment.armor);assert.equal(armor.templateId,'robe');assert.equal(armor.name,'로브');assert.equal(armor.stats.AR,3);assert.equal(armor.stats.DEX,0);}
+ assert.equal(g.state.inventory.length,6);assert.ok(g.state.inventory.every(i=>['dagger','robe'].includes(i.templateId)&&i.gradeId==='normal'&&!i.special));
  assert.throws(()=>create(g,'4명'),/최대 3/);assert.equal(g.state.characters.length,3);assert.equal(g.state.inventory.length,6);
  cmd(g,'DEPART');assert.equal(g.state.phase,'CHOICE_WAIT');assert.equal(remainingPoints(g.character),10);assert.throws(()=>create(g,'모험 중'),/여관/);
 });
@@ -35,7 +36,7 @@ test('common stats use invested plus equipped attributes, base defenses and ACC 
  for(const k of ['ACC','DEF','REF','FOR','WIL','maxHp'])assert.equal(st[k],10,k);
  for(const stat of BASE_STATS)cmd(g,'ALLOCATE_STAT',{stat});g.character.level=10;st=stats(g.state,config);
  assert.equal(st.ACC,14);assert.equal(st.DEF,14);for(const k of ['REF','FOR','WIL'])assert.equal(st[k],15);assert.equal(st.maxHp,60);
- g.character.appearanceId='wizard';assert.deepEqual(stats(g.state,config),st);assert.equal(base.DEX,-1);assert.equal(base.REF,9);
+ g.character.appearanceId='wizard';assert.deepEqual(stats(g.state,config),st);assert.equal(base.DEX,0);assert.equal(base.REF,10);assert.equal(base.AR,3);
 });
 test('selected character alone gains XP, retains HP/skills/cooldowns and cannot use another character skill',()=>{
  const g=make(),a=create(g,'첫째'),b=create(g,'둘째');a.hp=3;a.skillCooldowns.heal={readyAt:9999999999999};const before=structuredClone(a);

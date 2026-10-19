@@ -8,7 +8,7 @@ import { SKILL_CATALOG, validateSkillCatalog, initializeBattleSkills, maintained
 import { skillAvailability, skillDescription } from '../public/skills-view.js';
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
 const make = () => { const c=structuredClone(config); c.initiative.enemyDEX=-10; const g=new Game(c,null,()=>0); g.create({name: '모험가', appearanceId: 'wizard'});g.state.homePaused=false; g.state.risk=0; return g; };
-const battle = g => {g.beginBattle();g.character.hp=1;g.state.enemy.hp=100000;g.state.enemy.base=0;};
+const battle = g => {g.beginBattle();g.character.hp=1;g.state.enemy.hp=100000;g.state.enemy.weapon.damageMin=g.state.enemy.weapon.damageMax=0;};
 const item = g => g.character.skills.find(i=>i.templateId==='heal');
 const cmd = g => ({type:'USE_SKILL',characterId:g.character.id,itemId:item(g).id,battleId:g.state.battle.id,turn:g.state.battle.turn});
 const nextRound = g => { const round=g.state.battle.turn; while(g.state.battle.turn===round)g.battleAction(); };
@@ -26,7 +26,7 @@ test('heal is accepted exactly twice per battle across rounds/reload/equip/copie
  nextRound(g);assert.throws(()=>g.command(cmd(g)),/대기/);assert.equal(g.state.battle.skillUseCounts.heal,1);
  g.character.skillCooldowns.heal.readyAt=Date.now()-1;g.command(cmd(g));assert.equal(g.state.battle.skillUseCounts.heal,2);
  const view=g.snapshot().inventory.find(i=>i.slot==='skill');assert.equal(view.remainingUses,0);assert.equal(skillAvailability(g.snapshot(),view,Date.now()).kind,'exhausted');assert.match(skillDescription(view),/남은 0\/2회 · 소진/);
- const saved=structuredClone(g.state);g=new Game(g.config,saved);nextRound(g);g.character.skillCooldowns.heal.readyAt=Date.now()-1;
+ const saved=structuredClone(g.state);g=new Game(g.config,saved,()=>0);nextRound(g);g.character.skillCooldowns.heal.readyAt=Date.now()-1;
  const copy={...item(g),id:'duplicate-heal'};g.character.skills.push(copy);g.command({characterId: g.character?.id, type:'UNEQUIP',itemId:item(g).id});g.command({characterId: g.character?.id, type:'EQUIP',itemId:copy.id});
  assert.throws(()=>g.command({characterId: g.character?.id, ...cmd(g),itemId:copy.id}),/소진/);assert.equal(g.state.battle.skillUseCounts.heal,2);
  const cooldown=structuredClone(g.character.skillCooldowns);g.beginBattle();assert.deepEqual(g.state.battle.skillUseCounts,{});assert.deepEqual(g.character.skillCooldowns,cooldown);g.command({characterId: g.character?.id, ...cmd(g),itemId:copy.id});assert.equal(g.state.battle.skillUseCounts.heal,1);

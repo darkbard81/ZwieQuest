@@ -4,6 +4,7 @@ import { mapViewState, nodeLabels } from './map-navigation.js';
 import { initJournal } from './journal-view.js';
 import { sortInventory } from './inventory-order.js';
 import { initDefenseDetails } from './defense-details.js';
+import { initBestiary } from './bestiary-view.js';
 import { initInn } from './inn-view.js';
 import { appearanceFor } from './appearances.js';
 import { initSkills, skillDescription } from './skills-view.js';
@@ -24,6 +25,7 @@ let data = null, receivedAt = 0, user = null, source = null, connected = false, 
 const equipmentViews = new Map();
 let statsHTML = '';
 const defenseDetails = initDefenseDetails($('#stats'), $('#defense-details'));
+const bestiary = initBestiary($('#bestiary-panel'));
 const clientId = crypto.randomUUID(); let lastHeartbeat = 0;
 let world, choicePending = false;
 const combatFeed = createCombatFeed();
@@ -53,6 +55,7 @@ function receive(next) {
   const reset = data?.state?.progressId && next.state?.progressId && data.state.progressId !== next.state.progressId;
   if (reset) { journal.reset(); journalSeq = -1; inventoryKey = ''; choicePending = false; world?.clearTransient(); }
   const combatEvents = combatFeed.consume(next, connected && !reset);
+  bestiary.update(next.state);
   data = next; receivedAt = performance.now(); connected = true;
   $('#connection').classList.remove('lost'); $('#connection').innerHTML = `<i></i>${next.mode === 'ONLINE' ? '온라인' : '오프라인'} · ${next.rate}×`;
   $('#server-status').textContent = 'SERVER LIVE · SAVED';
@@ -79,8 +82,8 @@ function receive(next) {
   $('#scene-location').textContent = s.phase === 'HOME' ? `${theme.name} · ${s.mapId === 'village' ? 'HOME' : '출발점'}` : theme.name;
   $('#scene-direction').textContent = s.phase === 'TRAVEL' ? `${s.direction === 'left' ? '←' : '→'} 새로운 길을 향해` : '성장은 자동으로, 선택은 자유롭게';
   $('#enemy-hud').hidden = !s.enemy || s.phase !== 'BATTLE';
-  if (s.enemy) $('#enemy-hud').innerHTML = `${esc(s.enemy.name)} · ${s.enemy.hp}/${s.enemy.maxHp}<div class="meter"><div style="width:${100 * s.enemy.hp / s.enemy.maxHp}%"></div></div>`;
-  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : `${s.lastReward?.kind === 'treasure' ? '보물상자에서' : '전투 보상으로'} 경험치와 금화를 얻었어요.`) : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
+  if (s.enemy) $('#enemy-hud').innerHTML = `${esc(s.enemy.name)}${s.enemy.level ? ` Lv.${s.enemy.level}` : ''} · ${s.enemy.hp}/${s.enemy.maxHp}<div class="meter"><div style="width:${100 * s.enemy.hp / s.enemy.maxHp}%"></div></div>`;
+  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : `${s.lastReward?.kind === 'treasure' ? '보물상자에서' : '전투 보상으로'} ${s.lastReward?.goldOnly ? '하위 레벨 몬스터의 금화만 얻었어요.' : '경험치와 금화를 얻었어요.'}`) : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
   $('#return-overlay').hidden = s.phase !== 'RETURN_HOME';
   if (s.phase === 'RETURN_HOME') $('#return-overlay').innerHTML = `<small>JOURNEY COMPLETE</small><h2>${s.lastSummary?.downed ? '무사히 돌아왔어요' : s.lastSummary?.reason === 'boss' ? '수호자를 넘어섰어요' : '길 끝에서, 다시 출발'}</h2><p>${s.run}번째 여행 · ${theme.name}</p><strong>+ ${s.lastSummary.gold} G</strong><p>성장과 전리품을 안전하게 저장했습니다.<br>마을의 집(HOME)으로 돌아갑니다.</p>`;
   if ($('#map-dialog')?.open) renderMap();
@@ -167,7 +170,7 @@ const passwordInput = initPasswordInput($('#password'), $('#password-input-error
 authDialog.addEventListener('cancel', e => e.preventDefault());
 const logout = document.createElement('button'); logout.className = 'quiet'; logout.id = 'logout'; logout.textContent = '로그아웃'; logout.hidden = true; $('nav').insertBefore(logout, $('#help-button'));
 const adminSettings = initAdminSettings({ api, getUser: () => user, getState: () => data?.state, onReset: result => { if (result.state) receive(result); } });
-function showAuth() { adminSettings.setUser(null); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
+function showAuth() { bestiary.update(null); adminSettings.setUser(null); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
 function setAuthMode(mode) { passwordInput.clear(); authMode = mode; $('#tab-login').classList.toggle('active', mode === 'login'); $('#tab-register').classList.toggle('active', mode === 'register'); $('#auth-title').textContent = mode === 'login' ? '이어서 떠나는 여행' : '첫 여행을 시작해 볼까요?'; $('#auth-submit').textContent = mode === 'login' ? '로그인하고 여행 계속하기' : '계정 만들고 모험 시작하기'; $('#password').autocomplete = mode === 'login' ? 'current-password' : 'new-password'; $('#auth-error').textContent = ''; }
 $('#tab-login').onclick = () => setAuthMode('login'); $('#tab-register').onclick = () => setAuthMode('register');
 $('#auth-form').onsubmit = async e => {

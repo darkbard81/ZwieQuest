@@ -7,8 +7,8 @@ import {EQUIPMENT_CATALOG as catalog,generateEquipment,weaponDefense} from '../s
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
 const item=(id,specials=false)=>generateEquipment({slot:catalog.weapons.some(w=>w.id===id)?'weapon':'armor',templateId:id,gradeId:'normal',rng:()=>0,specials});
 function make(cls='warrior',first='hero',INT){
- const c=structuredClone(config);c.initiative.enemyDEX=first==='hero'?-10:10;
- const g=new Game(c,null,n=>Math.min(11,n-1));g.create({name: '모험가', appearanceId: cls});g.state.homePaused=false;if(INT!==undefined)g.character.attributes.INT=INT;g.state.risk=0;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=100000;g.state.enemy.base=1;return g;
+ const c=structuredClone(config);c.initiative.tieWinner=first;
+ const g=new Game(c,null,n=>Math.min(11,n-1));g.create({name: '모험가', appearanceId: cls});g.state.homePaused=false;if(INT!==undefined)g.character.attributes.INT=INT;g.state.risk=0;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=100000;g.state.enemy.weapon.damageMin=g.state.enemy.weapon.damageMax=0;return g;
 }
 function finishRound(g){const round=g.state.battle.turn;let guard=0;while(g.state.battle.turn===round&&guard++<10)g.battleAction();assert.ok(guard<=6);}
 const hits=g=>g.events.filter(e=>e.type==='hit').map(e=>e.hit);

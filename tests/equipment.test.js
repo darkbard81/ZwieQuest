@@ -48,7 +48,7 @@ test('loot is unrestricted, both classes wear armor, starter cannot roll free le
 });
 test('equipping new weapon and armor changes next attack, including type matchups',()=>{
  const g=make();const w=generate('mace','legendary'),a=generate('leather');g.state.inventory.push(w,a);g.beginBattle();g.state.enemy.hp=9999;g.state.enemy.AR=5;g.state.enemy.typeModifiers={blunt:-2};g.command({characterId: g.character?.id, type:'EQUIP',itemId:w.id});while(g.state.battle.actor!=='hero')g.battleAction();g.battleAction();assert.equal(g.state.battle.lastHit.damageType,'blunt');assert.equal(g.state.battle.lastHit.effectiveAR,3);assert.equal(g.state.battle.lastHit.pen,7);
- g.command({characterId: g.character?.id, type:'EQUIP',itemId:a.id});g.state.battle.actor='enemy';g.battleAction();assert.equal(g.state.battle.lastHit.effectiveAR,3);
+ g.command({characterId: g.character?.id, type:'EQUIP',itemId:a.id});g.state.battle.actor='enemy';g.state.enemy.weapon.damageTypes=['blunt'];g.battleAction();assert.equal(g.state.battle.lastHit.effectiveAR,3);
 });
 test('current saved items survive reload/template changes; retired gear becomes new catalog gear and stays sellable',()=>{
  const g=make();const legacy={id:'old-sword',slot:'weapon',name:'여행자의 검',classId:'warrior',tier:2,rarity:'희귀',value:40,icon:'sword',stats:{power:6,PEN:5}};g.state.inventory.push(legacy);g.command({characterId: g.character?.id, type:'EQUIP',itemId:legacy.id});g.beginBattle();g.state.enemy.hp=9999;while(g.state.battle.actor!=='hero')g.battleAction();g.battleAction();assert.equal(g.state.battle.lastHit.base,22);assert.equal(g.state.battle.lastHit.pen,5);

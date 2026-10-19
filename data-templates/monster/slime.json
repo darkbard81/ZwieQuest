@@ -1,0 +1,241 @@
+{
+  "slime": {
+    "hp": 10,
+    "hpGrowth": 2,
+    "A": {
+      "STR": 0,
+      "CON": 0,
+      "DEX": 0,
+      "PER": 0,
+      "INT": 0,
+      "RES": 0
+    },
+    "B": {
+      "ACC": 10,
+      "DEF": 10,
+      "REF": 10,
+      "FOR": 10,
+      "WIL": 10
+    },
+    "description": "어디서든 흔하게 발생되는 부정형 몬스터. 귀엽다!",
+    "variation": [
+      {
+        "id": "slash_slime",
+        "name": "슬라임(베기)",
+        "img_path": "public/assets/monster/slime/05-slime-slash.webp",
+        "skills": [],
+        "weapon": {
+          "id": "slash_weapon",
+          "name": "무기(Slash)",
+          "slot": "weapon",
+          "damageTypes": [
+            "slash"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "slash_armor",
+          "name": "외피(Slash)",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "pierce": -2,
+            "blunt": -2
+          },
+          "DEX": 0
+        },
+        "icon_path": "public/assets/monster/slime/icons/05-slime-slash.webp"
+      },
+      {
+        "id": "pierce_slime",
+        "name": "슬라임(관통)",
+        "img_path": "public/assets/monster/slime/07-slime-pierce.webp",
+        "skills": [],
+        "weapon": {
+          "id": "pierce_weapon",
+          "name": "무기(Pierce)",
+          "slot": "weapon",
+          "damageTypes": [
+            "pierce"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "pierce_armor",
+          "name": "외피(Pierce)",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "slash": -2,
+            "blunt": -2
+          },
+          "DEX": 0
+        },
+        "icon_path": "public/assets/monster/slime/icons/07-slime-pierce.webp"
+      },
+      {
+        "id": "blunt_slime",
+        "name": "슬라임(부수기)",
+        "img_path": "public/assets/monster/slime/06-slime-blunt.webp",
+        "skills": [],
+        "weapon": {
+          "id": "blunt_weapon",
+          "name": "무기(Blunt)",
+          "slot": "weapon",
+          "damageTypes": [
+            "blunt"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "blunt_armor",
+          "name": "외피(Blunt)",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "slash": -2,
+            "pierce": -2
+          },
+          "DEX": 0
+        },
+        "icon_path": "public/assets/monster/slime/icons/06-slime-blunt.webp"
+      },
+      {
+        "id": "fire_slime",
+        "name": "슬라임(소각)",
+        "img_path": "public/assets/monster/slime/01-slime-fire.webp",
+        "skills": [],
+        "weapon": {
+          "id": "fire_weapon",
+          "name": "무기(Fire)",
+          "slot": "weapon",
+          "damageTypes": [
+            "fire"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "fire_armor",
+          "name": "외피(Fire)",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "cold": -2,
+            "corrosion": -2
+          },
+          "DEX": 0
+        },
+        "icon_path": "public/assets/monster/slime/icons/01-slime-fire.webp"
+      },
+      {
+        "id": "cold_slime",
+        "name": "슬라임(동결)",
+        "img_path": "public/assets/monster/slime/02-slime-cold.webp",
+        "skills": [],
+        "weapon": {
+          "id": "cold_weapon",
+          "name": "무기(Cold)",
+          "slot": "weapon",
+          "damageTypes": [
+            "cold"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "cold_armor",
+          "name": "외피(Cold)",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "fire": -2,
+            "lightning": -2
+          },
+          "DEX": 0
+        },
+        "icon_path": "public/assets/monster/slime/icons/02-slime-cold.webp"
+      },
+      {
+        "id": "lightning_slime",
+        "name": "슬라임(충격)",
+        "img_path": "public/assets/monster/slime/04-slime-lightning.webp",
+        "skills": [],
+        "weapon": {
+          "id": "lightning_weapon",
+          "name": "무기(Lightning)",
+          "slot": "weapon",
+          "damageTypes": [
+            "lightning"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "lightning_armor",
+          "name": "외피(Lightning)",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "fire": -2,
+            "corrosion": -2
+          },
+          "DEX": 0
+        },
+        "icon_path": "public/assets/monster/slime/icons/04-slime-lightning.webp"
+      },
+      {
+        "id": "corrosion_slime",
+        "name": "슬라임(부식)",
+        "img_path": "public/assets/monster/slime/03-slime-corrosion.webp",
+        "skills": [],
+        "weapon": {
+          "id": "corrosion_weapon",
+          "name": "무기(Corrosion)",
+          "slot": "weapon",
+          "damageTypes": [
+            "corrosion"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "corrosion_armor",
+          "name": "외피(Corrosion)",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "cold": -2,
+            "lightning": -2
+          },
+          "DEX": 0
+        },
+        "icon_path": "public/assets/monster/slime/icons/03-slime-corrosion.webp"
+      }
+    ]
+  }
+}

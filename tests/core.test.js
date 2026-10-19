@@ -24,7 +24,7 @@ test('both classes finish unattended map attempts and preserve XP/items', () => 
   for(const cls of ['warrior','wizard']){const g=make(cls,n=>Math.min(n-1,11));let arrivals=0;g.rng=n=>n===10000&&g.state.phase==='TRAVEL'?(arrivals++%2?1250:0):Math.min(n-1,11);const themes=new Set();let count=0;while(g.state.completed<3&&count++<1500){g.tick(20000,1);themes.add(g.state.theme);}assert.equal(g.state.completed,3);assert.ok(themes.has('village'));assert.ok(g.character.level>1);assert.ok(g.state.inventory.length>3);assert.ok(g.state.victories>0);assert.ok(g.state.chests>0);}
 });
 test('branch choices only advance; stale choice rejected; default choice progresses', () => {
-  const g=make();g.advance();let previous=0;while(g.state.phase==='CHOICE_WAIT'&&previous<10){const choiceId=g.state.choiceId;g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'});assert.equal(g.state.step,++previous);assert.throws(()=>g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'}));while(!['CHOICE_WAIT','RETURN_HOME'].includes(g.state.phase))g.advance();}assert.ok(previous>0);assert.equal(g.state.phase,'RETURN_HOME');
+  const g=make();g.character.attributes.CON=100;g.character.attributes.STR=100;g.advance();let previous=0;while(g.state.phase==='CHOICE_WAIT'&&previous<10){const choiceId=g.state.choiceId;g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'});assert.equal(g.state.step,++previous);assert.throws(()=>g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'}));while(!['CHOICE_WAIT','RETURN_HOME'].includes(g.state.phase))g.advance();}assert.ok(previous>0);assert.equal(g.state.phase,'RETURN_HOME');
 });
 test('rate switch preserves spent game time; choice timeout is real-time and not extended',()=>{
   const g=make();g.phase('TRAVEL',6000);g.tick(1000,1);g.tick(1000,1.5);assert.equal(g.state.remaining,3500);
@@ -43,6 +43,6 @@ test('downed preserves possessions and returns home; no inventory silent cap',()
   const count=g.state.inventory.length;g.rng=()=>0;for(let i=0;i<120;i++)g.reward('victory');assert.equal(g.state.inventory.length,count+120);
 });
 test('DEX initiative and configured tie policy determine first actor',()=>{
- const cfg=structuredClone(config);cfg.initiative.enemyDEX=2;const g=new Game(cfg);g.create({name: '모험가', appearanceId: 'warrior'});g.state.homePaused=false;g.state.step=1;g.state.risk=0;g.beginBattle();assert.equal(g.state.battle.actor,'enemy');
- g.character.attributes.DEX=2;delete g.character.equipment.armor;g.beginBattle();assert.equal(g.state.battle.actor,'hero');cfg.initiative.tieWinner='enemy';g.beginBattle();assert.equal(g.state.battle.actor,'enemy');
+ const cfg=structuredClone(config);const g=new Game(cfg,null,()=>0);g.create({name: '모험가', appearanceId: 'warrior'});g.state.homePaused=false;g.state.step=1;g.state.risk=0;g.rng=n=>n===6?2:0;g.beginBattle();assert.equal(g.state.enemy.DEX,10);assert.equal(g.state.battle.actor,'enemy');
+ g.character.attributes.DEX=10;delete g.character.equipment.armor;g.beginBattle();assert.equal(g.state.battle.actor,'hero');cfg.initiative.tieWinner='enemy';g.beginBattle();assert.equal(g.state.battle.actor,'enemy');
 });
