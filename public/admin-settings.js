@@ -27,7 +27,7 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
     const reset = action === 'reset';
     find('#admin-delete-title').textContent = account.username + (reset ? ' 계정을 초기화할까요?' : ' 계정을 삭제할까요?');
     find('#admin-confirm-description').textContent = reset
-      ? '모든 직업을 레벨 1·경험치 0, 금화 0으로 되돌리고 장비·소지품은 현재 직업의 기본 장비로 교체합니다. 탐험·체크포인트·전투·모험 기록을 지웁니다. 로그인 정보·관리자 권한·외형·지도 구조는 유지되며 여관에서 다시 출발합니다. 관리자도 탐험 기록이 다시 자동 지급되지 않습니다. 앱에서 되돌릴 수 없습니다.'
+      ? '모든 캐릭터와 장비·소지품을 삭제하고 금화를 0으로 되돌립니다. 탐험·체크포인트·전투·모험 기록을 지웁니다. 로그인 정보·관리자 권한·지도 구조는 유지되며 여관에서 새 캐릭터를 생성해야 합니다. 관리자도 탐험 기록이 다시 자동 지급되지 않습니다. 앱에서 되돌릴 수 없습니다.'
       : '이 계정의 로그인 세션, 캐릭터·장비·맵·진행, 전투·모험 기록과 요청 기록을 함께 영구 삭제합니다. 앱에서 복구할 수 없습니다.';
     find('#admin-delete').textContent = reset ? '계정 초기화' : '계정 영구 삭제';
     find('#admin-confirm-name').value = ''; find('#admin-delete').disabled = true;
@@ -84,7 +84,7 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
       const reset = action === 'reset';
       const result = await api(reset ? '/api/admin/reset-account' : '/api/admin/delete-account', { userId: target.id, confirmUsername: find('#admin-confirm-name').value, ...(reset ? { requestId: resetRequestId } : {}) });
       if (reset) onReset(result);
-      cancel(); await refresh(); status(result.username + (reset ? ' 계정을 기본 장비·레벨 1·금화 0으로 초기화했습니다.' : ' 계정과 연결 기록을 삭제했습니다.')); find('#admin-refresh').focus();
+      cancel(); await refresh(); status(result.username + (reset ? ' 계정을 캐릭터 0명·소지품 없음·금화 0으로 초기화했습니다.' : ' 계정과 연결 기록을 삭제했습니다.')); find('#admin-refresh').focus();
     } catch (error) { status(error.message, true); }
     finally {
       busy = false; find('#admin-cancel').disabled = false; find('#admin-refresh').disabled = false;

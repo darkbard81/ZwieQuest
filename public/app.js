@@ -28,7 +28,7 @@ const clientId = crypto.randomUUID(); let lastHeartbeat = 0;
 let world, choicePending = false;
 const combatFeed = createCombatFeed();
 const skills = initSkills({ bar: $('#skill-bar'), slots: $('#skill-slots'), summary: $('#skill-summary'), status: $('#battle-status'), onUse: (itemId, battleId, turn, button, mode, enabled) => command(mode === 'toggle' ? 'TOGGLE_SKILL' : 'USE_SKILL', { itemId, battleId, turn, ...(mode === 'toggle' ? { enabled } : {}) }, button) });
-const inn = initInn({ panel: $('#inn-selection'), portrait: $('#portrait'), countdown: $('#rest-countdown'), onSelect: (appearanceId, button) => command('APPEARANCE', { appearanceId }, button) });
+const inn = initInn({ panel: $('#inn-selection'), portrait: $('#portrait'), countdown: $('#rest-countdown'), onCommand: (type, fields) => command(type, fields) });
 function updateInn() { inn.update(data?.state, receivedAt, data?.rate || 1, connected && !!user); }
 createWorld($('#world')).then(w => { world = w; if (data?.state) w.update(data.state); }).catch(e => { $('#render-error').hidden = false; $('#render-error').textContent = '게임 화면을 불러오지 못했습니다. 새로고침해 주세요. ' + e.message; console.error(e); });
 initWindows();
@@ -45,8 +45,8 @@ async function command(type, fields = {}, button) {
   if (!connected) { toast('서버 연결을 기다려 주세요.'); return; }
   if (button?.classList.contains('busy')) return;
   button?.classList.add('busy');
-  try { receive(await api('/api/command', { type, ...fields, progressId: data?.state?.progressId, requestId: crypto.randomUUID() })); }
-  catch (e) { toast(e.message); }
+  try { receive(await api('/api/command', { type, characterId: data?.state?.activeCharacterId, ...fields, progressId: data?.state?.progressId, requestId: crypto.randomUUID() })); return true; }
+  catch (e) { toast(e.message); return false; }
   finally { button?.classList.remove('busy'); }
 }
 function receive(next) {
@@ -59,16 +59,16 @@ function receive(next) {
   updateInn();
   skills.update(next.state, next.serverTime, receivedAt, connected);
   const s = next.state; $('#world').dataset.phase = s?.phase || 'HOME'; updateChoices();
-  if (!s) { world?.update(null); if (user && !$('#welcome').open) $('#welcome').showModal(); return; }
-  if ($('#welcome').open) $('#welcome').close(); world?.update(s); world?.playEvents(combatEvents);
+  if (!s) { world?.update(null); return; }
+  world?.update(s); world?.playEvents(combatEvents);
   const theme = next.themes.find(t => t.id === s.theme);
   $('#biome-tag').textContent = s.phase === 'HOME' ? 'PUB / REST' : REGIONS[s.theme].tag;
   $('#biome-name').textContent = s.phase === 'HOME' ? '여행자의 여관' : theme.name; $('#biome-sub').textContent = s.phase === 'HOME' ? '잠시 쉬며 다음 여행을 준비해요' : theme.subtitle; $('#phase-badge').textContent = s.enemy?.boss && s.phase === 'BATTLE' ? '지역 보스전' : phases[s.phase];
   $('#journey-summary').textContent = `완료한 여행 ${s.completed}회 · 승리 ${s.victories}회 · 보물 ${s.chests}개`; $('#gold-total').textContent = s.gold.toLocaleString();
-  $('#class-label').textContent = s.classId.toUpperCase(); $('#hero-name').textContent = appearanceFor(s).name; $('#hero-level').textContent = `Lv. ${s.level} · ${user?.username || '모험가'}`;
-  $('#hp-label').textContent = `${s.hp} / ${s.stats.maxHp}`; $('#hp-fill').style.width = `${100 * s.hp / s.stats.maxHp}%`;
+  $('#class-label').textContent = s.activeCharacterId ? appearanceFor(s).name + ' 외형' : '여관'; $('#hero-name').textContent = s.name || '첫 모험가를 생성하세요'; $('#hero-level').textContent = s.activeCharacterId ? `Lv. ${s.level} · ${user?.username || '모험가'}` : '여관의 캐릭터 관리에서 시작합니다';
+  $('#hp-label').textContent = `${s.hp} / ${s.stats.maxHp}`; $('#hp-fill').style.width = `${s.stats.maxHp ? 100 * s.hp / s.stats.maxHp : 0}%`;
   $('#xp-label').textContent = `${s.xp} / ${s.xpNext}`; $('#xp-fill').style.width = `${100 * s.xp / s.xpNext}%`;
-  const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${(s.combatStats || s.stats)[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<span>${statLabelHTML(k)} <b>${s.stats[k]}</b></span>`).join('')}</div>`;
+  const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${(s.combatStats || s.stats)[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="attribute-heading">능력치 배분 <b>남은 ${s.attributePoints}점</b><small>클릭마다 1점 투자 · 장비 보너스 별도</small></div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<button type="button" data-stat="${k}" ${!s.activeCharacterId || !s.attributePoints || !connected ? 'disabled' : ''} title="투자 ${s.attributes[k] || 0} · 장비 ${(s.stats[k] || 0) - (s.attributes[k] || 0)}" aria-label="${statNames[k]} 1점 배분">${statLabelHTML(k)} <b>${s.stats[k]}</b><small>투자 ${s.attributes[k] || 0}</small></button>`).join('')}</div>`;
   // Preserve hovered defense badges across unchanged server snapshots.
   if (nextStatsHTML !== statsHTML) { $('#stats').innerHTML = nextStatsHTML; statsHTML = nextStatsHTML; }
   defenseDetails.update();
@@ -110,7 +110,7 @@ function renderEquipment(s) {
   }
 }
 function renderInventory(s) {
-  const key = JSON.stringify([s.inventory.map(({cooldown, ...item}) => item), s.equipment, s.skillSlots, s.equipmentUsers, s.classId, filter]); if (key === inventoryKey) return; inventoryKey = key;
+  const key = JSON.stringify([s.inventory.map(({cooldown, ...item}) => item), s.equipment, s.skillSlots, s.equipmentUsers, s.characters.map(c=>[c.id,c.name]), s.activeCharacterId, filter]); if (key === inventoryKey) return; inventoryKey = key;
   $('#item-count').textContent = `${s.inventory.length}개`;
   const sale = s.normalSale || { count: 0, gold: 0 };
   $('#sell-normal').textContent = `일반 일괄 판매 (${sale.count}개 · ${sale.gold} G)`;
@@ -119,10 +119,10 @@ function renderInventory(s) {
   $('#inventory-list').innerHTML = items.length ? items.map(item => {
     const skill = item.slot === 'skill';
     const equipped = skill ? s.skillSlots.includes(item.id) : Object.values(s.equipment).includes(item.id);
-    if (skill) return `<article class="item skill-item"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3>${esc(item.name)}${equipped ? '<span class="equipped">장착</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${esc(item.id)}" ${!equipped && (!item.enabled || s.skillSlots.every(Boolean)) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button></div></div><p>${esc(item.description)}<br>${esc(skillDescription(item))}<br>공용 스킬 · 최대 6개 장착 · 판매 불가</p></div></article>`;
-    const users = s.equipmentUsers?.[item.id] || (equipped ? [s.classId] : []);
-    const names = users.map(id => s.classProfiles?.[id]?.name || id).join('·');
-    return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3><span class="rarity">${esc(item.rarity)}</span> ${esc(item.name)}${users.length ? `<span class="equipped">${esc(names)} 장착</span>` : ''}${item.special ? ' <span class="item-special">특수</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}">${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${users.length ? `disabled title="${esc(names)} 직업에서 장착을 해제해 주세요"` : ''}>판매 ${item.value} G</button></div></div><p>${itemDetailsHTML(item)}</p></div></article>`;
+    if (skill) return `<article class="item skill-item"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3>${esc(item.name)}${equipped ? '<span class="equipped">장착</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${esc(item.id)}" ${!equipped && (!item.enabled || s.skillSlots.every(Boolean)) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button></div></div><p>${esc(item.description)}<br>${esc(skillDescription(item))}<br>이 캐릭터의 스킬 · 최대 6개 장착 · 판매 불가</p></div></article>`;
+    const users = s.equipmentUsers?.[item.id] || (equipped ? [s.activeCharacterId] : []);
+    const names = users.map(id => s.characters.find(c=>c.id === id)?.name || id).join('·');
+    return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3><span class="rarity">${esc(item.rarity)}</span> ${esc(item.name)}${users.length ? `<span class="equipped">${esc(names)} 장착</span>` : ''}${item.special ? ' <span class="item-special">특수</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}" ${!s.activeCharacterId || (!equipped && users.length) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${users.length ? `disabled title="${esc(names)} 캐릭터에서 장착을 해제해 주세요"` : ''}>판매 ${item.value} G</button></div></div><p>${itemDetailsHTML(item)}</p></div></article>`;
   }).join('') : '<p class="muted">아직 발견한 장비가 없어요. 여행을 조금 더 지켜보세요.</p>';
 }
 $('#inventory-list').addEventListener('click', e => { const b = e.target.closest('[data-action]'); if (b) command(b.dataset.action, { itemId: b.dataset.item }, b); });
@@ -148,8 +148,7 @@ async function choose(direction) {
 for (const direction of ['left', 'right']) $(`#choose-${direction}`).onclick = () => choose(direction);
 addEventListener('keydown', e => { if (e.repeat || !['ArrowLeft', 'ArrowRight'].includes(e.key) || e.target.closest('input,textarea,select,dialog,[role=tablist]') || document.querySelector('dialog[open]') || data?.state?.phase !== 'CHOICE_WAIT') return; e.preventDefault(); $(`#choose-${e.key === 'ArrowLeft' ? 'left' : 'right'}`).click(); });
 $('#class-switch').onclick = () => { const w = $('#world-window'); if (w.classList.contains('collapsed')) w.querySelector('.minimize').click(); inn.focus(); };
-$$('[data-class]').forEach(b => b.onclick = () => command('CREATE', { classId: b.dataset.class }, b));
-$('#welcome').addEventListener('cancel', e => e.preventDefault());
+$('#stats').addEventListener('click', e => { const button = e.target.closest('button[data-stat]'); if (button && !button.disabled) command('ALLOCATE_STAT', { stat: button.dataset.stat }, button); });
 $('#help-button').onclick = () => $('#help').showModal(); $$('#help .dialog-close').forEach(b => b.onclick = () => $('#help').close());
 async function presence(active = true) { if (!user) return; if (active) lastHeartbeat = Date.now(); try { await api('/api/presence', { clientId, active }); } catch (e) { if (active) $('#connection').classList.add('lost'); } }
 function disconnect() { source?.close(); source = null; connected = false; skills.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
@@ -168,7 +167,7 @@ const passwordInput = initPasswordInput($('#password'), $('#password-input-error
 authDialog.addEventListener('cancel', e => e.preventDefault());
 const logout = document.createElement('button'); logout.className = 'quiet'; logout.id = 'logout'; logout.textContent = '로그아웃'; logout.hidden = true; $('nav').insertBefore(logout, $('#help-button'));
 const adminSettings = initAdminSettings({ api, getUser: () => user, getState: () => data?.state, onReset: result => { if (result.state) receive(result); } });
-function showAuth() { adminSettings.setUser(null); if ($('#welcome').open) $('#welcome').close(); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
+function showAuth() { adminSettings.setUser(null); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
 function setAuthMode(mode) { passwordInput.clear(); authMode = mode; $('#tab-login').classList.toggle('active', mode === 'login'); $('#tab-register').classList.toggle('active', mode === 'register'); $('#auth-title').textContent = mode === 'login' ? '이어서 떠나는 여행' : '첫 여행을 시작해 볼까요?'; $('#auth-submit').textContent = mode === 'login' ? '로그인하고 여행 계속하기' : '계정 만들고 모험 시작하기'; $('#password').autocomplete = mode === 'login' ? 'current-password' : 'new-password'; $('#auth-error').textContent = ''; }
 $('#tab-login').onclick = () => setAuthMode('login'); $('#tab-register').onclick = () => setAuthMode('register');
 $('#auth-form').onsubmit = async e => {

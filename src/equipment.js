@@ -50,7 +50,7 @@ export function rollGrade(rng, catalog = EQUIPMENT_CATALOG) {
   for (const grade of catalog.grades) { pick -= grade.weight; if (pick < 0) return grade; }
   throw Error('Invalid grade random roll');
 }
-export function generateEquipment({ slot, classId, rng, gradeId, templateId, specials = true, catalog = EQUIPMENT_CATALOG }) {
+export function generateEquipment({ slot, rng, gradeId, templateId, specials = true, catalog = EQUIPMENT_CATALOG }) {
   const templates = (slot === 'weapon' ? catalog.weapons : slot === 'armor' ? catalog.armors : slot === 'charm' ? catalog.charms : []);
   const t = templateId ? templates.find(t => t.id === templateId) : templates[rng(templates.length)];
   if (!t) throw Error('Unknown or unavailable equipment template');

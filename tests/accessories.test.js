@@ -6,9 +6,9 @@ import {stats} from '../src/combat.js';
 import {skillValues,SKILL_CATALOG} from '../src/skills.js';
 import {BASE_STATS,EQUIPMENT_CATALOG as c,generateEquipment,validateCatalog} from '../src/equipment.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
-const make=(cls='wizard')=>{const g=new Game(structuredClone(config),null,()=>0);g.create(cls);g.state.risk=0;return g;};
+const make=(cls='wizard')=>{const g=new Game(structuredClone(config),null,()=>0);g.create({name: '모험가', appearanceId: cls});g.state.homePaused=false;g.state.risk=0;return g;};
 const charm=(id,grade='normal',rng=()=>0)=>generateEquipment({slot:'charm',templateId:id,gradeId:grade,rng});
-const equip=(g,item)=>{g.state.inventory.push(item);g.command({type:'EQUIP',itemId:item.id});};
+const equip=(g,item)=>{g.state.inventory.push(item);g.command({characterId: g.character?.id, type:'EQUIP',itemId:item.id});};
 test('six charm categories x five grades have exact bonuses, distinct uniform secondary options and no special roll',()=>{
  const bonuses=[[1,0],[1,1],[2,0],[2,1],[2,2]];
  for(const t of c.charms)for(const [index,g] of c.grades.entries())for(let secondary=0;secondary<5;secondary++){
@@ -31,29 +31,29 @@ test('all six equipped base stats enter unchanged derived formulas once for both
  }
 });
 test('DEX offsets plate penalty and changes next initiative; CON swaps never create HP',()=>{
- const g=make();equip(g,generateEquipment({slot:'armor',templateId:'plate',gradeId:'normal',rng:()=>0}));assert.equal(stats(g.state,g.config).DEX,-1);
+ const g=make();g.character.attributes.DEX=2;equip(g,generateEquipment({slot:'armor',templateId:'plate',gradeId:'normal',rng:()=>0}));assert.equal(stats(g.state,g.config).DEX,-1);
  g.config.initiative.enemyDEX=0;g.beginBattle();assert.equal(g.state.battle.firstActor,'enemy');equip(g,charm('agility-charm','excellent'));assert.equal(stats(g.state,g.config).DEX,1);assert.equal(g.state.battle.firstActor,'enemy');g.beginBattle();assert.equal(g.state.battle.firstActor,'hero');
- const con=charm('vitality-charm','excellent');g.state.hp=20;equip(g,con);assert.equal(g.state.hp,20);g.state.hp=stats(g.state,g.config).maxHp;g.command({type:'UNEQUIP',itemId:con.id});assert.equal(g.state.hp,stats(g.state,g.config).maxHp);const hp=g.state.hp;g.command({type:'EQUIP',itemId:con.id});assert.equal(g.state.hp,hp);
+ const con=charm('vitality-charm','excellent');g.character.hp=20;equip(g,con);assert.equal(g.character.hp,20);g.character.hp=stats(g.state,g.config).maxHp;g.command({characterId: g.character?.id, type:'UNEQUIP',itemId:con.id});assert.equal(g.character.hp,stats(g.state,g.config).maxHp);const hp=g.character.hp;g.command({characterId: g.character?.id, type:'EQUIP',itemId:con.id});assert.equal(g.character.hp,hp);
 });
 test('INT accessory increases manual healing; STR boosts actual weapon damage',()=>{
  for(const cls of ['warrior','wizard']) {
-  const g=make(cls);equip(g,charm('wisdom-charm','excellent'));g.config.initiative.enemyDEX=-10;g.beginBattle();g.state.hp=1;
+  const g=make(cls);equip(g,charm('wisdom-charm','excellent'));g.config.initiative.enemyDEX=-10;g.beginBattle();g.character.hp=1;
   const effect=skillValues(SKILL_CATALOG.skills[0],stats(g.state,g.config));
-  g.command({type:'USE_SKILL',itemId:g.state.skillSlots[0],battleId:g.state.battle.id,turn:g.state.battle.turn});assert.equal(g.state.hp,1+effect.heal);
+  g.command({characterId: g.character?.id, type:'USE_SKILL',itemId:g.character.skillSlots[0],battleId:g.state.battle.id,turn:g.state.battle.turn});assert.equal(g.character.hp,1+effect.heal);
  }
  const a=make('warrior'),b=make('warrior');equip(b,charm('strength-charm','excellent'));
  for(const g of [a,b]){g.config.initiative.enemyDEX=-10;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=10000;g.state.enemy.DEF=-30;g.state.enemy.AR=0;g.rng=()=>11;g.battleAction();}
  const hit=b.state.battle.lastHit;assert.ok(hit.damage>a.state.battle.lastHit.damage);
 });
 test('legacy items are replaced once, preserve equipped IDs and new gear, and never reroll on reload',()=>{
- for(const cls of ['warrior','wizard']){const g=make(cls),current=structuredClone(g.state.inventory);const old=[{id:'old-charm',slot:'charm',name:'새벽의 부적',tier:1,stats:{ACC:2,WIL:1}}, {id:'old-weapon',slot:'weapon',icon:'staff',tier:2,stats:{power:8,PEN:2}}, {id:'old-armor',slot:'armor',tier:0,stats:{HP:10,AR:4}}];g.state.inventory.push(...old);g.state.equipment={charm:'old-charm',weapon:'old-weapon',armor:'old-armor'};g.beginBattle();const battle=structuredClone(g.state.battle),equipment={...g.state.equipment};const migrated=new Game(g.config,structuredClone(g.state),()=>0);
- assert.deepEqual(migrated.state.equipment,equipment);assert.deepEqual(migrated.state.battle,battle);assert.deepEqual(migrated.state.inventory.slice(0,current.length),current);
- const [ch,w,a]=migrated.state.inventory.slice(-3);assert.deepEqual(ch.stats,{STR:1,CON:1});assert.equal(ch.gradeId,'fine');assert.equal(w.templateId,'fire-staff');assert.equal(w.gradeId,'excellent');assert.equal(a.templateId,cls==='wizard'?'robe':'leather');assert.equal(ch.id,'old-charm');
+ for(const cls of ['warrior','wizard']){const g=make(cls),current=structuredClone(g.state.inventory);const old=[{id:'old-charm',slot:'charm',name:'새벽의 부적',tier:1,stats:{ACC:2,WIL:1}}, {id:'old-weapon',slot:'weapon',icon:'staff',tier:2,stats:{power:8,PEN:2}}, {id:'old-armor',slot:'armor',tier:0,stats:{HP:10,AR:4}}];g.state.inventory.push(...old);g.character.equipment={charm:'old-charm',weapon:'old-weapon',armor:'old-armor'};g.beginBattle();const battle=structuredClone(g.state.battle),equipment={...g.character.equipment};const migrated=new Game(g.config,structuredClone(g.state),()=>0);
+ assert.deepEqual(migrated.character.equipment,equipment);assert.deepEqual(migrated.state.battle,battle);assert.deepEqual(migrated.state.inventory.slice(0,current.length),current);
+ const [ch,w,a]=migrated.state.inventory.slice(-3);assert.deepEqual(ch.stats,{STR:1,CON:1});assert.equal(ch.gradeId,'fine');assert.equal(w.templateId,'fire-staff');assert.equal(w.gradeId,'excellent');assert.equal(a.templateId,'leather');assert.equal(ch.id,'old-charm');
  const saved=structuredClone(migrated.state),again=new Game(g.config,structuredClone(saved),()=>{throw Error('Unexpected reroll');});assert.deepEqual(again.state,saved);
  }
 });
 test('fresh starter gear uses the current catalog; treasure grants no equipment',()=>{
- for(const cls of ['warrior','wizard']){const g=make(cls);assert.equal(g.state.inventory.length,3);assert.deepEqual(g.state.inventory.map(i=>i.slot),['weapon','armor','skill']);assert.ok(g.state.inventory.every(i=>i.templateId));assert.ok(g.state.inventory.filter(i=>i.slot!=='skill').every(i=>i.gradeId==='normal'));assert.equal(g.state.equipment.charm,undefined);
+ for(const cls of ['warrior','wizard']){const g=make(cls);assert.equal(g.state.inventory.length,2);assert.deepEqual(g.state.inventory.map(i=>i.slot),['weapon','armor']);assert.ok(g.state.inventory.every(i=>i.templateId));assert.ok(g.state.inventory.filter(i=>i.slot!=='skill').every(i=>i.gradeId==='normal'));assert.equal(g.character.equipment.charm,undefined);
   g.state.risk=0;g.rng=()=>{throw Error('Treasure must not roll equipment');};const before=structuredClone(g.state.inventory);g.reward('treasure');assert.deepEqual(g.state.inventory,before);assert.equal(g.state.lastReward.itemId,null);assert.equal(g.state.lastReward.xp,g.config.balance.treasureXP);assert.equal(g.state.gold,g.config.balance.treasureGold);assert.equal(g.state.chests,1);
  }
 });

@@ -52,8 +52,8 @@ test('miss, graze, natural-one downgrade and fixed damage are not described as o
 
 test('real hero and enemy attacks persist original combat explanation across reload', () => {
   const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
-  const game = new Game(config, null, () => 11); game.create('warrior'); game.advance();
-  game.state.risk = 0; game.beginBattle(); game.state.hp = game.state.enemy.hp = 10000;
+  const game = new Game(config, null, () => 11); game.create({name: '모험가', appearanceId: 'warrior'});game.state.homePaused=false; game.advance();
+  game.state.risk = 0; game.beginBattle(); game.character.hp = game.state.enemy.hp = 10000;
   const enemy = game.state.enemy.name;
   for (const actor of ['hero', 'enemy']) {
     game.state.battle.actor = actor; game.state.battle.ap = 3; game.battleAction();

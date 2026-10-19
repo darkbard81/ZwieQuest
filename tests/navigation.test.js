@@ -8,17 +8,17 @@ import { mapSVG } from '../public/map-view.js';
 import { rollEncounter } from '../src/encounters.js';
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
 const quiet = n => n === 10000 ? 9999 : Math.min(11, n - 1);
-function make() { const g = new Game(config, null, quiet); g.create('warrior'); return g; }
+function make() { const g = new Game(config, null, quiet); g.create({name: '모험가', appearanceId: 'warrior'});g.state.homePaused=false; return g; }
 function reveal(g) { prepareAdminGame(g, true); }
 function targetAt(map, depth) { return Object.values(map.nodes).find(n => n.depth === depth && n.edges).id; }
 
 test('departure selection only accepts owned checkpoints, persists, and takes effect on HOME departure without changing the current journey', () => {
  const g = make();
  assert.deepEqual(g.snapshot().availableStarts.map(m => m.id), ['village']);
- for (const mapId of ['snow', '__proto__', 'missing', null]) assert.throws(() => g.command({type:'START_MAP',mapId}), /체크포인트/);
+ for (const mapId of ['snow', '__proto__', 'missing', null]) assert.throws(() => g.command({characterId: g.character?.id, type:'START_MAP',mapId}), /체크포인트/);
  g.advance();g.enterRegion('snow');g.choose('left');
  const before = structuredClone(g.state);
- g.command({type:'START_MAP',mapId:'snow'});
+ g.command({characterId: g.character?.id, type:'START_MAP',mapId:'snow'});
  for (const key of ['mapId','currentNodeId','phase','remaining','path','hp','run']) assert.deepEqual(g.state[key],before[key]);
  let restored = new Game(config, structuredClone(g.state), quiet);
  assert.equal(restored.state.departureMapId,'snow');
@@ -33,9 +33,9 @@ test('departure selection only accepts owned checkpoints, persists, and takes ef
 
 test('every unlocked map supports an automatic route from HOME, saves between steps and stops exactly at the target', () => {
  for (const mapId of ['village','volcano','snow','desert','beach']) {
-  let g = make();reveal(g);g.command({type:'START_MAP',mapId});
+  let g = make();reveal(g);g.command({characterId: g.character?.id, type:'START_MAP',mapId});
   const map=g.state.maps[mapId],target=targetAt(map,3),expected=routeTo(map,map.rootId,target);
-  g.command({type:'AUTO_ROUTE',mapId,nodeId:target});
+  g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId,nodeId:target});
   assert.equal(g.state.phase,'HOME');assert.equal(g.state.currentNodeId,g.state.maps.village.rootId);
   assert.match(mapSVG(g.snapshot()),/자동 이동 목표/);
   g = new Game(config,structuredClone(g.state),quiet);g.advance();
@@ -51,31 +51,31 @@ test('every unlocked map supports an automatic route from HOME, saves between st
 
 test('hidden targets, other maps and backward paths are rejected; visible unknown child is selectable; manual choice and cancel release the route', () => {
  const g=make(),map=g.state.maps.village,root=map.nodes[map.rootId],hidden=targetAt(map,3);
- assert.throws(()=>g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:hidden}),/표시된/);
- assert.throws(()=>g.command({type:'AUTO_ROUTE',mapId:'snow',nodeId:g.state.maps.snow.rootId}),/표시된/);
- g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:root.edges.left});assert.ok(g.state.autoRoute);
- g.command({type:'CANCEL_ROUTE'});assert.equal(g.state.autoRoute,null);
- reveal(g);g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:hidden});
- g.command({type:'START_MAP',mapId:'snow'});assert.equal(g.state.autoRoute,null);
- g.command({type:'START_MAP',mapId:'village'});g.advance();g.choose('left');g.advance();
- assert.throws(()=>g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:map.rootId}),/앞으로/);
- assert.throws(()=>g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:root.edges.right}),/앞으로/);
+ assert.throws(()=>g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:hidden}),/표시된/);
+ assert.throws(()=>g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'snow',nodeId:g.state.maps.snow.rootId}),/표시된/);
+ g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:root.edges.left});assert.ok(g.state.autoRoute);
+ g.command({characterId: g.character?.id, type:'CANCEL_ROUTE'});assert.equal(g.state.autoRoute,null);
+ reveal(g);g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:hidden});
+ g.command({characterId: g.character?.id, type:'START_MAP',mapId:'snow'});assert.equal(g.state.autoRoute,null);
+ g.command({characterId: g.character?.id, type:'START_MAP',mapId:'village'});g.advance();g.choose('left');g.advance();
+ assert.throws(()=>g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:map.rootId}),/앞으로/);
+ assert.throws(()=>g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:root.edges.right}),/앞으로/);
  const child=g.state.maps.village.nodes[g.state.currentNodeId].edges.left;
  g.state.autoRoute={mapId:'village',nodeId:child};
- g.command({type:'CHOOSE',direction:'right',choiceId:g.state.choiceId});assert.equal(g.state.autoRoute,null);
+ g.command({characterId: g.character?.id, type:'CHOOSE',direction:'right',choiceId:g.state.choiceId});assert.equal(g.state.autoRoute,null);
 });
 
 test('automatic route waits for encounters, resumes after combat/treasure, and a defeat cancels it', () => {
  for (const encounter of ['battle','treasure']) {
   const g=make();reveal(g);const map=g.state.maps.village,target=targetAt(map,3);
-  g.advance();g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:target});
+  g.advance();g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:target});
   g.rng=n=>n===10000?(encounter==='battle'?0:1250):Math.min(11,n-1);g.advance();
   assert.equal(g.state.phase,encounter==='battle'?'BATTLE':'TREASURE');assert.equal(g.state.step,1);assert.ok(g.state.autoRoute);
-  if(encounter==='battle'){g.state.hp=10000;g.state.enemy.hp=1;g.state.enemy.DEF=-100;g.state.enemy.AR=0;g.state.battle.actor='hero';g.battleAction();assert.equal(g.state.phase,'TREASURE');}
+  if(encounter==='battle'){g.character.hp=10000;g.state.enemy.hp=1;g.state.enemy.DEF=-100;g.state.enemy.AR=0;g.state.battle.actor='hero';g.battleAction();assert.equal(g.state.phase,'TREASURE');}
   g.rng=quiet;g.advance();assert.equal(g.state.phase,'TRAVEL');assert.equal(g.state.step,2);
   g.advance();g.advance();assert.equal(g.state.currentNodeId,target);assert.equal(g.state.autoRoute,null);
  }
- const g=make();reveal(g);g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:targetAt(g.state.maps.village,3)});g.advance();g.finish(true);assert.equal(g.state.autoRoute,null);
+ const g=make();reveal(g);g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:targetAt(g.state.maps.village,3)});g.advance();g.finish(true);assert.equal(g.state.autoRoute,null);
 });
 
 test('labels use depth and stable left-to-right indexes for paths and dead ends without fixed encounter names', () => {

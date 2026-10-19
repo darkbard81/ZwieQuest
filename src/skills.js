@@ -1,3 +1,4 @@
+import { activeCharacter } from './characters.js';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { EQUIPMENT_CATALOG } from './equipment.js';
@@ -44,23 +45,26 @@ export function initializeBattleSkills(battle, events) {
   }
   battle.skillToggles ||= {};
 }
-// Learned skills and cooldowns are shared across classes. Per-battle state is
+// Learned skills and cooldowns belong to one character. Per-battle state is
 // initialized only at battle creation or one-time legacy migration, not per turn.
+const owner = state => state.characters ? activeCharacter(state) : state;
+const learned = state => state.characters ? owner(state)?.skills || [] : state.inventory;
 export function initializeSkills(state, catalog = SKILL_CATALOG) {
-  state.skillSlots ||= Array(catalog.maxEquipped).fill(null);
-  state.skillCooldowns ||= {};
-  state.skillGrants ||= [];
+  if (!owner(state)) return;
+  owner(state).skillSlots ||= Array(catalog.maxEquipped).fill(null);
+  owner(state).skillCooldowns ||= {};
+  owner(state).skillGrants ||= [];
   initializeBattleSkills(state.battle);
   for (const def of catalog.skills.filter(s => s.enabled && s.grantOnCreate)) {
-    if (state.skillGrants.includes(def.id)) continue;
-    let item = state.inventory.find(i => i.slot === 'skill' && i.templateId === def.id);
+    if (owner(state).skillGrants.includes(def.id)) continue;
+    let item = learned(state).find(i => i.slot === 'skill' && i.templateId === def.id);
     if (!item) {
       item = { id: randomUUID(), templateId: def.id, slot: 'skill', name: def.name, stats: {} };
-      state.inventory.push(item);
-      const empty = state.skillSlots.indexOf(null);
-      if (def.equipByDefault && empty !== -1) state.skillSlots[empty] = item.id;
+      learned(state).push(item);
+      const empty = owner(state).skillSlots.indexOf(null);
+      if (def.equipByDefault && empty !== -1) owner(state).skillSlots[empty] = item.id;
     }
-    state.skillGrants.push(def.id);
+    owner(state).skillGrants.push(def.id);
   }
 }
 export function skillValues(def, hero) {
@@ -76,29 +80,30 @@ export function skillItemView(item, state, hero, catalog = SKILL_CATALOG) {
     useContexts: def?.useContexts || [], activationMode: def?.activationMode, effectType: def?.effect.type, perBattleLimit: def?.perBattleLimit ?? null,
     usesThisBattle: used, remainingUses: inCombat && def?.perBattleLimit != null ? Math.max(0, def.perBattleLimit - used) : null,
     toggleOn: inCombat && !!state.battle?.skillToggles?.[item.templateId], toggleConsumesTurn: def?.toggleConsumesTurn ?? null,
-    ...(def ? skillValues(def, hero) : {}), cooldown: state.skillCooldowns[item.templateId] || null };
+    ...(def ? skillValues(def, hero) : {}), cooldown: owner(state).skillCooldowns[item.templateId] || null };
 }
 export function equipSkill(state, item, unequip = false, slotIndex, catalog = SKILL_CATALOG) {
-  const current = state.skillSlots.indexOf(item.id);
+  if (!owner(state) || !learned(state).some(i => i.id === item.id)) throw Error('이 캐릭터가 습득한 스킬이 아닙니다.');
+  const current = owner(state).skillSlots.indexOf(item.id);
   if (unequip) {
     if (current === -1) throw Error('장착 중인 스킬이 아닙니다.');
-    state.skillSlots[current] = null; return;
+    owner(state).skillSlots[current] = null; return;
   }
   if (!skillDefinition(item.templateId, catalog)?.enabled) throw Error('사용할 수 없는 스킬입니다.');
   if (slotIndex !== undefined && (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= catalog.maxEquipped)) throw Error('스킬 슬롯은 1~6번입니다.');
   if (current !== -1 && slotIndex === undefined) return;
-  const target = slotIndex ?? state.skillSlots.indexOf(null);
+  const target = slotIndex ?? owner(state).skillSlots.indexOf(null);
   if (target === -1) throw Error('스킬은 최대 6개까지 장착할 수 있습니다. 먼저 해제해 주세요.');
-  if (current !== -1) state.skillSlots[current] = null;
-  state.skillSlots[target] = item.id;
+  if (current !== -1) owner(state).skillSlots[current] = null;
+  owner(state).skillSlots[target] = item.id;
 }
 function validateUse(state, item, command, catalog, consumesTurn) {
-  if (!item || item.slot !== 'skill' || !state.skillSlots.includes(item.id)) throw Error('장착 중인 스킬을 선택하세요.');
+  if (!owner(state) || !item || !learned(state).some(i => i.id === item.id) || item.slot !== 'skill' || !owner(state).skillSlots.includes(item.id)) throw Error('장착 중인 스킬을 선택하세요.');
   const def = skillDefinition(item.templateId, catalog);
   if (!def?.enabled) throw Error('사용할 수 없는 스킬입니다.');
   const b = state.phase === 'BATTLE' ? state.battle : null;
   if (!def.useContexts.includes(b ? 'combat' : 'nonCombat')) throw Error(b ? '전투 외에 사용하는 스킬입니다.' : '스킬은 전투 중에만 사용할 수 있습니다.');
-  if (state.hp <= 0 || (b && state.enemy?.hp <= 0)) throw Error('지금은 스킬을 사용할 수 없습니다.');
+  if (owner(state).hp <= 0 || (b && state.enemy?.hp <= 0)) throw Error('지금은 스킬을 사용할 수 없습니다.');
   // Prevent a stale non-combat request from executing after a battle starts, or vice versa.
   if ((b?.id ?? null) !== (command.battleId ?? null) || (b && command.turn !== b.turn)) throw Error('스킬을 선택한 턴이 지났습니다.');
   if (b && (b.actor !== 'hero' || b.ap <= 0)) throw Error('자신의 턴에만 스킬을 사용할 수 있습니다.');
@@ -107,7 +112,7 @@ function validateUse(state, item, command, catalog, consumesTurn) {
 }
 function checkActivation(state, def, b, now) {
   if (b && def.perBattleLimit !== null && (b.skillUseCounts?.[def.id] || 0) >= def.perBattleLimit) throw Error(`전투당 ${def.perBattleLimit}회 사용을 모두 소진했습니다.`);
-  if ((state.skillCooldowns[def.id]?.readyAt || 0) > now) throw Error('스킬 재사용 대기 중입니다.');
+  if ((owner(state).skillCooldowns[def.id]?.readyAt || 0) > now) throw Error('스킬 재사용 대기 중입니다.');
 }
 function recordActivation(state, def, b, values, now, consumesTurn) {
   if (b) {
@@ -115,16 +120,16 @@ function recordActivation(state, def, b, values, now, consumesTurn) {
     b.skillUseCounts[def.id] = (b.skillUseCounts[def.id] || 0) + 1;
     if (consumesTurn) b.skillUsed = true;
   }
-  state.skillCooldowns[def.id] = { startedAt: now, readyAt: now + values.cooldownMs, durationMs: values.cooldownMs };
+  owner(state).skillCooldowns[def.id] = { startedAt: now, readyAt: now + values.cooldownMs, durationMs: values.cooldownMs };
 }
 export function useSkill(state, item, hero, command, now = Date.now(), catalog = SKILL_CATALOG) {
   const { def, b } = validateUse(state, item, command, catalog, true);
   if (def.activationMode !== 'direct') throw Error('유지형 스킬은 ON/OFF로 조작하세요.');
   checkActivation(state, def, b, now);
   const values = skillValues(def, hero);
-  const healed = Math.min(values.heal, Math.max(0, hero.maxHp - state.hp));
+  const healed = Math.min(values.heal, Math.max(0, hero.maxHp - owner(state).hp));
   if (!healed) throw Error('회복할 체력이 없습니다.');
-  state.hp += healed;
+  owner(state).hp += healed;
   recordActivation(state, def, b, values, now, true);
   return { skillId: def.id, name: def.name, healed, ...values, round: b?.turn ?? null, battleId: b?.id ?? null };
 }
@@ -145,11 +150,11 @@ export function toggleSkill(state, item, hero, command, now = Date.now(), catalo
 // a bonus on a previously boosted snapshot. Duplicate copies count only once.
 export function maintainedSkillBonuses(state, catalog = SKILL_CATALOG) {
   const bonus = { ACC: 0 };
-  if (state.phase !== 'BATTLE' || !state.battle || state.hp <= 0 || state.enemy?.hp <= 0) return bonus;
-  const weapon = state.inventory.find(i => i.slot === 'weapon' && i.id === state.equipment.weapon);
+  if (!owner(state) || state.phase !== 'BATTLE' || !state.battle || owner(state).hp <= 0 || state.enemy?.hp <= 0) return bonus;
+  const weapon = state.inventory.find(i => i.slot === 'weapon' && i.id === owner(state).equipment.weapon);
   const applied = new Set();
-  for (const id of state.skillSlots || []) {
-    const item = state.inventory.find(i => i.slot === 'skill' && i.id === id);
+  for (const id of owner(state).skillSlots || []) {
+    const item = learned(state).find(i => i.slot === 'skill' && i.id === id);
     const def = skillDefinition(item?.templateId, catalog);
     if (!def?.enabled || def.activationMode !== 'toggle' || !def.useContexts.includes('combat') || !state.battle.skillToggles?.[def.id] || applied.has(def.id)) continue;
     applied.add(def.id);

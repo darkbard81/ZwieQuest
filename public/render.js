@@ -59,13 +59,14 @@ export async function createWorld(container) {
   function frame(now) {
     requestAnimationFrame(frame);
     if (document.hidden || container.closest('.collapsed') || stopped) return;
-    const s = state || { classId: 'warrior', phase: 'HOME', theme: 'village', direction: 'right', run: 0, step: 0 };
+    const s = state || { appearanceId: 'warrior', phase: 'HOME', theme: 'village', direction: 'right', run: 0, step: 0 };
     const texture = s.phase === 'HOME' ? backgrounds.pub : backgrounds[s.theme] || backgrounds.village;
     background.texture = texture; background.height = 384; background.width = 384 * texture.width / texture.height;
     cameraView = camera.sample(now, background.width, reduced);
     background.position.set(cameraView.x, 0);
     const appearance = appearanceFor(s), h = heroes[appearance.id], meta = h.meta;
     const motion = animator.sample(now, reduced);
+    hero.visible = shadow.visible = !!s.activeCharacterId;
     hero.texture = h.frames[meta.animations[motion.action].frameNames[motion.frame]];
     hero.anchor.set(meta.anchor.x / meta.frameWidth, meta.anchor.y / meta.frameHeight);
     const size = (s.phase === 'HOME' ? 154 : 192) / meta.frameHeight;

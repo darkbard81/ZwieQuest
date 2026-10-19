@@ -2,7 +2,6 @@ import { Game } from './game.js';
 
 // Called only after the server has checked the account's stored administrator role.
 export function prepareAdminGame(game, revealAgain = false) {
-  if (!game.state) game.create('warrior');
   const s = game.state;
   if (s.adminExplorationGranted && !revealAgain) return;
   for (const [id, map] of Object.entries(s.maps)) {
@@ -28,8 +27,6 @@ export function regenerateAdminMaps(game) {
 export function resetGameProgress(game, isAdmin) {
   if (!game.state) throw Error('초기화할 모험가가 없습니다.');
   const old = game.state, fresh = new Game(game.config);
-  fresh.create(old.classId);
-  fresh.state.appearanceId = old.appearanceId;
   // Maps belong to the account; reset discovery, not the account's geography.
   fresh.state.maps = structuredClone(old.maps);
   fresh.state.currentNodeId = fresh.state.maps.village.rootId;
@@ -41,6 +38,6 @@ export function resetGameProgress(game, isAdmin) {
   fresh.state.eventSeq = old.eventSeq;
   fresh.state.resetAt = Date.now();
   fresh.events = [];
-  fresh.log('home', '계정 초기화 · 기본 장비, 레벨 1, 금화 0으로 여관에서 다시 시작합니다.');
+  fresh.log('home', '계정 초기화 · 캐릭터 0명, 소지품 없음, 금화 0으로 여관에서 다시 시작합니다.');
   return fresh;
 }

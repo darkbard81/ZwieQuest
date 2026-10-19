@@ -50,8 +50,8 @@ function commit(id, command) {
     db.exec('COMMIT'); game.events = [];
   } catch (e) { db.exec('ROLLBACK'); throw e; }
 }
-// Provision existing administrator accounts once, including accounts without a hero.
-for (const { user_id: id } of db.prepare('SELECT user_id FROM admin_accounts').all()) commit(id);
+// Persist loaded migrations before accepting requests. Administrators receive map access, never an automatic character.
+for (const id of new Set([...games.keys(), ...db.prepare('SELECT user_id FROM admin_accounts').all().map(r => r.user_id)])) commit(id);
 function broadcast(id) {
   let line;
   for (const [res, u] of clients) if (u.id === id) {

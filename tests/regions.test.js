@@ -9,7 +9,7 @@ const names = { village: '새싹마을', volcano: '홍련 분화구', snow: '백
 const oldNames = { village: '바람꽃 마을', volcano: '잿불 화산', snow: '별빛 설원', desert: '황금빛 사막', beach: '푸른달 해변' };
 
 test('region rename preserves every saved route and in-flight progress without regeneration', () => {
-  const game = new Game(config, null, n => n - 1); game.create('warrior');
+  const game = new Game(config, null, n => n - 1); game.create({name: '모험가', appearanceId: 'warrior'});game.state.homePaused=false;
   game.advance(); game.choose('left');
   game.state.checkpointHistory = [{ mapId: 'desert', nodeId: game.state.maps.desert.rootId, firstPassedAt: 123 }];
   game.state.departureMapId = 'desert'; game.rememberExploration();

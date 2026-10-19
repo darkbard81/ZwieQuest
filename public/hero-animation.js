@@ -19,7 +19,7 @@ export function createHeroAnimator() {
   function clear() { sequence = []; }
   return {
     update(next, now) {
-      const key = next ? `${next.appearanceId || next.classId}:${next.mapId}:${next.run}:${next.currentNodeId}:${next.phase}` : '';
+      const key = next ? `${next.activeCharacterId || next.appearanceId}:${next.mapId}:${next.run}:${next.currentNodeId}:${next.phase}` : '';
       if (key !== phaseKey) { phaseAt = !state && next?.phase === 'DOWNED' ? now - PLAYBACK.Side_Down.duration : now; clear(); }
       phaseKey = key; state = next;
     },
@@ -40,7 +40,7 @@ export function createHeroAnimator() {
       sequence = actions.map(action => { const item = { action, at }; at += PLAYBACK[action].duration; return item; });
     },
     sample(now, reduced = false) {
-      const s = state || { phase: 'HOME', classId: 'warrior' };
+      const s = state || { phase: 'HOME', appearanceId: 'warrior' };
       let action = 'Front_Idle', elapsed = now - phaseAt, hold = false;
       if (s.phase === 'TRAVEL') action = 'Side_Walk';
       else if (s.phase === 'BATTLE') { action = 'Side_Attack'; elapsed = 0; }
@@ -54,7 +54,7 @@ export function createHeroAnimator() {
         } else if (active === sequence.at(-1)) clear();
       }
       const frame = sampleAnimationFrame(action, elapsed, reduced);
-      return { classId: s.classId || 'warrior', action, frame, mirrored: action === 'Side_Walk' && s.direction === 'left', transient: hold, hurt: action === 'Side_Hit' };
+      return { appearanceId: s.appearanceId || 'warrior', action, frame, mirrored: action === 'Side_Walk' && s.direction === 'left', transient: hold, hurt: action === 'Side_Hit' };
     }
   };
 }

@@ -15,7 +15,7 @@ export class AccountAdmin {
     this.requireAdmin(actorId);
     return this.db.prepare(`SELECT u.id,u.username,u.created_at AS createdAt,
       EXISTS(SELECT 1 FROM admin_accounts a WHERE a.user_id=u.id) AS isAdmin,
-      EXISTS(SELECT 1 FROM account_state s WHERE s.user_id=u.id) AS hasCharacter
+      EXISTS(SELECT 1 FROM account_state s WHERE s.user_id=u.id AND (json_array_length(s.body, '$.characters') > 0 OR json_extract(s.body, '$.classId') IS NOT NULL)) AS hasCharacter
       FROM users u ORDER BY u.created_at,u.username`).all()
       .map(row => ({ ...row, isAdmin: !!row.isAdmin, hasCharacter: !!row.hasCharacter }));
   }

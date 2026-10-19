@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import {createHeroAnimator, sampleAnimationFrame, PLAYBACK} from '../public/hero-animation.js';
 import {createCombatFeed} from '../public/combat-feedback.js';
 import { APPEARANCES } from '../public/appearances.js';
-const state=(phase='HOME',extra={})=>({classId:'warrior',mapId:'village',run:1,currentNodeId:'n1',phase,...extra});
+const state=(phase='HOME',extra={})=>({appearanceId:'warrior',mapId:'village',run:1,currentNodeId:'n1',phase,...extra});
 const event=(actor,damage=10)=>({type:'hit',hit:{actor,damage}});
 test('all appearances share the 24-frame, two-second Idle used by inn previews',()=>{
  for(const appearance of APPEARANCES){
   assert.equal(appearance.idleDurationMs,undefined);assert.equal(appearance.idleFrameCount,undefined);
-  const a=createHeroAnimator();a.update(state('HOME',{appearanceId:appearance.id,classId:appearance.classId}),0);
+  const a=createHeroAnimator();a.update(state('HOME',{appearanceId:appearance.id,appearanceId:appearance.appearanceId}),0);
   for(let i=0;i<24;i++){
    const now=(i+0.5)*2000/24;
    assert.equal(a.sample(now).frame,i,appearance.id);
@@ -26,12 +26,12 @@ test('shared sampler loops only Idle/Walk and clamps all one-shot actions',()=>{
   assert.equal(sampleAnimationFrame(action,spec.duration*2),spec.loop?0:23);
  }
 });
-test('idle, travel facing, combat neutral and class switch',()=>{
+test('idle, travel facing, combat neutral and appearance switch',()=>{
  const a=createHeroAnimator();a.update(state(),0);assert.equal(a.sample(300).action,'Front_Idle');
  a.update(state('TRAVEL',{direction:'left'}),400);assert.equal(a.sample(800).mirrored,true);assert.equal(a.sample(800).action,'Side_Walk');
  a.update(state('BATTLE'),900);assert.deepEqual([a.sample(1000).action,a.sample(1000).frame,a.sample(1000).mirrored],['Side_Attack',0,false]);
  a.events([event('hero')],1000);assert.ok(a.sample(1250).frame>0);assert.equal(a.sample(1651).frame,0);
- a.update(state('HOME',{classId:'wizard'}),1800);assert.equal(a.sample(1900).classId,'wizard');assert.equal(a.sample(1900).action,'Front_Idle');
+ a.update(state('HOME',{appearanceId:'wizard'}),1800);assert.equal(a.sample(1900).appearanceId,'wizard');assert.equal(a.sample(1900).action,'Front_Idle');
 });
 test('misses do not hurt; real damage interrupts attack; rapid hits replace instead of queue',()=>{
  const a=createHeroAnimator();a.update(state('BATTLE'),0);a.events([event('enemy',0)],0);assert.equal(a.sample(100).hurt,false);

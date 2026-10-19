@@ -1,15 +1,15 @@
-// Shared by the server and client. Add future class assignments here.
+// Appearance IDs select art only; they never select statistics or growth.
 export const APPEARANCES = [
-  { id: 'warrior', name: '전사', classId: 'warrior', assetVersion: 'playback-v1' },
-  { id: 'wizard', name: '마법사', classId: 'wizard', assetVersion: 'playback-v1' },
-  { id: 'barbarian', name: '바바리안', classId: 'warrior', assetVersion: 'playback-v1' },
-  { id: 'ranger', name: '레인저', classId: 'warrior', assetVersion: 'playback-v1' },
-  { id: 'cat', name: '고양이', classId: 'warrior', assetVersion: 'playback-v1' },
-  { id: 'lamia', name: '라미아', classId: 'warrior', assetVersion: 'playback-v1' }
+  { id: 'warrior', name: '전사', assetVersion: 'playback-v1' },
+  { id: 'wizard', name: '마법사', assetVersion: 'playback-v1' },
+  { id: 'barbarian', name: '바바리안', assetVersion: 'playback-v1' },
+  { id: 'ranger', name: '레인저', assetVersion: 'playback-v1' },
+  { id: 'cat', name: '고양이', assetVersion: 'playback-v1' },
+  { id: 'lamia', name: '라미아', assetVersion: 'playback-v1' }
 ];
 export const findAppearance = id => APPEARANCES.find(item => item.id === id);
-export const defaultAppearance = classId => APPEARANCES.find(item => item.classId === classId) || APPEARANCES[0];
-export const appearanceFor = state => findAppearance(state?.appearanceId) || defaultAppearance(state?.classId);
+export const defaultAppearance = appearanceId => APPEARANCES.find(item => item.id === appearanceId) || APPEARANCES[0];
+export const appearanceFor = state => findAppearance(state?.appearanceId) || defaultAppearance();
 export const appearanceAssets = id => `/assets/${id}`;
 
 export function restRemaining(state, receivedAt, now, rate = 1) {
