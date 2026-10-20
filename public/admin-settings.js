@@ -5,20 +5,19 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
   document.querySelector('nav').insertBefore(button, document.querySelector('#help-button'));
   const dialog = document.createElement('dialog'); dialog.id = 'admin-settings';
   dialog.setAttribute('aria-labelledby', 'admin-title');
-  dialog.innerHTML = `<button class="dialog-close" type="button" aria-label="관리자 설정 닫기">×</button>
-    <p class="eyebrow">ACCOUNT SETTINGS</p><h2 id="admin-title">관리자 설정</h2>
-    <div class="admin-tabs" role="tablist" aria-label="관리자 설정 항목"><button id="admin-tab-accounts" type="button" role="tab" aria-selected="true" aria-controls="admin-panel-accounts">계정 관리</button><button id="admin-tab-probabilities" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-probabilities" tabindex="-1">확률관리</button></div>
+  dialog.innerHTML = `<header class="admin-dialog-header"><button class="dialog-close" type="button" aria-label="관리자 설정 닫기">×</button>
+    <p class="eyebrow">ADMIN SETTINGS</p><h2 id="admin-title">관리자 설정</h2>
+    <div class="admin-tabs" role="tablist" aria-label="관리자 설정 항목"><button id="admin-tab-accounts" type="button" role="tab" aria-selected="true" aria-controls="admin-panel-accounts">계정 관리</button><button id="admin-tab-probabilities" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-probabilities" tabindex="-1">확률관리</button></div></header>
     <section id="admin-panel-accounts" role="tabpanel" aria-labelledby="admin-tab-accounts">
-    <p class="muted">계정의 모험 진행을 초기화하거나 사용하지 않는 계정을 삭제할 수 있습니다.</p>
+    <div class="admin-scroll"><p class="muted">계정의 모험 진행을 초기화하거나 사용하지 않는 계정을 삭제할 수 있습니다.</p>
     <div class="admin-map-actions"><button id="admin-reveal-map" type="button">내 전체 지도·체크포인트 획득</button><button id="admin-reset-maps" class="danger" type="button">지도·체크포인트 초기화</button></div>
-    <div class="admin-heading"><strong id="admin-count">계정 목록</strong><button id="admin-refresh" type="button">새로고침</button></div>
-    <div id="admin-status" role="status" aria-live="polite"></div><div id="admin-list"></div>
+    <div class="admin-heading"><strong id="admin-count">계정 목록</strong></div>
+    <div id="admin-list"></div>
     <form id="admin-confirm" hidden><h3 id="admin-delete-title">계정 삭제 확인</h3>
       <p id="admin-confirm-description"></p>
       <label for="admin-confirm-name">대상 아이디를 정확히 입력하세요.</label>
       <input id="admin-confirm-name" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="24">
-      <div class="admin-actions"><button id="admin-cancel" type="button">취소</button><button id="admin-delete" class="danger" type="submit" disabled>계정 영구 삭제</button></div>
-    </form></section>
+    </form></div><footer class="admin-dialog-footer"><div id="admin-status" role="status" aria-live="polite"></div><div class="admin-actions"><button id="admin-refresh" type="button">새로고침</button><div id="admin-confirm-actions" class="admin-confirm-actions" hidden><button id="admin-cancel" type="button">취소</button><button id="admin-delete" class="danger" type="submit" form="admin-confirm" disabled>계정 영구 삭제</button></div></div></footer></section>
     <section id="admin-panel-probabilities" role="tabpanel" aria-labelledby="admin-tab-probabilities" hidden></section>`;
   document.body.append(dialog);
   const find = selector => dialog.querySelector(selector);
@@ -41,7 +40,7 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
   }
   let target = null, busy = false, request = 0, action = 'delete', resetRequestId = null, resetProgressId = null;
   function status(text, error = false) { find('#admin-status').textContent = text; find('#admin-status').classList.toggle('error', error); }
-  function cancel() { target = null; find('#admin-confirm').hidden = true; find('#admin-confirm-name').value = ''; find('#admin-delete').disabled = true; }
+  function cancel() { target = null; find('#admin-confirm').hidden = true; find('#admin-confirm-actions').hidden = true; find('#admin-confirm-name').value = ''; find('#admin-delete').disabled = true; }
   function confirm(account, operation) {
     if (busy) return;
     target = account; action = operation; resetRequestId = crypto.randomUUID(); resetProgressId = getState()?.progressId; status('');
@@ -54,7 +53,7 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
       : '이 계정의 로그인 세션, 캐릭터·장비·맵·진행, 전투·모험 기록과 요청 기록을 함께 영구 삭제합니다. 앱에서 복구할 수 없습니다.';
     find('#admin-delete').textContent = maps ? '지도·체크포인트 초기화' : reset ? '계정 초기화' : '계정 영구 삭제';
     find('#admin-confirm-name').value = ''; find('#admin-delete').disabled = true;
-    find('#admin-confirm').hidden = false; find('#admin-confirm-name').focus();
+    find('#admin-confirm').hidden = false; find('#admin-confirm-actions').hidden = false; find('#admin-confirm-name').focus();
   }
   function render(accounts) {
     cancel(); const table = document.createElement('table'); table.className = 'admin-table';

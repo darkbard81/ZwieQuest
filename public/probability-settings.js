@@ -1,6 +1,5 @@
 export function initProbabilitySettings({ panel, api, getUser }) {
-  panel.innerHTML = `<p class="muted">모든 계정에 적용되는 확률입니다. 슬라이더를 조절한 뒤 확정을 눌러 적용하세요.</p>
-    <form id="probability-form">
+  panel.innerHTML = `<form id="probability-form"><div class="admin-scroll"><p class="muted">모든 계정에 적용되는 확률입니다. 슬라이더를 조절한 뒤 확정을 눌러 적용하세요.</p>
       <fieldset disabled>
         <section class="probability-card"><h3>탐험</h3><p class="probability-help">일반 경로 도착 시 한 번 추첨합니다. 보스·출구·막다른 길은 제외합니다.</p>
           <div class="probability-legend"><span class="probability-battle">전투 <output id="probability-battle-value">20%</output></span><span class="probability-treasure">보물 <output id="probability-treasure-value">5%</output></span><span class="probability-pass">통과 <output id="probability-pass-value">75%</output></span></div>
@@ -11,10 +10,10 @@ export function initProbabilitySettings({ panel, api, getUser }) {
           <input id="probability-drop" type="range" min="0" max="100" step="1" value="25">
           <p class="probability-help">모든 레벨의 일반 몬스터·보스 처치 시 적용합니다. 보물 상자는 제외합니다. 장비 종류·등급·특수 옵션 확률은 유지됩니다.</p>
         </section>
-      </fieldset>
+      </fieldset></div><footer class="admin-dialog-footer">
       <p id="probability-current" class="probability-help"></p><p id="probability-status" role="status" aria-live="polite"></p>
       <div class="admin-actions"><button id="probability-reload" type="button">다시 불러오기</button><button id="probability-confirm" class="primary" type="submit" disabled>확정</button></div>
-    </form>`;
+    </footer></form>`;
   const find = s => panel.querySelector(s), form = find('#probability-form'), fieldset = find('fieldset');
   const a = find('#probability-battle'), b = find('#probability-treasure'), drop = find('#probability-drop');
   let saved = null, pending = false, loading = false, generation = 0, requestId = null;

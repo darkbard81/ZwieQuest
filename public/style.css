@@ -86,7 +86,18 @@ nav{gap:7px}.quiet{padding:7px 9px;font-size:11px}.connection{font-size:10px;pad
 #password-input-error{font-size:11px;color:#e6b4a4;min-height:0;margin:4px 0 0}#password-input-error:empty{display:none}
 
 /* Administrator settings use a separate dialog and never cover a running playfield by default. */
-#admin-settings{width:min(660px,calc(100vw - 32px));max-height:calc(100vh - 40px);padding:26px;overflow:auto}
+#admin-settings{width:min(660px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:0;overflow:hidden}
+#admin-settings[open]{display:flex;flex-direction:column}
+.admin-dialog-header{position:relative;flex:none;padding:20px 24px 0;background:#182b27;border-bottom:1px solid var(--line)}
+#admin-settings .dialog-close{top:12px;right:12px;width:44px;height:44px;padding:0}
+#admin-settings h2{padding-right:44px}
+#admin-settings [role=tabpanel],#probability-form{display:flex;flex-direction:column;min-height:0}
+.admin-scroll{min-height:0;overflow:auto;overscroll-behavior:contain;padding:16px 24px}
+.admin-dialog-footer{flex:none;padding:12px 24px 16px;background:#182b27;border-top:1px solid var(--line)}
+.admin-dialog-footer .admin-actions{margin-top:8px;flex-wrap:wrap}
+.admin-confirm-actions{display:flex;gap:8px;flex-wrap:wrap}
+.admin-dialog-footer #probability-status{margin:4px 0;min-height:1.6em}
+.admin-dialog-footer #probability-current{margin:0 0 4px}
 #admin-settings h2{margin:5px 0 8px;font-size:23px}#admin-settings p{line-height:1.6}
 .admin-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:16px 0 10px}
 #admin-status{min-height:22px;font-size:12px;color:var(--mint)}#admin-status.error{color:#edb2a3}
@@ -97,7 +108,7 @@ nav{gap:7px}.quiet{padding:7px 9px;font-size:11px}.connection{font-size:10px;pad
 #admin-confirm h3{font-size:15px;margin:0 0 8px}#admin-confirm p{font-size:12px;color:#e5c4b9}#admin-confirm label{display:block;font-size:12px;margin:10px 0 7px}
 #admin-confirm input{display:block;width:100%;padding:9px 10px;background:#17231f;border:1px solid #a28570;border-radius:5px;color:var(--text);font:inherit}
 .admin-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}.danger{border-color:#ab7161;background:#613c32;color:#ffe4da}.danger:hover{background:#784a3c;border-color:#d79881}
-@media(max-width:600px){#admin-settings{padding:20px}.admin-table th,.admin-table td{padding:8px 4px;font-size:11px}.admin-table td:nth-child(3),.admin-table th:nth-child(3){display:none}}
+@media(max-width:600px){.admin-dialog-header{padding:14px 16px 0}.admin-scroll{padding:12px 16px}.admin-dialog-footer{padding:10px 16px 12px}.admin-table th,.admin-table td{padding:8px 4px;font-size:11px}.admin-table td:nth-child(3),.admin-table th:nth-child(3){display:none}}
 
 /* Full-size 256px sprites: leave headroom and keep enemy labels above the boss. */
 #world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) #biome-tag,#world:is([data-phase="BATTLE"],[data-phase="TREASURE"],[data-phase="DOWNED"]) #biome-sub{display:none}
@@ -268,8 +279,13 @@ main{padding-top:12px}
 .bestiary-card { width:66px; height:66px; padding:0; min-width:0; }
 .bestiary-card .equipment-icon { width:64px; height:64px; }
 .bestiary-card:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
-#bestiary-dialog { width:900px; max-width:95vw; max-height:90dvh; overflow:auto; padding:24px; }
-#bestiary-title { font-size:24px; margin:6px 0 18px; }
+#bestiary-dialog { width:900px; max-width:95vw; max-height:90dvh; overflow:hidden; padding:0; }
+#bestiary-dialog[open] { display:flex; flex-direction:column; }
+.bestiary-dialog-header { display:flex; align-items:center; justify-content:space-between; flex:none; padding:12px 24px; border-bottom:1px solid var(--line); }
+.bestiary-dialog-header .eyebrow { margin:0; }
+#bestiary-dialog .dialog-close { position:static; width:44px; height:44px; padding:0; flex:none; }
+.bestiary-scroll { min-height:0; overflow:auto; padding:20px 24px 24px; }
+#bestiary-title { font-size:18px; margin:4px 0; }
 #bestiary-detail { display:grid; grid-template-columns:45% 55%; min-height:450px; border:1px solid var(--line); border-radius:10px; background-color:#11251f; background-image:linear-gradient(90deg,#11251f22,#11251f44 38%,#11251ff2 57%),var(--monster-image,none); background-repeat:no-repeat; background-size:100% 100%, 52% auto; background-position:center,left center; overflow:hidden; }
 .bestiary-lore { align-self:end; padding:18px; margin:12px; background:#11251fdf; border-radius:8px; font-size:12px; line-height:1.8; }
 .bestiary-facts { padding:22px; font-size:12px; line-height:1.8; }
@@ -277,12 +293,18 @@ main{padding-top:12px}
 .bestiary-facts h3 span { color:var(--gold); font-size:13px; }
 .bestiary-facts h4 { margin:12px 0 4px; color:var(--gold); }
 .bestiary-facts p { margin:6px 0; }
-.monster-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; }
+.bestiary-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.bestiary-columns section { min-width:0; overflow-wrap:anywhere; }
+.bestiary-columns h5 { font-size:12px; margin:6px 0; }
+.bestiary-equipment { margin:12px 0; border-top:1px solid var(--line); }
+.monster-stats { display:grid; grid-template-columns:minmax(0,1fr); gap:5px; }
 .monster-stats>div { background:#294237cc; border-radius:4px; padding:3px 5px; }
 .monster-stats b { float:right; }
 .bestiary-history { margin-top:16px; border-top:1px solid var(--line); padding-top:10px; color:var(--muted); }
 @media(max-width:650px) {
-  #bestiary-dialog { padding:18px; }
+  .bestiary-dialog-header { padding:8px 14px; }
+  .bestiary-scroll { padding:14px; }
+  .bestiary-columns { gap:10px; }
   #bestiary-detail { grid-template-columns:1fr; background-image:linear-gradient(#11251f00 220px,#11251f 340px),var(--monster-image,none); background-size:100% 100%, 300px auto; background-position:center,center top; }
   .bestiary-lore { margin-top:270px; }
   .bestiary-facts { background:#11251feb; padding:16px; }
@@ -308,7 +330,7 @@ main{padding-top:12px}
 .admin-map-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 
 /* Global probability controls: one segmented track and two keyboard-accessible handles. */
-.admin-tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);padding-bottom:12px;margin:18px 0}
+.admin-tabs{display:flex;gap:8px;padding-bottom:12px;margin:14px 0 0}
 .admin-tabs [aria-selected=true]{background:#3d5042;border-color:#8caa72;color:#eff5dd}
 #admin-panel-probabilities fieldset{border:0;margin:0;padding:0;min-width:0}
 .probability-card{background:#142621;border:1px solid #395248;border-radius:10px;padding:16px;margin-bottom:14px}
@@ -332,3 +354,5 @@ main{padding-top:12px}
 #probability-status{min-height:2.8em;font-size:12px;line-height:1.5}
 #probability-status.error{color:#f2a397}
 #admin-panel-probabilities fieldset:disabled{opacity:.55}
+
+@media(max-height:500px){.admin-dialog-header{padding-top:8px}.admin-dialog-header>.eyebrow{display:none}.admin-tabs{margin-top:8px;padding-bottom:8px}.admin-dialog-footer{padding-top:8px;padding-bottom:8px}}
