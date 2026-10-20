@@ -16,7 +16,7 @@ const rngFor=(variation=0,level=0,grade=0,attribute=0)=>{let call=0;return n=>[v
 test('each region has inclusive level bounds and excludes any matching damage type',()=>{
  const bans={village:null,volcano:'cold',snow:'fire',desert:'lightning',beach:'corrosion'};
  for(const [map,ban] of Object.entries(bans)){
-  const pool=eligibleVariations(map);assert.equal(pool.length,ban?18:21);
+  const pool=eligibleVariations(map);assert.equal(pool.length,ban?24:28);
   assert.ok(pool.every(({variation:v})=>!v.weapon.damageTypes.includes(ban)));
   for(let i=0;i<pool.length;i++)for(const edge of [0,ENCOUNTER_CONFIG.regions[map].maxLevel-ENCOUNTER_CONFIG.regions[map].minLevel]){
    const e=generateMonster(map,rngFor(i,edge));assert.equal(e.variationId,pool[i].variation.id);assert.equal(e.level,edge+ENCOUNTER_CONFIG.regions[map].minLevel);
@@ -112,5 +112,20 @@ test('all seven golem attacks use Fortitude in generated combat and retain their
   const hero=stats(g.state,config);assert.notEqual(hero.FOR,hero.DEF);
   g.rng=()=>0;g.battleAction('enemy');
   assert.equal(g.state.battle.lastHit.target,'FOR');assert.equal(g.state.battle.lastHit.calculation.defense,hero.FOR);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
+ }
+});
+
+test('all seven ghost attacks use Will in generated combat and retain their names',()=>{
+ const pool=eligibleVariations('village'),ghosts=pool.filter(({monster})=>monster.id==='ghost');
+ assert.equal(ghosts.length,7);
+ assert.equal(new Set(ghosts.flatMap(({variation})=>variation.weapon.damageTypes)).size,7);
+ for(const {variation:v} of ghosts){
+  const g=make();g.character.attributes.INT=7;g.character.attributes.RES=1;
+  g.rng=rngFor(pool.findIndex(({variation})=>variation.id===v.id));g.beginBattle();
+  assert.equal(g.state.enemy.monsterId,'ghost');assert.equal(g.state.enemy.hitDefense,'WIL');assert.equal(g.state.enemy.weapon.hitDefense,'WIL');
+  assert.match(g.state.enemy.name,/유령/);assert.equal(g.state.enemy.attackName,v.weapon.name);
+  const hero=stats(g.state,config);assert.notEqual(hero.WIL,hero.DEF);
+  g.rng=()=>0;g.battleAction('enemy');
+  assert.equal(g.state.battle.lastHit.target,'WIL');assert.equal(g.state.battle.lastHit.calculation.defense,hero.WIL);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
  }
 });

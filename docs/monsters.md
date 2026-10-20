@@ -10,6 +10,8 @@
 
 골렘은 `golem.json`의 7개 피해 유형으로 추가한다. 기본 수치와 유형별 약점은 기존 몬스터와 같고, 골렘의 모든 공격은 인내(FOR)를 대상으로 한다. 원본 PNG는 `art-workbench/monsters/golem`에 보존하며, 512×512 무손실 WebP와 128×128 도감 아이콘은 `public/assets/monster/golem`에 둔다.
 
+유령은 `ghost.json`의 7개 피해 유형으로 추가한다. 기본 수치와 유형별 약점은 기존 몬스터와 같고, 유령의 모든 공격은 의지(WIL)를 대상으로 한다. 원본 PNG는 `art-workbench/monsters/ghost`에 보존하며, 512×512 무손실 WebP와 128×128 도감 아이콘은 `public/assets/monster/ghost`에 둔다.
+
 `data-templates/encounters.json`의 지역별 규칙으로 무기의 damageTypes에 금지 타입이 하나라도 포함된 variation을 제외한다. 남은 variation과 지역 레벨 범위에서 각각 균등 추첨한다. 후보가 비면 시작 시 검증 오류를 낸다.
 
 | 지역 | 레벨 | 생성 제외 피해 타입 |
