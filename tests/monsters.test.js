@@ -37,12 +37,12 @@ test('grades share equipment bonuses and exact weights, normal omits name prefix
  }
  assert.deepEqual(Object.values(counts),[60,25,10,4,1]);
 });
-test('point allocation and derived HP, ACC, defenses, LB use template and level',()=>{
+test('point allocation and derived HP, ACC and weighted defenses use template without level bonus',()=>{
  for(const map of ['village','volcano'])for(let level=0;level<=ENCOUNTER_CONFIG.regions[map].maxLevel-ENCOUNTER_CONFIG.regions[map].minLevel;level++)for(let attr=0;attr<6;attr++){
-  const e=generateMonster(map,rngFor(0,level,0,attr)),lb=Math.floor((e.level-1)/3);
+  const e=generateMonster(map,rngFor(0,level,0,attr));
   assert.equal(Object.values(e.allocatedAttributes).reduce((a,b)=>a+b,0),pointBudget(e.level));
-  assert.equal(e.hp,10+2*(e.level-1)+5*e.CON);assert.equal(e.maxHp,e.hp);assert.equal(e.ACC,9+e.PER+lb);
-  assert.equal(e.DEF,10+e.RES+lb);assert.equal(e.REF,10+e.DEX+e.PER+lb);assert.equal(e.FOR,10+e.STR+e.CON+lb);assert.equal(e.WIL,10+e.INT+e.RES+lb);
+  assert.equal(e.hp,Math.floor((50+10*(e.level-1))*(100+5*e.CON)/100));assert.equal(e.maxHp,e.hp);assert.equal(e.ACC,9+e.PER);
+  assert.equal(e.DEF,10+e.RES);assert.equal(e.REF,10+2*e.DEX+2*e.PER);assert.equal(e.FOR,10+2*e.STR+2*e.CON);assert.equal(e.WIL,10+2*e.INT+2*e.RES);
  }
  const a=make(),b=make();b.character.level=99;b.character.attributes.STR=200;b.state.risk=20;b.state.step=10;a.beginBattle();b.beginBattle();
  for(const key of ['level','attributes','ACC','DEF','maxHp','gradeId','variationId'])assert.deepEqual(a.state.enemy[key],b.state.enemy[key]);
@@ -78,11 +78,11 @@ test('bestiary groups by encountered variation, records grade/level/history and 
  g.rng=rngFor(1);g.beginBattle();assert.deepEqual(Object.keys(g.state.bestiary),[firstId,secondId]);
  const saved=JSON.parse(JSON.stringify(g.state)),restored=new Game(config,structuredClone(saved),()=>{throw Error('reload must not reroll');});assert.deepEqual(restored.state.enemy,{...saved.enemy,...actionSpeed(saved.enemy.DEX)});assert.deepEqual(restored.state.bestiary,saved.bestiary);
  restored.rng=()=>9999;restored.reward('victory');assert.equal(restored.state.bestiary[secondId].defeats,1);assert.equal(restored.state.bestiary[firstId].defeats,0);
- assert.equal(first.maxHp,10);assert.deepEqual(make().state.bestiary,{});assert.deepEqual(resetGameProgress(restored,false).state.bestiary,{});
+ assert.equal(first.maxHp,50);assert.deepEqual(make().state.bestiary,{});assert.deepEqual(resetGameProgress(restored,false).state.bestiary,{});
 });
-test('bosses and old in-flight monsters retain legacy combat/rewards and do not enter variation grid',()=>{
- const g=make();g.beginBattle(true);assert.equal(g.state.enemy.generationVersion,undefined);assert.deepEqual(g.state.bestiary,{});g.reward('boss');assert.equal(g.state.lastReward.xp,config.balance.bossXP);
- g.state.enemy={name:'old',hp:7,maxHp:12,DEX:1,base:9};const h=new Game(config,structuredClone(g.state));assert.deepEqual(h.state.enemy,{...g.state.enemy,...actionSpeed(g.state.enemy.DEX)});assert.deepEqual(h.state.bestiary,{});
+test('generated bosses enter the bestiary, keep boss rewards, and old in-flight enemies stay unchanged',()=>{
+ const g=make();g.state.mapId='volcano';g.beginBattle(true);assert.equal(g.state.enemy.generationVersion,1);const id=g.state.enemy.variationId;assert.equal(g.state.bestiary[id].encounters,1);g.reward('boss');assert.equal(g.state.lastReward.xp,config.balance.bossXP);assert.equal(g.state.bestiary[id].defeats,1);
+ g.state.enemy={name:'old',hp:7,maxHp:12,DEX:1,base:9};const h=new Game(config,structuredClone(g.state));assert.deepEqual(h.state.enemy,{...g.state.enemy,...actionSpeed(g.state.enemy.DEX)});assert.deepEqual(h.state.bestiary,g.state.bestiary);
 });
 
 test('all seven harpy attacks use Reflex in generated combat and retain their names',()=>{

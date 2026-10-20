@@ -86,11 +86,11 @@ function receive(next) {
   $('#hero-world-hp').setAttribute('aria-valuemax', String(worldMaxHp));
   $('#hero-world-hp').setAttribute('aria-valuenow', String(worldHp));
   $('#xp-label').textContent = `${s.xp} / ${s.xpNext}`; $('#xp-fill').style.width = `${100 * s.xp / s.xpNext}%`;
-  const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB', 'actionSpeed'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${Number((s.combatStats || s.stats)[k].toFixed(2))}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="attribute-heading">능력치 배분 <b>남은 ${s.attributePoints}점</b></div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<button type="button" data-stat="${k}" ${!s.activeCharacterId || !s.attributePoints || !connected ? 'disabled' : ''} aria-label="${statNames[k]} 1점 배분">${statLabelHTML(k)} <b>${s.stats[k]}</b></button>`).join('')}</div>`;
+  const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'actionSpeed'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${Number((s.combatStats || s.stats)[k].toFixed(2))}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="attribute-heading">능력치 배분 <b>남은 ${s.attributePoints}점</b></div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<button type="button" data-stat="${k}" ${!s.activeCharacterId || !s.attributePoints || !connected ? 'disabled' : ''} aria-label="${statNames[k]} 1점 배분">${statLabelHTML(k)} <b>${s.stats[k]}</b></button>`).join('')}</div>`;
   // Preserve hovered defense badges across unchanged server snapshots.
   if (nextStatsHTML !== statsHTML) { $('#stats').innerHTML = nextStatsHTML; statsHTML = nextStatsHTML; }
   defenseDetails.update();
-  $('#stats').title = ['STR', 'CON', 'DEX', 'PER', 'INT', 'RES', 'DEF', 'FOR', 'REF', 'WIL', 'LB'].map(k => `${statNames[k]} ${s.stats[k]}`).join(' · ');
+  $('#stats').title = ['STR', 'CON', 'DEX', 'PER', 'INT', 'RES', 'DEF', 'FOR', 'REF', 'WIL'].map(k => `${statNames[k]} ${s.stats[k]}`).join(' · ');
   $('#class-switch').disabled = s.phase !== 'HOME';
   renderEquipment(s);
   renderInventory(s);

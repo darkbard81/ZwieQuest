@@ -94,7 +94,7 @@ test('equipped INT is added to the max-HP healing percentage: INT4 heals 30 perc
   const charm = generateEquipment({ slot: 'charm', templateId: 'wisdom-charm', gradeId: 'normal', rng: () => 0 });
   g.state.inventory.push(charm); g.command({characterId: g.character?.id,  type: 'EQUIP', itemId: charm.id });
   battle(g); const hero = stats(g.state, g.config);
-  assert.equal(hero.INT, 4); assert.equal(hero.maxHp, 10);
-  const view = g.snapshot().inventory.find(i => i.slot === 'skill'); assert.equal(view.heal, 3);
-  g.command(command(g)); assert.equal(g.character.hp, 4);
+  assert.equal(hero.INT, 4); assert.equal(hero.maxHp, 50);
+  const view = g.snapshot().inventory.find(i => i.slot === 'skill'); assert.equal(view.heal, 15);
+  g.command(command(g)); assert.equal(g.character.hp, 16);
 });

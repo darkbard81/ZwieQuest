@@ -304,3 +304,5 @@ main{padding-top:12px}
 .hero-world-hp{position:absolute;left:118px;top:135px;width:96px;height:8px;border:1px solid #dce9cc99;border-radius:5px;background:#10251fe6;overflow:hidden;pointer-events:none}
 .hero-world-hp>div{height:100%;width:0;background:linear-gradient(90deg,#648f75,#a4c79d);transition:width .2s}
 @media(prefers-reduced-motion:reduce){.hero-world-hp>div{transition:none}}
+
+.admin-map-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}

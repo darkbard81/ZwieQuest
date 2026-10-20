@@ -18,11 +18,16 @@ export function eligibleVariations(mapId, catalog = MONSTER_CATALOG, rules = ENC
     .filter(variation => !variation.weapon.damageTypes.some(type => region.excludedDamageTypes.includes(type)))
     .map(variation => ({ monster, variation })));
 }
+export function eligibleBossVariations(mapId, catalog = MONSTER_CATALOG, rules = ENCOUNTER_CONFIG) {
+  const type = rules.regions[mapId]?.bossDamageType;
+  if (!type) throw Error(`No regional boss configured for ${mapId}`);
+  return eligibleVariations(mapId, catalog, rules).filter(({ variation }) => variation.weapon.damageTypes.includes(type));
+}
 export function validateMonsters(catalog, rules) {
   const ids = new Set(), types = new Set(Object.keys(EQUIPMENT_CATALOG.damageTypes));
   if (!catalog.length || rules.version !== 1) throw Error('Missing monster templates or unsupported encounter version');
   for (const monster of catalog) {
-    if (!/^[a-z0-9_-]+$/.test(monster.id) || !Number.isInteger(monster.hp) || monster.hp < 1 || !Number.isInteger(monster.hpGrowth) || monster.hpGrowth < 0 || typeof monster.description !== 'string') throw Error('Invalid monster base');
+    if (!/^[a-z0-9_-]+$/.test(monster.id) || !Number.isInteger(monster.hp) || monster.hp < 1 || !Number.isInteger(monster.hpGrowth) || monster.hpGrowth < 0 || !Number.isFinite(monster.hpConPercent) || monster.hpConPercent < 0 || typeof monster.description !== 'string') throw Error('Invalid monster base');
     for (const key of BASE_STATS) if (!Number.isInteger(monster.A?.[key]) || monster.A[key] < 0) throw Error('Invalid monster attribute');
     for (const key of ['ACC','DEF','REF','FOR','WIL']) if (!Number.isInteger(monster.B?.[key])) throw Error('Invalid monster defense');
     if (!Array.isArray(monster.variation) || !monster.variation.length) throw Error('Missing monster variations');
@@ -38,6 +43,7 @@ export function validateMonsters(catalog, rules) {
     const region = rules.regions[id];
     if (!region || !Number.isInteger(region.minLevel) || !Number.isInteger(region.maxLevel) || region.minLevel < 1 || region.maxLevel < region.minLevel || !Array.isArray(region.excludedDamageTypes) || region.excludedDamageTypes.some(type => !types.has(type))) throw Error(`Invalid monster region: ${id}`);
     if (!eligibleVariations(id, catalog, rules).length) throw Error(`No eligible monsters for ${id}`);
+    if (id !== 'village' && (!types.has(region.bossDamageType) || !eligibleBossVariations(id, catalog, rules).length)) throw Error(`Invalid regional boss: ${id}`);
   }
   const r = rules.rewards;
   if (!r || !Number.isInteger(r.equalLevelKills) || r.equalLevelKills < 1 || !Number.isFinite(r.xpBonusPerLevel) || r.xpBonusPerLevel < 0 || !Number.isInteger(r.maxBonusLevels) || r.maxBonusLevels < 0 || !Number.isFinite(r.goldBase) || r.goldBase < 0 || !Number.isFinite(r.goldPerLevel) || r.goldPerLevel < 0 || EQUIPMENT_CATALOG.grades.some(g => !Number.isFinite(r.goldMultipliers?.[g.id]) || r.goldMultipliers[g.id] <= 0)) throw Error('Invalid monster rewards');
@@ -50,6 +56,17 @@ export function generateMonster(mapId, rng, catalog = MONSTER_CATALOG, rules = E
   if (!candidates.length) throw Error(`No eligible monsters for ${mapId}`);
   const { monster, variation } = candidates[rng(candidates.length)], region = rules.regions[mapId];
   const level = region.minLevel + rng(region.maxLevel - region.minLevel + 1), grade = rollGrade(rng);
+  return buildMonster({ monster, variation }, level, grade, rng, mapId, config);
+}
+export function generateBoss(mapId, level, rng, catalog = MONSTER_CATALOG, rules = ENCOUNTER_CONFIG, config = {}) {
+  if (!Number.isSafeInteger(level) || level < 1) throw Error('Invalid boss level');
+  const candidates = eligibleBossVariations(mapId, catalog, rules);
+  if (!candidates.length) throw Error(`No eligible bosses for ${mapId}`);
+  const selected = candidates[rng(candidates.length)];
+  const grade = EQUIPMENT_CATALOG.grades.find(g => g.id === 'legendary');
+  return { ...buildMonster(selected, level, grade, rng, mapId, config), boss: true };
+}
+function buildMonster({ monster, variation }, level, grade, rng, mapId, config) {
   const allocatedAttributes = Object.fromEntries(BASE_STATS.map(key => [key, 0]));
   for (let i = 0; i < pointBudget(level); i++) allocatedAttributes[BASE_STATS[rng(BASE_STATS.length)]]++;
   const attributes = Object.fromEntries(BASE_STATS.map(key => [key, monster.A[key] + allocatedAttributes[key]]));

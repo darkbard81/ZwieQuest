@@ -24,10 +24,10 @@ test('charm rarity and category rolls cover 60/25/10/4/1 and six categories equa
  for(let choice=0;choice<6;choice++)assert.equal(generateEquipment({slot:'charm',rng:n=>n===6?choice:0}).templateId,c.charms[choice].id);
  const bad=structuredClone(c);bad.charms[0].primaryStat='ACC';assert.throws(()=>validateCatalog(bad));
 });
-test('all six equipped base stats enter unchanged derived formulas once for both classes',()=>{
- const effects={STR:{STR:1,FOR:1},CON:{CON:1,FOR:1,maxHp:5},DEX:{DEX:1,REF:1},PER:{PER:1,ACC:1,REF:1},INT:{INT:1,WIL:1},RES:{RES:1,DEF:1,WIL:1}};
+test('all six equipped base stats enter weighted derived formulas once for both classes',()=>{
+ const effects={STR:{STR:1,FOR:2},CON:{CON:1,FOR:2,maxHp:2},DEX:{DEX:1,REF:2},PER:{PER:1,ACC:1,REF:2},INT:{INT:1,WIL:2},RES:{RES:1,DEF:1,WIL:2}};
  for(const cls of ['warrior','wizard'])for(const t of c.charms){const g=make(cls),before=stats(g.state,g.config);equip(g,charm(t.id));const after=stats(g.state,g.config);
-  for(const key of [...BASE_STATS,'ACC','DEF','FOR','REF','WIL','maxHp','AR','PEN','LB'])assert.equal(after[key]-before[key],effects[t.primaryStat][key]||0,`${cls} ${t.id} ${key}`);
+  for(const key of [...BASE_STATS,'ACC','DEF','FOR','REF','WIL','maxHp','AR','PEN'])assert.equal(after[key]-before[key],effects[t.primaryStat][key]||0,`${cls} ${t.id} ${key}`);
  }
 });
 test('DEX charms increase speed under heavy armor without removing its relative penalty; CON swaps never heal',()=>{

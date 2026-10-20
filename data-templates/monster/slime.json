@@ -1,7 +1,8 @@
 {
   "slime": {
-    "hp": 10,
-    "hpGrowth": 2,
+    "hp": 50,
+    "hpGrowth": 10,
+    "hpConPercent": 5,
     "A": {
       "STR": 0,
       "CON": 0,

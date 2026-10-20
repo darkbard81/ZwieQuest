@@ -1,10 +1,10 @@
 import { randomInt, randomUUID } from 'node:crypto';
 import { CHARACTER_VERSION, MAX_CHARACTERS, activeCharacter, newCharacter, migrateCharacters, equipmentUsers, remainingPoints, allocatePoint } from './characters.js';
-import { attack, stats, statDetails, levelBonus } from './combat.js';
+import { attack, stats, statDetails } from './combat.js';
 import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
 import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
 import { rollEncounter } from './encounters.js';
-import { generateMonster, monsterRewards, recordMonsterEncounter } from './monsters.js';
+import { generateMonster, generateBoss, monsterRewards, recordMonsterEncounter } from './monsters.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorSpeed, migrateLegacyEquipment } from './equipment.js';
 import { initializeSkills, initializeBattleSkills, skillItemView, equipSkill, useSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
 import { COMBAT_RULES_VERSION, DEFAULT_SPEED, actionSpeed, newCombatants, migrateBattle, nextAction, advanceReadiness } from './action-speed.js';
@@ -157,7 +157,7 @@ export class Game {
       xp: treasure ? 0 : (boss ? tune.bossXP : tune.battleXP) + s.risk * tune.riskXP,
       gold: (boss ? tune.bossGold : treasure ? tune.treasureGold : tune.battleGold) + s.risk * tune.riskGold, canDrop: true };
     const { xp, gold } = rewards;
-    if (generated && s.bestiary[s.enemy.variationId]) s.bestiary[s.enemy.variationId].defeats++;
+    if (!treasure && s.enemy?.generationVersion === 1 && s.bestiary[s.enemy.variationId]) s.bestiary[s.enemy.variationId].defeats++;
     this.character.xp += xp; s.gold += gold;
     if (treasure) s.chests++; else s.victories++;
     // One shared 25% roll, then equal weapon / armor / accessory odds.
@@ -169,7 +169,7 @@ export class Game {
     this.log(kind, treasure ? `보물 발견 · 금화 +${gold}` : `${boss ? '보스 격파' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : generated && !rewards.canDrop ? ' · 하위 레벨 몬스터: 골드만 획득' : ' · 장비 없음'}`, { battleId: s.battle?.id ?? null, xp, gold, itemId: item?.id || null, characterId: this.character.id });
     while (this.character.xp >= this.character.level * this.config.xpPerLevel) {
       this.character.xp -= this.character.level * this.config.xpPerLevel; this.character.level++;
-      this.log('level', `레벨 ${this.character.level}! 최대 HP 증가${levelBonus(this.character.level) !== levelBonus(this.character.level - 1) ? ' · 전투 숙련 +1' : ''}`);
+      this.log('level', `레벨 ${this.character.level}! 최대 HP 증가`);
     }
     s.lastBattleId = s.battle?.id ?? null;
     s.enemy = null; s.battle = null; this.phase('TREASURE', this.config.treasureMs);
@@ -177,14 +177,9 @@ export class Game {
   beginBattle(boss = false) {
     if (!this.character) throw Error('출전 캐릭터가 없습니다.');
     const s = this.state;
-    if (boss) {
-      const lb = levelBonus(this.character.level), tune = this.config.balance;
-      const maxHp = Math.floor((tune.enemyHP + s.step * tune.enemyHPPerStep + this.character.level * tune.enemyHPPerLevel + s.risk * tune.enemyRiskHP) * tune.bossHPMultiplier);
-      s.enemy = { boss: true, name: MAP_DEFS[s.mapId].boss, hp: maxHp, maxHp, damageTypes: ['blunt'], typeModifiers: {}, STR: 1, ACC: 3 + lb, DEF: 3 + lb, REF: 4 + lb, WIL: 2 + lb, FOR: 4 + lb, AR: 2 + s.risk, PEN: 2, DEX: this.config.initiative.enemyDEX + 1, base: Math.floor((tune.enemyDamage + s.risk * tune.enemyRiskDamage) * tune.bossDamageMultiplier) };
-    } else {
-      s.enemy = generateMonster(s.mapId, this.rng, undefined, undefined, this.config);
-      recordMonsterEncounter(s, s.enemy);
-    }
+    s.enemy = boss ? generateBoss(s.mapId, this.character.level, this.rng, undefined, undefined, this.config)
+      : generateMonster(s.mapId, this.rng, undefined, undefined, this.config);
+    recordMonsterEncounter(s, s.enemy);
     Object.assign(s.enemy, actionSpeed(s.enemy.DEX || 0, s.enemy.armor?.actionSpeedPenaltyRate || 0, this.config));
     s.battle = { id: randomUUID(), skillUsed: false, skillUseCounts: {}, skillToggles: {}, combatants: newCombatants(), actionSeq: 0, elapsedMs: 0, lastHit: null, rulesVersion: COMBAT_RULES_VERSION };
     this.phase('BATTLE', 0); this.refreshBattleTiming();

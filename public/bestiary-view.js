@@ -21,7 +21,7 @@ export function initBestiary(panel) {
     dialog.querySelector('#bestiary-title').textContent = entry.name;
     const image = monsterAssetURL(sample.img_path);
     detail.style.setProperty('--monster-image', image ? `url('${image}')` : 'none');
-    const stats = ['STR','CON','DEX','PER','INT','RES','ACC','DEF','REF','FOR','WIL','PEN','AR','LB'];
+    const stats = ['STR','CON','DEX','PER','INT','RES','ACC','DEF','REF','FOR','WIL','PEN','AR'];
     detail.innerHTML = `<div class="bestiary-lore"><p>${esc(sample.description)}</p><p>조우 ${entry.encounters}회 · 처치 ${entry.defeats}회</p></div><div class="bestiary-facts"><p class="eyebrow">최근 조우 개체</p><h3>${esc(sample.name)} <span>Lv.${sample.level}</span></h3><p class="monster-hp">최대 HP <b>${sample.maxHp}</b></p><div class="monster-stats">${stats.map(key => `<div>${statLabelHTML(key)} <b>${sample[key]}</b></div>`).join('')}</div><h4>${esc(sample.weapon.name)}</h4><p>${itemDetailsHTML(sample.weapon)}</p><h4>${esc(sample.armor.name)}</h4><p>${itemDetailsHTML(sample.armor)}</p><p>스킬: ${sample.skills.length ? sample.skills.map(skill => esc(typeof skill === 'string' ? skill : skill.name || skill.id)).join(' · ') : '없음'}</p><div class="bestiary-history"><p>발견 레벨: ${entry.minLevel === entry.maxLevel ? entry.minLevel : `${entry.minLevel}–${entry.maxLevel}`}</p><p>발견 등급: ${Object.keys(gradeNames).filter(id => entry.grades[id]).map(id => `${gradeNames[id]} ${entry.grades[id]}회`).join(' · ')}</p><p>조우 지역: ${entry.maps.map(id => esc(REGIONS[id]?.name || id)).join(' · ')}</p></div></div>`;
   }
   grid.onclick = event => {

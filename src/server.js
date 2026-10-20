@@ -7,7 +7,7 @@ import { Game, THEMES } from './game.js';
 import { initializeBattleSkills } from './skills.js';
 import { LocalAuth } from './auth.js';
 import { AccountAdmin, forgetAccount } from './admin.js';
-import { prepareAdminGame, resetGameProgress } from './account-progress.js';
+import { prepareAdminGame, regenerateAdminMaps, resetGameProgress } from './account-progress.js';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const config = JSON.parse(readFileSync(join(root, 'config.json')));
 const port = Number(process.env.PORT || 4317), host = process.env.HOST || '127.0.0.1';
@@ -133,7 +133,16 @@ const server = http.createServer(async (req, res) => {
       broadcast(user.id); return json(res, 200, { ok: true });
     }
     if (url.pathname === '/api/command') {
-      if (cmd.type === 'ADMIN_REVEAL_MAP' && !user.isAdmin) return json(res, 403, { error: '관리자만 전체 지도를 공개할 수 있습니다.' });
+      const resetMaps = cmd.type === 'ADMIN_RESET_MAPS';
+      if ((cmd.type === 'ADMIN_REVEAL_MAP' || resetMaps) && !user.isAdmin) return json(res, 403, { error: '관리자만 지도 관리 기능을 사용할 수 있습니다.' });
+      if (resetMaps) {
+        if (cmd.confirmUsername !== user.username || (cmd.userId !== undefined && cmd.userId !== user.id)) return json(res, 409, { error: '현재 관리자 계정의 아이디를 정확히 입력하세요.' });
+        if (typeof cmd.requestId !== 'string' || !/^[\w-]{8,100}$/.test(cmd.requestId)) return json(res, 400, { error: '요청 ID가 필요합니다.' });
+        // A successful reset changes progressId. Its retry still returns the saved result.
+        const previous = db.prepare('SELECT body FROM requests WHERE user_id=? AND id=?').get(user.id, cmd.requestId);
+        if (previous) return json(res, 200, { ...JSON.parse(previous.body), duplicate: true, ...payload(user.id) });
+        if (cmd.progressId !== getGame(user.id).state.progressId) return json(res, 409, { error: '진행 상태가 변경되었습니다. 다시 확인하세요.', ...payload(user.id) });
+      }
       const current = getGame(user.id).state;
       if ((cmd.progressId !== undefined || current?.resetAt) && cmd.progressId !== current?.progressId) return json(res, 409, { error: '계정이 초기화되었습니다. 현재 상태에서 다시 선택하세요.', ...payload(user.id) });
       const budget = commandRates.get(user.id) || { second: 0, count: 0 }, second = Math.floor(Date.now() / 1000);
@@ -143,7 +152,7 @@ const server = http.createServer(async (req, res) => {
       const prev = db.prepare('SELECT body FROM requests WHERE user_id=? AND id=?').get(user.id, cmd.requestId);
       if (prev) return json(res, 200, { ...JSON.parse(prev.body), duplicate: true, ...payload(user.id) });
       tick(); const game = getGame(user.id), old = structuredClone(game.state);
-      try { if (cmd.type === 'ADMIN_REVEAL_MAP') prepareAdminGame(game, true); else game.command(cmd); const result = { ok: true }; commit(user.id, { id: cmd.requestId, result }); broadcast(user.id); return json(res, 200, { ...result, ...payload(user.id) }); }
+      try { if (cmd.type === 'ADMIN_REVEAL_MAP') prepareAdminGame(game, true); else if (resetMaps) regenerateAdminMaps(game); else game.command(cmd); const result = { ok: true }; commit(user.id, { id: cmd.requestId, result }); broadcast(user.id); return json(res, 200, { ...result, ...payload(user.id) }); }
       catch (e) { game.state = old; game.events = []; return json(res, 409, { error: e.message, ...payload(user.id) }); }
     }
   }

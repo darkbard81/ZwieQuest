@@ -36,7 +36,7 @@ test('HTTP character ownership, duplicate/multitab allocation, cap/retirement, r
   assert.equal((await send(a.cookie,'SELECT_CHARACTER',{characterId:id})).status,200);
   const before=(await req('/api/state',undefined,a.cookie)).body.state;
   assert.equal((await send(a.cookie,'RETIRE_CHARACTER',{characterId:id2,confirmName:'새벽'})).status,200);
-  state=(await req('/api/state',undefined,a.cookie)).body.state;assert.equal(state.characters.length,2);assert.deepEqual(state.inventory,before.inventory);assert.equal(state.attributePoints,9);assert.equal(state.hp,10);
+  state=(await req('/api/state',undefined,a.cookie)).body.state;assert.equal(state.characters.length,2);assert.deepEqual(state.inventory,before.inventory);assert.equal(state.attributePoints,9);assert.equal(state.hp,50);
   // Race the last available point from two tabs. Exactly one succeeds.
   for(let n=0;n<8;n++)assert.equal((await send(a.cookie,'ALLOCATE_STAT',{characterId:id,stat:'PER'})).status,200);
   await sleep(1100);const race=await Promise.all([send(a.cookie,'ALLOCATE_STAT',{characterId:id,stat:'PER'}),send(second.cookie,'ALLOCATE_STAT',{characterId:id,stat:'PER'})]);assert.deepEqual(race.map(r=>r.status).sort(),[200,409]);

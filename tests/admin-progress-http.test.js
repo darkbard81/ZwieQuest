@@ -51,5 +51,31 @@ test('HTTP admin provisioning, reset authorization/rollback/retry, stale command
   await stop();await start();state=(await req('/api/state',undefined,a.cookie)).body.state;assert.deepEqual(state.checkpointHistory,[]);assert.equal(state.exploredNodes.village.length,1);assert.equal((await req('/api/auth/me',undefined,a.cookie)).body.user.isAdmin,true);
   const reveal={type:'ADMIN_REVEAL_MAP',progressId:state.progressId,requestId:randomUUID()};const shown=await req('/api/command',reveal,a.cookie);assert.equal(shown.status,200);assert.equal(shown.body.state.checkpointHistory.length,4);assert.equal(shown.body.state.exploredNodes.village.length,Object.keys(shown.body.state.mapGraph.nodes).length);assert.equal((await req('/api/command',reveal,a.cookie)).body.duplicate,true);
   await stop();await start();state=(await req('/api/state',undefined,a.cookie)).body.state;assert.equal(state.checkpointHistory.length,4);assert.equal(state.progressId,self.body.state.progressId);
+
+  const created=await command(a.cookie,state,'CREATE_CHARACTER',{name:'지도 관리자',appearanceId:'cat'});assert.equal(created.status,200);state=created.body.state;
+  const mapsBefore=JSON.parse(db.prepare('SELECT body FROM account_state WHERE user_id=?').get(admin.id).body).maps;
+  const otherBefore=(await req('/api/state',undefined,o.cookie)).body.state;
+  const resetMaps={type:'ADMIN_RESET_MAPS',progressId:state.progressId,confirmUsername:admin.username,requestId:randomUUID()};
+  assert.equal((await req('/api/command',resetMaps,o.cookie)).status,403);
+  assert.equal((await req('/api/command',{...resetMaps,confirmUsername:'wrong'},a.cookie)).status,409);
+  assert.equal((await req('/api/command',{...resetMaps,userId:player.id},a.cookie)).status,409);
+  assert.equal((await req('/api/command',{...resetMaps,progressId:undefined},a.cookie)).status,409);
+  assert.equal((await req('/api/command',resetMaps,a.cookie,'https://other.example')).status,403);
+  db.exec(`CREATE TRIGGER fail_map_reset BEFORE UPDATE ON account_state WHEN OLD.user_id='${admin.id}' BEGIN SELECT RAISE(ABORT,'map rollback'); END;`);
+  assert.equal((await req('/api/command',resetMaps,a.cookie)).status,409);
+  assert.deepEqual(JSON.parse(db.prepare('SELECT body FROM account_state WHERE user_id=?').get(admin.id).body).maps,mapsBefore);
+  assert.equal(db.prepare('SELECT COUNT(*) n FROM requests WHERE user_id=? AND id=?').get(admin.id,resetMaps.requestId).n,0);
+  db.exec('DROP TRIGGER fail_map_reset');
+  const resetResult=await req('/api/command',resetMaps,a.cookie);assert.equal(resetResult.status,200);const resetState=resetResult.body.state;
+  assert.notEqual(resetState.progressId,state.progressId);assert.equal(resetState.phase,'HOME');assert.equal(resetState.homePaused,true);assert.equal(resetState.mapId,'village');assert.deepEqual(resetState.checkpointHistory,[]);assert.equal(resetState.exploredNodes.village.length,1);
+  for(const key of ['characters','activeCharacterId','inventory','gold','bestiary'])assert.deepEqual(resetState[key],state[key],key);
+  const newMaps=JSON.parse(db.prepare('SELECT body FROM account_state WHERE user_id=?').get(admin.id).body).maps;assert.notDeepEqual(newMaps,mapsBefore);
+  assert.equal((await req('/api/command',resetMaps,a.cookie)).body.duplicate,true);
+  assert.deepEqual(JSON.parse(db.prepare('SELECT body FROM account_state WHERE user_id=?').get(admin.id).body).maps,newMaps);
+  assert.equal((await command(a.cookie,state,'DEPART')).status,409);
+  assert.equal((await req('/api/command',{...resetMaps,requestId:randomUUID()},a.cookie)).status,409);
+  assert.deepEqual((await req('/api/state',undefined,o.cookie)).body.state.mapGraph,otherBefore.mapGraph);
+  await stop();await start();state=(await req('/api/state',undefined,a.cookie)).body.state;assert.deepEqual(state.checkpointHistory,[]);assert.equal(state.exploredNodes.village.length,1);assert.equal(state.progressId,resetState.progressId);assert.equal(state.homePaused,true);
+  assert.deepEqual(JSON.parse(db.prepare('SELECT body FROM account_state WHERE user_id=?').get(admin.id).body).maps,newMaps);
  }finally{await stop();db?.close();rmSync(dir,{recursive:true,force:true});}
 });

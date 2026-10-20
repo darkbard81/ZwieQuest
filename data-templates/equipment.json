@@ -253,8 +253,8 @@
       "damageTypes": [
         "fire"
       ],
-      "damageMin": 2,
-      "damageMax": 10,
+      "damageMin": 14,
+      "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
       "hitDefense": "WIL"
@@ -266,8 +266,8 @@
       "damageTypes": [
         "cold"
       ],
-      "damageMin": 2,
-      "damageMax": 10,
+      "damageMin": 14,
+      "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
       "hitDefense": "WIL"
@@ -279,8 +279,8 @@
       "damageTypes": [
         "lightning"
       ],
-      "damageMin": 2,
-      "damageMax": 10,
+      "damageMin": 14,
+      "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
       "hitDefense": "WIL"
@@ -292,8 +292,8 @@
       "damageTypes": [
         "corrosion"
       ],
-      "damageMin": 2,
-      "damageMax": 10,
+      "damageMin": 14,
+      "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
       "hitDefense": "WIL"

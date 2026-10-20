@@ -18,16 +18,8 @@
     "riskGold": 8,
     "legacySwordBasic": 16,
     "legacyStaffBasic": 20,
-    "enemyHP": 40,
-    "enemyHPPerStep": 5,
-    "enemyHPPerLevel": 3,
-    "enemyRiskHP": 10,
-    "enemyDamage": 9,
-    "enemyRiskDamage": 2,
     "bossXP": 90,
     "bossGold": 120,
-    "bossHPMultiplier": 1.6,
-    "bossDamageMultiplier": 1.2,
     "charmRareChance": 18,
     "charmRiskRareChance": 15
   },
@@ -42,8 +34,9 @@
     "pricePerTier": 14
   },
   "character": {
-    "hp": 10,
-    "hpGrowth": 5,
+    "hp": 50,
+    "hpGrowth": 10,
+    "hpConPercent": 5,
     "B": {
       "ACC": 10,
       "DEF": 10,

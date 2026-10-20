@@ -1,13 +1,11 @@
 import { activeCharacter } from './characters.js';
 import { actionSpeed } from './action-speed.js';
 import { BASE_STATS } from './equipment.js';
-const LEVEL_BONUS_INTERVAL = 3;
-export const levelBonus = level => Math.floor((level - 1) / LEVEL_BONUS_INTERVAL);
 const DEFENSE_RULES = {
-  DEF: { attributes: ['RES'] },
-  REF: { attributes: ['DEX', 'PER'] },
-  FOR: { attributes: ['STR', 'CON'] },
-  WIL: { attributes: ['INT', 'RES'] }
+  DEF: { attributes: { RES: 1 } },
+  REF: { attributes: { DEX: 2, PER: 2 } },
+  FOR: { attributes: { STR: 2, CON: 2 } },
+  WIL: { attributes: { INT: 2, RES: 2 } }
 };
 export function hitResult(roll, acc, defense) {
   const margin = roll + acc - (10 + defense);
@@ -38,28 +36,33 @@ export function attack({ roll, acc, defense, str, base, pen, ar, damageTypes = [
   return { ...hit, ...armor, damage, base, damageRate, tacticDamageRate, pen: raw ? null : pen, ar,
     calculation: { acc, defense, factors, fixedDamage: raw ? fixedDamage : null } };
 }
+// Shared character and monster HP; multiply before dividing to avoid rounding
+// exact integer percentages down (e.g. 100 * 115 / 100 must be 115).
+export function maximumHp(level, con, profile, equipmentHp = 0) {
+  const baseHp = profile.hp + profile.hpGrowth * (level - 1);
+  return Math.floor(baseHp * (100 + (profile.hpConPercent ?? 5) * con) / 100) + equipmentHp;
+}
 export function stats(state, config) {
   return statDetails(state, config).values;
 }
 // Values and their displayed breakdown share the same authoritative calculation.
 export function statDetails(state, config, character = activeCharacter(state)) {
   const cls = config.character;
-  if (!character) return { values: { ...Object.fromEntries([...BASE_STATS, 'ACC', 'DEF', 'REF', 'FOR', 'WIL', 'LB', 'PEN', 'AR', 'power'].map(k => [k, 0])), maxHp: 0, ...actionSpeed(0, 0, config), typeModifiers: {} }, defenses: {} };
-  const lb = levelBonus(character.level);
+  if (!character) return { values: { ...Object.fromEntries([...BASE_STATS, 'ACC', 'DEF', 'REF', 'FOR', 'WIL', 'PEN', 'AR', 'power'].map(k => [k, 0])), maxHp: 0, ...actionSpeed(0, 0, config), typeModifiers: {} }, defenses: {} };
   const gear = Object.values(character.equipment).map(id => state.inventory.find(i => i.id === id)).filter(Boolean);
   const e = key => gear.reduce((sum, i) => sum + (key === 'DEX' && i.slot === 'armor' ? 0 : i.stats[key] || 0), 0);
   const b = Object.fromEntries(BASE_STATS.map(key => [key, character.attributes[key] + e(key)]));
   const defenses = Object.fromEntries(Object.entries(DEFENSE_RULES).map(([key, rule]) => {
-    const attributes = rule.attributes.map(key => ({ key, base: character.attributes[key], equipment: e(key), value: b[key] }));
-    const detail = { base: cls.B[key], attributes, level: character.level, levelBonus: lb, levelBonusInterval: LEVEL_BONUS_INTERVAL, equipment: e(key), mastery: null };
-    detail.total = detail.base + attributes.reduce((sum, a) => sum + a.value, 0) + lb + detail.equipment;
+    const attributes = Object.entries(rule.attributes).map(([key, multiplier]) => ({ key, base: character.attributes[key], equipment: e(key), value: b[key], multiplier, contribution: b[key] * multiplier }));
+    const detail = { base: cls.B[key], attributes, level: character.level, equipment: e(key), mastery: null };
+    detail.total = detail.base + attributes.reduce((sum, a) => sum + a.contribution, 0) + detail.equipment;
     return [key, detail];
   }));
   const values = {
-    ...b, LB: lb,
-    ACC: cls.B.ACC + b.PER + lb + e('ACC'),
+    ...b,
+    ACC: cls.B.ACC + b.PER + e('ACC'),
     ...Object.fromEntries(Object.entries(defenses).map(([key, detail]) => [key, detail.total])),
-    maxHp: cls.hp + cls.hpGrowth * (character.level - 1) + 5 * b.CON + e('HP'),
+    maxHp: maximumHp(character.level, b.CON, cls, e('HP')),
     PEN: e('PEN'), AR: e('AR'), power: e('power'),
     ...actionSpeed(b.DEX, gear.find(i => i.slot === 'armor')?.actionSpeedPenaltyRate || 0, config),
     typeModifiers: { ...(gear.find(i => i.slot === 'armor')?.typeModifiers || {}) }

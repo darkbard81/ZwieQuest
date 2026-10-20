@@ -6,9 +6,9 @@ const defenses = new Set(['DEF', 'FOR', 'REF', 'WIL']);
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export function defenseTooltip(key, detail) {
   if (!detail || !defenses.has(key)) return '';
-  const terms = [['기본값', detail.base], ...detail.attributes.map(a => [statNames[a.key], a.value]), ['레벨 보너스', detail.levelBonus], ['장비 보정', detail.equipment]];
-  if (detail.mastery) terms.push(['직업 숙련', detail.mastery.value]);
-  return `${terms.map(([name, value]) => `${name}(${value})`).join(' + ')} = ${detail.total}`;
+  const terms = [`기본값(${detail.base})`, ...detail.attributes.map(a => `${statNames[a.key]}(${a.value})${(a.multiplier ?? 1) === 1 ? '' : ` × ${a.multiplier}`}`), `장비 보정(${detail.equipment})`];
+  if (detail.mastery) terms.push(`직업 숙련(${detail.mastery.value})`);
+  return `${terms.join(' + ')} = ${detail.total}`;
 }
 export function statLabelHTML(key, value, tooltip = '') {
   const name = uiIconHTML('stat', key) + escapeHTML(statNames[key] || key);

@@ -112,7 +112,7 @@ test('dead ends, exits and bosses keep their terminal behavior without rolling o
  const g=make();
  for(const map of Object.values(g.state.maps))for(const node of Object.values(map.nodes).filter(n=>!n.edges)){
   g.state.mapId=map.id;g.state.theme=map.id;g.state.currentNodeId=node.id;g.state.step=node.depth;g.state.runGold=g.state.gold;g.state.risk=0;g.phase('TRAVEL',1);
-  g.rng=()=>{throw Error('No random encounter at a terminal');};g.advance();
+  g.rng=n=>{if(node.kind!=='boss'||n===10000)throw Error('No random encounter at a terminal');return 0;};g.advance();
   assert.equal(g.state.phase,node.kind==='boss'?'BATTLE':node.kind==='exit'?'CHOICE_WAIT':'RETURN_HOME');
  }
 });
