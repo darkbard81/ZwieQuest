@@ -110,7 +110,8 @@
       "damageMax": 13,
       "ACC": 2,
       "PEN": 3,
-      "hitDefense": "REF"
+      "hitDefense": "REF",
+      "weaponCategory": "light"
     },
     {
       "id": "shortsword",
@@ -124,7 +125,8 @@
       "damageMax": 16,
       "ACC": 1,
       "PEN": 2,
-      "hitDefense": "DEF"
+      "hitDefense": "DEF",
+      "weaponCategory": "light"
     },
     {
       "id": "longsword",
@@ -138,7 +140,8 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "DEF"
+      "hitDefense": "DEF",
+      "weaponCategory": "sword"
     },
     {
       "id": "rapier",
@@ -151,7 +154,8 @@
       "damageMax": 16,
       "ACC": 2,
       "PEN": 4,
-      "hitDefense": "REF"
+      "hitDefense": "REF",
+      "weaponCategory": "light"
     },
     {
       "id": "greatsword",
@@ -161,11 +165,12 @@
         "slash",
         "blunt"
       ],
-      "damageMin": 19,
-      "damageMax": 25,
+      "damageMin": 22,
+      "damageMax": 29,
       "ACC": -2,
       "PEN": 2,
-      "hitDefense": "DEF"
+      "hitDefense": "DEF",
+      "weaponCategory": "heavy"
     },
     {
       "id": "handaxe",
@@ -178,7 +183,8 @@
       "damageMax": 18,
       "ACC": 1,
       "PEN": 2,
-      "hitDefense": "DEF"
+      "hitDefense": "DEF",
+      "weaponCategory": "axe"
     },
     {
       "id": "battleaxe",
@@ -187,11 +193,12 @@
       "damageTypes": [
         "slash"
       ],
-      "damageMin": 17,
-      "damageMax": 23,
+      "damageMin": 20,
+      "damageMax": 26,
       "ACC": -1,
       "PEN": 3,
-      "hitDefense": "DEF"
+      "hitDefense": "DEF",
+      "weaponCategory": "heavy"
     },
     {
       "id": "mace",
@@ -200,11 +207,12 @@
       "damageTypes": [
         "blunt"
       ],
-      "damageMin": 15,
-      "damageMax": 19,
+      "damageMin": 17,
+      "damageMax": 21,
       "ACC": 0,
       "PEN": 3,
-      "hitDefense": "FOR"
+      "hitDefense": "FOR",
+      "weaponCategory": "mace"
     },
     {
       "id": "warhammer",
@@ -213,11 +221,12 @@
       "damageTypes": [
         "blunt"
       ],
-      "damageMin": 17,
-      "damageMax": 23,
+      "damageMin": 21,
+      "damageMax": 29,
       "ACC": -1,
       "PEN": 4,
-      "hitDefense": "FOR"
+      "hitDefense": "FOR",
+      "weaponCategory": "heavy"
     },
     {
       "id": "spear",
@@ -230,7 +239,8 @@
       "damageMax": 19,
       "ACC": 0,
       "PEN": 3,
-      "hitDefense": "REF"
+      "hitDefense": "REF",
+      "weaponCategory": "spear"
     },
     {
       "id": "halberd",
@@ -240,11 +250,12 @@
         "slash",
         "blunt"
       ],
-      "damageMin": 16,
-      "damageMax": 22,
+      "damageMin": 18,
+      "damageMax": 24,
       "ACC": -1,
       "PEN": 2,
-      "hitDefense": "DEF"
+      "hitDefense": "DEF",
+      "weaponCategory": "polearm"
     },
     {
       "id": "fire-staff",
@@ -257,7 +268,8 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "WIL"
+      "hitDefense": "WIL",
+      "weaponCategory": "staff"
     },
     {
       "id": "ice-staff",
@@ -270,7 +282,8 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "WIL"
+      "hitDefense": "WIL",
+      "weaponCategory": "staff"
     },
     {
       "id": "lightning-staff",
@@ -283,7 +296,8 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "WIL"
+      "hitDefense": "WIL",
+      "weaponCategory": "staff"
     },
     {
       "id": "corrosion-staff",
@@ -296,7 +310,8 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "WIL"
+      "hitDefense": "WIL",
+      "weaponCategory": "staff"
     }
   ],
   "armors": [
@@ -457,6 +472,45 @@
     },
     "natural": {
       "name": "자연 외피",
+      "actionSpeedPenaltyRate": 0
+    }
+  },
+  "weaponBalanceRulesVersion": 1,
+  "weaponCategories": {
+    "light": {
+      "name": "경량 검",
+      "actionSpeedPenaltyRate": 0
+    },
+    "sword": {
+      "name": "한손 검",
+      "actionSpeedPenaltyRate": 0.05
+    },
+    "axe": {
+      "name": "한손 도끼",
+      "actionSpeedPenaltyRate": 0.1
+    },
+    "mace": {
+      "name": "한손 둔기",
+      "actionSpeedPenaltyRate": 0.1
+    },
+    "spear": {
+      "name": "창",
+      "actionSpeedPenaltyRate": 0.05
+    },
+    "polearm": {
+      "name": "장병기",
+      "actionSpeedPenaltyRate": 0.15
+    },
+    "heavy": {
+      "name": "중량 무기",
+      "actionSpeedPenaltyRate": 0.2
+    },
+    "staff": {
+      "name": "지팡이",
+      "actionSpeedPenaltyRate": 0
+    },
+    "natural": {
+      "name": "자연 공격",
       "actionSpeedPenaltyRate": 0
     }
   }

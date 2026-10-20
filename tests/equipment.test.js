@@ -29,7 +29,7 @@ test('lowest effective AR is used; an extra type never reduces damage',()=>{
 test('Raw is fixed on any non-miss, exclusive, unaffected by STR, grade, PEN, AR',()=>{
  for(const roll of [2,8,12,20]){const a=attack({roll,acc:6,defense:3,str:100,base:900,pen:-100,ar:900,damageTypes:['raw'],damageRate:99,fixedDamage:7});assert.equal(a.damage,a.tier===0?0:7);assert.equal(a.effectiveAR,0);assert.equal(a.pen,null);}
  assert.throws(()=>effectiveArmor(1,['slash','raw']));assert.throws(()=>attack({roll:12,acc:10,defense:0,damageTypes:['raw']}));
- const catalog=structuredClone(c);catalog.weapons.push({id:'raw-test',name:'Raw 검증',slot:'weapon',hitDefense:'WIL',ACC:0,damageTypes:['raw'],fixedDamage:7});validateCatalog(catalog);
+ const catalog=structuredClone(c);catalog.weapons.push({id:'raw-test',name:'Raw 검증',slot:'weapon',weaponCategory:'staff',hitDefense:'WIL',ACC:0,damageTypes:['raw'],fixedDamage:7});validateCatalog(catalog);
  const raw=generateEquipment({slot:'weapon',classId:'wizard',templateId:'raw-test',gradeId:'legendary',rng:()=>0,catalog});assert.deepEqual(raw.damageTypes,['raw']);assert.equal(raw.fixedDamage,7);assert.equal(raw.stats.PEN,undefined);assert.equal(raw.damageRate,undefined);assert.equal(raw.special,null);
  catalog.weapons.at(-1).damageTypes.push('fire');assert.throws(()=>validateCatalog(catalog));
 });

@@ -13,6 +13,8 @@ export function validateCatalog(c) {
   if (![c.saleBase, c.saleGradeStep].every(v => Number.isInteger(v) && v >= 0)) fail('sale values');
   if (!c.armorCategories || !Object.keys(c.armorCategories).length) fail('armor categories');
   for (const category of Object.values(c.armorCategories)) if (!Number.isFinite(category.actionSpeedPenaltyRate) || category.actionSpeedPenaltyRate < 0 || category.actionSpeedPenaltyRate > .5) fail('armor speed penalty');
+  if (!Number.isInteger(c.weaponBalanceRulesVersion) || c.weaponBalanceRulesVersion < 1 || !c.weaponCategories || !Object.keys(c.weaponCategories).length) fail('weapon categories / balance version');
+  for (const category of Object.values(c.weaponCategories)) if (!Number.isFinite(category.actionSpeedPenaltyRate) || category.actionSpeedPenaltyRate < 0 || category.actionSpeedPenaltyRate > .5) fail('weapon speed penalty');
   const ids = new Set();
   for (const g of c.grades) {
     if (ids.has(g.id)) fail('duplicate grade'); ids.add(g.id);
@@ -27,6 +29,8 @@ export function validateCatalog(c) {
   for (const t of [...c.weapons, ...c.armors, ...c.charms]) {
     if (!/^[a-z]+(?:-[a-z]+)*$/.test(t.id) || ids.has(t.id)) fail('template id'); ids.add(t.id);
     if (t.slot === 'weapon') {
+      if (!c.weaponCategories[t.weaponCategory]) fail('weapon category');
+      if (t.actionSpeedPenaltyRate != null && t.actionSpeedPenaltyRate !== c.weaponCategories[t.weaponCategory].actionSpeedPenaltyRate) fail('weapon speed penalty');
       if (t.classId != null) fail('equipment must not restrict class');
       if (!['DEF', 'FOR', 'REF', 'WIL'].includes(t.hitDefense)) fail('weapon hit defense');
       if (!Array.isArray(t.damageTypes) || t.damageTypes.length < 1 || t.damageTypes.length > 3 || new Set(t.damageTypes).size !== t.damageTypes.length || t.damageTypes.some(d => !c.damageTypes[d])) fail('weapon types');
@@ -65,6 +69,7 @@ export function generateEquipment({ slot, rng, gradeId, templateId, specials = t
     iconPath: `/assets/equipment/${t.id}-v1.webp`, value: catalog.saleBase + tier * catalog.saleGradeStep, stats: {}, special: null };
   const types = Object.keys(catalog.damageTypes).filter(d => d !== 'raw');
   if (slot === 'weapon') {
+    item.weaponCategory = t.weaponCategory; item.actionSpeedPenaltyRate = catalog.weaponCategories[t.weaponCategory].actionSpeedPenaltyRate; item.weaponBalanceRulesVersion = catalog.weaponBalanceRulesVersion;
     item.hitDefense = t.hitDefense; item.damageTypes = [...t.damageTypes];
     const raw = t.damageTypes.includes('raw');
     item.stats.ACC = (t.ACC || 0) + g.ACC;
@@ -113,6 +118,23 @@ export function migrateArmorSpeed(inventory) {
     item.actionSpeedPenaltyRate = EQUIPMENT_CATALOG.armorCategories[item.armorCategory].actionSpeedPenaltyRate;
     item.armorSpeedRulesVersion = 1;
   }
+}
+
+// Adopt the approved weapon balance once, without rerolling grade or special options.
+export function migrateWeaponBalance(inventory) {
+  let changed = false;
+  for (const item of inventory) if (item.slot === 'weapon' && !(item.weaponBalanceRulesVersion >= EQUIPMENT_CATALOG.weaponBalanceRulesVersion)) {
+    const template = EQUIPMENT_CATALOG.weapons.find(t => t.id === item.templateId);
+    if (!template) continue;
+    item.weaponCategory = template.weaponCategory;
+    item.actionSpeedPenaltyRate = EQUIPMENT_CATALOG.weaponCategories[template.weaponCategory].actionSpeedPenaltyRate;
+    if (!item.damageTypes?.includes('raw') && !template.damageTypes.includes('raw')) {
+      item.damageMin = template.damageMin; item.damageMax = template.damageMax;
+    }
+    item.weaponBalanceRulesVersion = EQUIPMENT_CATALOG.weaponBalanceRulesVersion;
+    changed = true;
+  }
+  return changed;
 }
 
 // Replace retired items once, preserving identity so equipped slots keep working.

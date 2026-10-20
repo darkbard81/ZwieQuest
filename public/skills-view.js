@@ -67,7 +67,7 @@ export function initSkills({ bar, slots, summary, status, onUse }) {
     status.textContent = state.phase === 'BATTLE' && b
       ? `개인 행동 주기 ${b.combatants.hero.actionSeq} · ${b.skillUsed ? '이번 주기 스킬 사용 완료' : '직접 스킬 1회 사용 가능'} · ` + ['hero','enemy'].map(actor => {
         const t = state.battleTiming?.[actor];
-        return t ? `${actor === 'hero' ? '모험가' : '몬스터'}: 속도 ${Number(t.actionSpeed.toFixed(2))}, 갑옷 -${Math.round(t.actionSpeedPenaltyRate * 100)}%, 준비 ${Math.min(100, Math.floor(t.readiness * 100))}% (${(t.nextActionMs / 1000).toFixed(2)} 게임초)` : '';
+        return t ? `${actor === 'hero' ? '모험가' : '몬스터'}: 속도 ${Number(t.actionSpeed.toFixed(2))}, 갑옷 -${Math.round((t.armorSpeedPenaltyRate ?? t.actionSpeedPenaltyRate) * 100)}%, 무기 -${Math.round((t.weaponSpeedPenaltyRate || 0) * 100)}%, 준비 ${Math.min(100, Math.floor(t.readiness * 100))}% (${(t.nextActionMs / 1000).toFixed(2)} 게임초)` : '';
       }).join(' / ')
       : '전투 중 개인 행동 주기당 직접 스킬 1회 · 자동 공격은 계속 진행';
   }

@@ -1,18 +1,23 @@
 // Progress is in game milliseconds, never an absolute wall/monotonic timestamp.
-export const COMBAT_RULES_VERSION = 5;
+export const COMBAT_RULES_VERSION = 6;
 export const DEFAULT_SPEED = Object.freeze({ base: 100, perDEX: 5, minimum: 1, baseIntervalMs: 2200, maxEventsPerTick: 500 });
-export function actionSpeed(DEX = 0, penalty = 0, config = {}) {
+export function actionSpeed(DEX = 0, penalty = 0, config = {}, weaponPenalty = 0) {
   const c = { ...DEFAULT_SPEED, ...config.actionSpeed };
   if (![c.base, c.minimum, c.baseIntervalMs].every(v => Number.isFinite(v) && v > 0) || !Number.isFinite(c.perDEX) || c.perDEX < 0) throw Error('Invalid action speed configuration');
-  if (!Number.isFinite(DEX) || !Number.isFinite(penalty) || penalty < 0 || penalty > .5) throw Error('Invalid action speed input');
+  if (!Number.isFinite(DEX) || [penalty, weaponPenalty].some(p => !Number.isFinite(p) || p < 0 || p > .5)) throw Error('Invalid action speed input');
   const baseActionSpeed = Math.max(c.minimum, c.base + DEX * c.perDEX);
-  const speed = baseActionSpeed * (1 - penalty);
-  return { baseActionSpeed, actionSpeed: speed, actionSpeedPenaltyRate: penalty, actionIntervalMs: c.baseIntervalMs * c.base / speed };
+  const speed = baseActionSpeed * (1 - penalty) * (1 - weaponPenalty);
+  return { baseActionSpeed, actionSpeed: speed, actionSpeedPenaltyRate: penalty + weaponPenalty - penalty * weaponPenalty, armorSpeedPenaltyRate: penalty, weaponSpeedPenaltyRate: weaponPenalty, actionIntervalMs: c.baseIntervalMs * c.base / speed };
+}
+export function enemyActionSpeed(enemy, config = {}) {
+  return actionSpeed(enemy.DEX || 0, enemy.armor?.actionSpeedPenaltyRate ?? enemy.armorSpeedPenaltyRate ?? enemy.actionSpeedPenaltyRate ?? 0, config, enemy.weapon?.actionSpeedPenaltyRate ?? enemy.weaponSpeedPenaltyRate ?? 0);
 }
 export const newCombatants = () => ({ hero: { readiness: 0, actionSeq: 0 }, enemy: { readiness: 0, actionSeq: 0 } });
 export function migrateBattle(state, heroAlive) {
   const b = state.battle;
   if (!b || b.rulesVersion >= COMBAT_RULES_VERSION) return;
+  // v5 already uses independent readiness. Balance changes must not reset it.
+  if (b.rulesVersion >= 5) { b.rulesVersion = COMBAT_RULES_VERSION; return; }
   b.combatants = newCombatants(); b.elapsedMs = 0; b.actionSeq ??= 0;
   b.skillUsed ??= false;
   if (state.phase === 'BATTLE' && heroAlive && state.enemy?.hp > 0) {

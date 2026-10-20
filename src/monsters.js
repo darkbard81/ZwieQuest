@@ -36,7 +36,7 @@ export function validateMonsters(catalog, rules) {
       ids.add(variation.id);
       for (const path of [variation.img_path, variation.icon_path]) if (!safePath(path) || !existsSync(new URL(path, root))) throw Error(`Missing monster image: ${path}`);
       // Monster template IDs may use underscores; equipment validation otherwise stays shared.
-      validateCatalog({ ...EQUIPMENT_CATALOG, weapons: [{ ...variation.weapon, id: 'monster-weapon' }], armors: [{ ...variation.armor, id: 'monster-armor' }] });
+      validateCatalog({ ...EQUIPMENT_CATALOG, weapons: [{ weaponCategory: 'natural', ...variation.weapon, id: 'monster-weapon' }], armors: [{ ...variation.armor, id: 'monster-armor' }] });
     }
   }
   for (const id of Object.keys(REGIONS)) {
@@ -70,7 +70,7 @@ function buildMonster({ monster, variation }, level, grade, rng, mapId, config) 
   const allocatedAttributes = Object.fromEntries(BASE_STATS.map(key => [key, 0]));
   for (let i = 0; i < pointBudget(level); i++) allocatedAttributes[BASE_STATS[rng(BASE_STATS.length)]]++;
   const attributes = Object.fromEntries(BASE_STATS.map(key => [key, monster.A[key] + allocatedAttributes[key]]));
-  const equipmentCatalog = { ...EQUIPMENT_CATALOG, weapons: [variation.weapon], armors: [variation.armor] };
+  const equipmentCatalog = { ...EQUIPMENT_CATALOG, weapons: [{ weaponCategory: 'natural', ...variation.weapon }], armors: [variation.armor] };
   const weapon = generateEquipment({ slot: 'weapon', templateId: variation.weapon.id, gradeId: grade.id, specials: false, rng, catalog: equipmentCatalog });
   const armor = generateEquipment({ slot: 'armor', templateId: variation.armor.id, gradeId: grade.id, specials: false, rng, catalog: equipmentCatalog });
   delete weapon.iconPath; delete armor.iconPath;

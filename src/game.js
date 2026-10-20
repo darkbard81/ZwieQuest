@@ -5,9 +5,9 @@ import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
 import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
 import { rollEncounter } from './encounters.js';
 import { generateMonster, generateBoss, monsterRewards, recordMonsterEncounter } from './monsters.js';
-import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorSpeed, migrateLegacyEquipment } from './equipment.js';
+import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorSpeed, migrateWeaponBalance, migrateLegacyEquipment } from './equipment.js';
 import { initializeSkills, initializeBattleSkills, skillItemView, equipSkill, useSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
-import { COMBAT_RULES_VERSION, DEFAULT_SPEED, actionSpeed, newCombatants, migrateBattle, nextAction, advanceReadiness } from './action-speed.js';
+import { COMBAT_RULES_VERSION, DEFAULT_SPEED, enemyActionSpeed, newCombatants, migrateBattle, nextAction, advanceReadiness } from './action-speed.js';
 export const THEMES = Object.entries(MAP_DEFS).map(([id, def]) => ({ id, name: def.name, subtitle: def.subtitle }));
 export class Game {
   constructor(config, state = null, rng = n => randomInt(n)) {
@@ -28,6 +28,7 @@ export class Game {
       // Convert retired gear using the legacy appearance hint before removing class fields.
       migrateLegacyEquipment(state, this.rng);
       migrateArmorSpeed(state.inventory);
+      const weaponBalanceChanged = migrateWeaponBalance(state.inventory);
       const migrated = migrateCharacters(state);
       if (state.characters.length > MAX_CHARACTERS || (state.characters.length && !activeCharacter(state))) throw Error('잘못된 캐릭터 저장 상태입니다.');
       for (const character of state.characters) {
@@ -42,7 +43,8 @@ export class Game {
         state.battle.id ||= randomUUID();
         migrateBattle(state, this.character?.hp > 0);
       }
-      if (state.enemy) Object.assign(state.enemy, actionSpeed(state.enemy.DEX || 0, state.enemy.armor?.actionSpeedPenaltyRate ?? state.enemy.actionSpeedPenaltyRate ?? 0, config));
+      if (state.enemy) Object.assign(state.enemy, enemyActionSpeed(state.enemy, config));
+      if (weaponBalanceChanged && state.enemy) this.refreshBattleTiming();
       delete state.tactic;
       state.combatRulesVersion = COMBAT_RULES_VERSION;
       // Older saves paused at regional entrances as HOME. Resume the same journey.
@@ -180,14 +182,14 @@ export class Game {
     s.enemy = boss ? generateBoss(s.mapId, this.character.level, this.rng, undefined, undefined, this.config)
       : generateMonster(s.mapId, this.rng, undefined, undefined, this.config);
     recordMonsterEncounter(s, s.enemy);
-    Object.assign(s.enemy, actionSpeed(s.enemy.DEX || 0, s.enemy.armor?.actionSpeedPenaltyRate || 0, this.config));
+    Object.assign(s.enemy, enemyActionSpeed(s.enemy, this.config));
     s.battle = { id: randomUUID(), skillUsed: false, skillUseCounts: {}, skillToggles: {}, combatants: newCombatants(), actionSeq: 0, elapsedMs: 0, lastHit: null, rulesVersion: COMBAT_RULES_VERSION };
     this.phase('BATTLE', 0); this.refreshBattleTiming();
     this.log('battle', `${s.enemy.name}${s.enemy.level ? ` Lv.${s.enemy.level}` : ''} 등장! 각자의 행동속도로 전투를 시작합니다.`);
   }
   battleIntervals() {
     const s = this.state;
-    return { hero: stats(s, this.config).actionIntervalMs, enemy: actionSpeed(s.enemy.DEX || 0, s.enemy.actionSpeedPenaltyRate || 0, this.config).actionIntervalMs };
+    return { hero: stats(s, this.config).actionIntervalMs, enemy: enemyActionSpeed(s.enemy, this.config).actionIntervalMs };
   }
   refreshBattleTiming() {
     const s = this.state, b = s.battle;
@@ -381,9 +383,9 @@ export class Game {
     const { values: hero, defenses: defenseBreakdown } = statDetails(this.state, this.config);
     const weapon = state.inventory.find(i => i.id === c?.equipment.weapon);
     const battleTiming = state.phase === 'BATTLE' && state.battle ? Object.fromEntries(['hero','enemy'].map(actor => {
-      const values = actor === 'hero' ? hero : actionSpeed(state.enemy.DEX || 0, state.enemy.actionSpeedPenaltyRate || 0, this.config);
+      const values = actor === 'hero' ? hero : enemyActionSpeed(state.enemy, this.config);
       const readiness = state.battle.combatants[actor].readiness;
-      return [actor, { actionSpeed: values.actionSpeed, actionSpeedPenaltyRate: values.actionSpeedPenaltyRate, readiness, nextActionMs: state.battle.transition ? state.battle.transition.remainingMs + (state.battle.transition.actor === actor ? 0 : values.actionIntervalMs) : Math.max(0, 1 - readiness) * values.actionIntervalMs }];
+      return [actor, { actionSpeed: values.actionSpeed, actionSpeedPenaltyRate: values.actionSpeedPenaltyRate, armorSpeedPenaltyRate: values.armorSpeedPenaltyRate, weaponSpeedPenaltyRate: values.weaponSpeedPenaltyRate, readiness, nextActionMs: state.battle.transition ? state.battle.transition.remainingMs + (state.battle.transition.actor === actor ? 0 : values.actionIntervalMs) : Math.max(0, 1 - readiness) * values.actionIntervalMs }];
     })) : null;
     return { ...structuredClone(state), battleTiming,
       ...(c ? structuredClone(c) : { name: '', appearanceId: null, level: 0, xp: 0, hp: 0, attributes: {}, equipment: {}, skillSlots: Array(6).fill(null), skillCooldowns: {} }),

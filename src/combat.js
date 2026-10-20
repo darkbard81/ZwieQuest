@@ -64,7 +64,7 @@ export function statDetails(state, config, character = activeCharacter(state)) {
     ...Object.fromEntries(Object.entries(defenses).map(([key, detail]) => [key, detail.total])),
     maxHp: maximumHp(character.level, b.CON, cls, e('HP')),
     PEN: e('PEN'), AR: e('AR'), power: e('power'),
-    ...actionSpeed(b.DEX, gear.find(i => i.slot === 'armor')?.actionSpeedPenaltyRate || 0, config),
+    ...actionSpeed(b.DEX, gear.find(i => i.slot === 'armor')?.actionSpeedPenaltyRate || 0, config, gear.find(i => i.slot === 'weapon')?.actionSpeedPenaltyRate || 0),
     typeModifiers: { ...(gear.find(i => i.slot === 'armor')?.typeModifiers || {}) }
   };
   return { values, defenses };
