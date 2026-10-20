@@ -1,0 +1,255 @@
+{
+  "golem": {
+    "hp": 10,
+    "hpGrowth": 2,
+    "A": {
+      "STR": 0,
+      "CON": 0,
+      "DEX": 0,
+      "PER": 0,
+      "INT": 0,
+      "RES": 0
+    },
+    "B": {
+      "ACC": 10,
+      "DEF": 10,
+      "REF": 10,
+      "FOR": 10,
+      "WIL": 10
+    },
+    "description": "마력으로 움직이는 암석과 수정의 골렘. 육중한 몸체와 속성을 품은 주먹, 수정 무기로 적을 짓누른다.",
+    "variation": [
+      {
+        "id": "slash_golem",
+        "name": "골렘(베기)",
+        "img_path": "public/assets/monster/golem/05-golem-slash.webp",
+        "skills": [],
+        "weapon": {
+          "id": "slash_golem_weapon",
+          "name": "붉은 수정 대검",
+          "slot": "weapon",
+          "damageTypes": [
+            "slash"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "FOR"
+        },
+        "armor": {
+          "id": "slash_golem_armor",
+          "name": "붉은 수정 외피",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "pierce": -2,
+            "blunt": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/golem/icons/05-golem-slash.webp",
+        "attackName": "붉은 수정 대검"
+      },
+      {
+        "id": "pierce_golem",
+        "name": "골렘(관통)",
+        "img_path": "public/assets/monster/golem/07-golem-pierce.webp",
+        "skills": [],
+        "weapon": {
+          "id": "pierce_golem_weapon",
+          "name": "보랏빛 수정 창",
+          "slot": "weapon",
+          "damageTypes": [
+            "pierce"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "FOR"
+        },
+        "armor": {
+          "id": "pierce_golem_armor",
+          "name": "보랏빛 수정 외피",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "slash": -2,
+            "blunt": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/golem/icons/07-golem-pierce.webp",
+        "attackName": "보랏빛 수정 창"
+      },
+      {
+        "id": "blunt_golem",
+        "name": "골렘(부수기)",
+        "img_path": "public/assets/monster/golem/06-golem-blunt.webp",
+        "skills": [],
+        "weapon": {
+          "id": "blunt_golem_weapon",
+          "name": "암석 대망치",
+          "slot": "weapon",
+          "damageTypes": [
+            "blunt"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "FOR"
+        },
+        "armor": {
+          "id": "blunt_golem_armor",
+          "name": "황금 균열 외피",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "slash": -2,
+            "pierce": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/golem/icons/06-golem-blunt.webp",
+        "attackName": "암석 대망치"
+      },
+      {
+        "id": "fire_golem",
+        "name": "골렘(소각)",
+        "img_path": "public/assets/monster/golem/01-golem-fire.webp",
+        "skills": [],
+        "weapon": {
+          "id": "fire_golem_weapon",
+          "name": "용암 주먹",
+          "slot": "weapon",
+          "damageTypes": [
+            "fire"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "FOR"
+        },
+        "armor": {
+          "id": "fire_golem_armor",
+          "name": "용암 암석 외피",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "cold": -2,
+            "corrosion": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/golem/icons/01-golem-fire.webp",
+        "attackName": "용암 주먹"
+      },
+      {
+        "id": "cold_golem",
+        "name": "골렘(동결)",
+        "img_path": "public/assets/monster/golem/02-golem-cold.webp",
+        "skills": [],
+        "weapon": {
+          "id": "cold_golem_weapon",
+          "name": "빙결 수정 폭발",
+          "slot": "weapon",
+          "damageTypes": [
+            "cold"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "FOR"
+        },
+        "armor": {
+          "id": "cold_golem_armor",
+          "name": "빙결 수정 외피",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "fire": -2,
+            "lightning": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/golem/icons/02-golem-cold.webp",
+        "attackName": "빙결 수정 폭발"
+      },
+      {
+        "id": "lightning_golem",
+        "name": "골렘(충격)",
+        "img_path": "public/assets/monster/golem/04-golem-lightning.webp",
+        "skills": [],
+        "weapon": {
+          "id": "lightning_golem_weapon",
+          "name": "뇌광 주먹",
+          "slot": "weapon",
+          "damageTypes": [
+            "lightning"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "FOR"
+        },
+        "armor": {
+          "id": "lightning_golem_armor",
+          "name": "뇌광 암석 외피",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "fire": -2,
+            "corrosion": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/golem/icons/04-golem-lightning.webp",
+        "attackName": "뇌광 주먹"
+      },
+      {
+        "id": "corrosion_golem",
+        "name": "골렘(부식)",
+        "img_path": "public/assets/monster/golem/03-golem-corrosion.webp",
+        "skills": [],
+        "weapon": {
+          "id": "corrosion_golem_weapon",
+          "name": "산성 돌진",
+          "slot": "weapon",
+          "damageTypes": [
+            "corrosion"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "FOR"
+        },
+        "armor": {
+          "id": "corrosion_golem_armor",
+          "name": "산성 암석 외피",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "cold": -2,
+            "lightning": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/golem/icons/03-golem-corrosion.webp",
+        "attackName": "산성 돌진"
+      }
+    ]
+  }
+}

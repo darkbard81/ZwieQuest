@@ -8,6 +8,8 @@
 
 하피도 슬라임과 같은 7개 피해 유형을 가진다. `harpy.json`은 기본 수치와 유형별 약점을 슬라임과 공유하며, 이름·설명·공격·깃털 명칭을 하피에 맞춘다. 모든 하피 공격은 회피(DEF)가 아닌 반사(REF)를 대상으로 한다. 선택적인 `attackName`은 전투 로그의 공격명에 사용하며, 없는 기존 몬스터는 종전 공격명을 유지한다. 하피 원본 PNG는 `art-workbench/monsters/harpy`에 보존하고, 투명도를 유지한 512×512 본 이미지와 128×128 도감 아이콘을 `public/assets/monster/harpy`에 둔다.
 
+골렘은 `golem.json`의 7개 피해 유형으로 추가한다. 기본 수치와 유형별 약점은 기존 몬스터와 같고, 골렘의 모든 공격은 인내(FOR)를 대상으로 한다. 원본 PNG는 `art-workbench/monsters/golem`에 보존하며, 512×512 무손실 WebP와 128×128 도감 아이콘은 `public/assets/monster/golem`에 둔다.
+
 `data-templates/encounters.json`의 지역별 규칙으로 무기의 damageTypes에 금지 타입이 하나라도 포함된 variation을 제외한다. 남은 variation과 지역 레벨 범위에서 각각 균등 추첨한다. 후보가 비면 시작 시 검증 오류를 낸다.
 
 | 지역 | 레벨 | 생성 제외 피해 타입 |
