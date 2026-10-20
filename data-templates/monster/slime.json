@@ -46,7 +46,8 @@
             "pierce": -2,
             "blunt": -2
           },
-          "DEX": 0
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
         },
         "icon_path": "public/assets/monster/slime/icons/05-slime-slash.webp"
       },
@@ -77,7 +78,8 @@
             "slash": -2,
             "blunt": -2
           },
-          "DEX": 0
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
         },
         "icon_path": "public/assets/monster/slime/icons/07-slime-pierce.webp"
       },
@@ -108,7 +110,8 @@
             "slash": -2,
             "pierce": -2
           },
-          "DEX": 0
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
         },
         "icon_path": "public/assets/monster/slime/icons/06-slime-blunt.webp"
       },
@@ -139,7 +142,8 @@
             "cold": -2,
             "corrosion": -2
           },
-          "DEX": 0
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
         },
         "icon_path": "public/assets/monster/slime/icons/01-slime-fire.webp"
       },
@@ -170,7 +174,8 @@
             "fire": -2,
             "lightning": -2
           },
-          "DEX": 0
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
         },
         "icon_path": "public/assets/monster/slime/icons/02-slime-cold.webp"
       },
@@ -201,7 +206,8 @@
             "fire": -2,
             "corrosion": -2
           },
-          "DEX": 0
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
         },
         "icon_path": "public/assets/monster/slime/icons/04-slime-lightning.webp"
       },
@@ -232,7 +238,8 @@
             "cold": -2,
             "lightning": -2
           },
-          "DEX": 0
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
         },
         "icon_path": "public/assets/monster/slime/icons/03-slime-corrosion.webp"
       }

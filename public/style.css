@@ -66,7 +66,7 @@ nav{gap:7px}.quiet{padding:7px 9px;font-size:11px}.connection{font-size:10px;pad
 .defense-REF{color:#c2f0d4;background:#214934;border-color:#518b69}
 .defense-WIL{color:#e7d4ff;background:#44305f;border-color:#8d6ab3}
 #stats{display:flex;flex-direction:column;gap:8px;margin:10px 0}
-#stats div{border:0}#stats .combat-stats{display:grid;grid-template-columns:repeat(4,1fr)}
+#stats div{border:0}#stats .combat-stats{display:grid;grid-template-columns:repeat(5,1fr)}
 #stats .combat-stats small{font-size:10px}#stats .combat-stats b{font-size:15px;margin-top:1px}
 #stats .defense-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}#stats .defense-tag b{display:inline;font-size:12px;margin:0;font-weight:700}
 #stats .base-stats{display:flex;justify-content:space-between;font-size:10px;color:#adc2b9}#stats .base-stats b{display:inline;font-size:11px;margin:0;color:#e8eee8}

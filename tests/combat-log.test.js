@@ -56,7 +56,7 @@ test('real hero and enemy attacks persist original combat explanation across rel
   game.state.risk = 0; game.beginBattle(); game.character.hp = game.state.enemy.hp = 10000;
   const enemy = game.state.enemy.name;
   for (const actor of ['hero', 'enemy']) {
-    game.state.battle.actor = actor; game.state.battle.ap = 3; game.battleAction();
+    game.battleAction(actor);
     const record = game.events.at(-1);
     assert.equal(record.type, 'hit');
     assert.equal(record.hit.attackerName, actor === 'hero' ? '모험가' : enemy);

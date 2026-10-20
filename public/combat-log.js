@@ -12,9 +12,10 @@ export function combatLogHTML(entry) {
   if (!c || !h.attackerName || !h.defenderName) return logHTML(entry.text);
   const outcome = h.label === '빗나감' ? '미스' : h.label;
   const result = `<span class="combat-result combat-result-${h.tier}">${esc(outcome)}</span>`;
-  const summary = `${esc(h.attackerName)} → ${esc(h.defenderName)} · ${result}! ${damageTagHTML(h.damageType)} ${tag('피해', h.damage)}`;
+  const sequence = h.actionSeq != null ? `${tag('행동', h.actionSeq)} ${tag('전투 시간', `${(h.combatTimeMs / 1000).toFixed(2)}초`)} · ` : '';
+  const summary = `${sequence}${esc(h.attackerName)} → ${esc(h.defenderName)} · ${result}! ${damageTagHTML(h.damageType)} ${tag('피해', h.damage)}`;
   const natural = h.roll === 20 ? tag('자연 20 · 판정 ↑') : h.roll === 1 ? tag('자연 1 · 판정 ↓') : '';
-  const accuracy = `${stat('ACC', c.acc, '연속 공격 페널티와 전술 보정을 반영한 명중')} + ${tag('🎲', h.roll, '20면체 주사위 눈금')} vs ${stat(h.target, c.defense)} + ${tag('기준', 10)} → ${result}${natural ? ` ${natural}` : ''}`;
+  const accuracy = `${stat('ACC', c.acc, h.actionSeq != null ? '현재 장비와 유지형 스킬을 반영한 명중' : '당시 연속 공격 페널티와 전술 보정을 반영한 명중')} + ${tag('🎲', h.roll, '20면체 주사위 눈금')} vs ${stat(h.target, c.defense)} + ${tag('기준', 10)} → ${result}${natural ? ` ${natural}` : ''}`;
   let damage;
   if (h.damageType === 'raw') {
     damage = `${tag('고정', c.fixedDamage)} · ${tag('방어도 무시')} → ${tag('피해', h.damage, '미스이면 0, 그 외에는 고정 피해 그대로 적용')}`;

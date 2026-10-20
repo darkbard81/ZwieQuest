@@ -1,7 +1,7 @@
 import { uiIconHTML } from './ui-icons.js';
 import { damageNames, damageTagHTML } from './damage-tags.js';
 export const statNames = Object.freeze({ STR: '힘', CON: '체질', DEX: '민첩', PER: '통찰', INT: '지능', RES: '결의',
-  ACC: '명중', DEF: '회피', FOR: '인내', REF: '반사', WIL: '의지', PEN: '관통력', AR: '방어도', HP: '체력', AP: '행동력', LB: '레벨 보너스', power: '피해' });
+  ACC: '명중', DEF: '회피', FOR: '인내', REF: '반사', WIL: '의지', PEN: '관통력', AR: '방어도', HP: '체력', AP: '행동력', actionSpeed: '행동속도', LB: '레벨 보너스', power: '피해' });
 const defenses = new Set(['DEF', 'FOR', 'REF', 'WIL']);
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export function defenseTooltip(key, detail) {

@@ -5,9 +5,9 @@ import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
 import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
 import { rollEncounter } from './encounters.js';
 import { generateMonster, monsterRewards, recordMonsterEncounter } from './monsters.js';
-import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorDEX, migrateLegacyEquipment } from './equipment.js';
+import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorSpeed, migrateLegacyEquipment } from './equipment.js';
 import { initializeSkills, initializeBattleSkills, skillItemView, equipSkill, useSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
-const COMBAT_RULES_VERSION = 4;
+import { COMBAT_RULES_VERSION, DEFAULT_SPEED, actionSpeed, newCombatants, migrateBattle, nextAction, advanceReadiness } from './action-speed.js';
 export const THEMES = Object.entries(MAP_DEFS).map(([id, def]) => ({ id, name: def.name, subtitle: def.subtitle }));
 export class Game {
   constructor(config, state = null, rng = n => randomInt(n)) {
@@ -27,7 +27,7 @@ export class Game {
       for (const map of Object.values(state.maps)) for (const node of Object.values(map.nodes)) delete node.event;
       // Convert retired gear using the legacy appearance hint before removing class fields.
       migrateLegacyEquipment(state, this.rng);
-      migrateArmorDEX(state.inventory);
+      migrateArmorSpeed(state.inventory);
       const migrated = migrateCharacters(state);
       if (state.characters.length > MAX_CHARACTERS || (state.characters.length && !activeCharacter(state))) throw Error('잘못된 캐릭터 저장 상태입니다.');
       for (const character of state.characters) {
@@ -39,12 +39,10 @@ export class Game {
       if (migrated) this.log('character', '캐릭터별 성장으로 이전했습니다. 기존 성장과 소지품은 보존하고 능력치 포인트를 지급했습니다.');
       initializeBattleSkills(state.battle);
       if (state.battle) {
-        // Preserve the saved actor, AP, attacks and HP; never replay an action.
         state.battle.id ||= randomUUID();
-        state.battle.skillUsed ??= false;
-        state.battle.rulesVersion = COMBAT_RULES_VERSION;
-        for (const key of ['roundTactic', 'roundEffects', 'heroReservedAP', 'tacticUsed']) delete state.battle[key];
+        migrateBattle(state, this.character?.hp > 0);
       }
+      if (state.enemy) Object.assign(state.enemy, actionSpeed(state.enemy.DEX || 0, state.enemy.armor?.actionSpeedPenaltyRate ?? state.enemy.actionSpeedPenaltyRate ?? 0, config));
       delete state.tactic;
       state.combatRulesVersion = COMBAT_RULES_VERSION;
       // Older saves paused at regional entrances as HOME. Resume the same journey.
@@ -168,11 +166,12 @@ export class Game {
     const item = slot ? this.item(slot) : null;
     if (item) s.inventory.push(item);
     s.lastReward = { kind, goldOnly: treasure || (generated && !rewards.canDrop), itemId: item?.id || null, itemName: item?.name || null, xp, gold };
-    this.log(kind, treasure ? `보물 발견 · 금화 +${gold}` : `${boss ? '보스 격파' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : generated && !rewards.canDrop ? ' · 하위 레벨 몬스터: 골드만 획득' : ' · 장비 없음'}`, { xp, gold, itemId: item?.id || null, characterId: this.character.id });
+    this.log(kind, treasure ? `보물 발견 · 금화 +${gold}` : `${boss ? '보스 격파' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : generated && !rewards.canDrop ? ' · 하위 레벨 몬스터: 골드만 획득' : ' · 장비 없음'}`, { battleId: s.battle?.id ?? null, xp, gold, itemId: item?.id || null, characterId: this.character.id });
     while (this.character.xp >= this.character.level * this.config.xpPerLevel) {
       this.character.xp -= this.character.level * this.config.xpPerLevel; this.character.level++;
       this.log('level', `레벨 ${this.character.level}! 최대 HP 증가${levelBonus(this.character.level) !== levelBonus(this.character.level - 1) ? ' · 전투 숙련 +1' : ''}`);
     }
+    s.lastBattleId = s.battle?.id ?? null;
     s.enemy = null; s.battle = null; this.phase('TREASURE', this.config.treasureMs);
   }
   beginBattle(boss = false) {
@@ -183,32 +182,29 @@ export class Game {
       const maxHp = Math.floor((tune.enemyHP + s.step * tune.enemyHPPerStep + this.character.level * tune.enemyHPPerLevel + s.risk * tune.enemyRiskHP) * tune.bossHPMultiplier);
       s.enemy = { boss: true, name: MAP_DEFS[s.mapId].boss, hp: maxHp, maxHp, damageTypes: ['blunt'], typeModifiers: {}, STR: 1, ACC: 3 + lb, DEF: 3 + lb, REF: 4 + lb, WIL: 2 + lb, FOR: 4 + lb, AR: 2 + s.risk, PEN: 2, DEX: this.config.initiative.enemyDEX + 1, base: Math.floor((tune.enemyDamage + s.risk * tune.enemyRiskDamage) * tune.bossDamageMultiplier) };
     } else {
-      s.enemy = generateMonster(s.mapId, this.rng);
+      s.enemy = generateMonster(s.mapId, this.rng, undefined, undefined, this.config);
       recordMonsterEncounter(s, s.enemy);
     }
-    const heroDEX = stats(s, this.config).DEX;
-    const first = heroDEX > s.enemy.DEX ? 'hero' : heroDEX < s.enemy.DEX ? 'enemy' : this.config.initiative.tieWinner;
-    s.battle = { id: randomUUID(), skillUsed: false, skillUseCounts: {}, skillToggles: {}, turn: 1, actor: first, firstActor: first, ap: 3, attacks: 0, lastHit: null, rulesVersion: COMBAT_RULES_VERSION };
-    this.phase('BATTLE', this.config.battleActionMs); this.log('battle', `${s.enemy.name}${s.enemy.level ? ` Lv.${s.enemy.level}` : ''} 등장! ${first === 'hero' ? '모험가' : '몬스터'} 선공 (DEX ${heroDEX}:${s.enemy.DEX})으로 시작합니다.`);
-    this.startRound();
+    Object.assign(s.enemy, actionSpeed(s.enemy.DEX || 0, s.enemy.armor?.actionSpeedPenaltyRate || 0, this.config));
+    s.battle = { id: randomUUID(), skillUsed: false, skillUseCounts: {}, skillToggles: {}, combatants: newCombatants(), actionSeq: 0, elapsedMs: 0, lastHit: null, rulesVersion: COMBAT_RULES_VERSION };
+    this.phase('BATTLE', 0); this.refreshBattleTiming();
+    this.log('battle', `${s.enemy.name}${s.enemy.level ? ` Lv.${s.enemy.level}` : ''} 등장! 각자의 행동속도로 전투를 시작합니다.`);
   }
-  startRound() {
+  battleIntervals() {
+    const s = this.state;
+    return { hero: stats(s, this.config).actionIntervalMs, enemy: actionSpeed(s.enemy.DEX || 0, s.enemy.actionSpeedPenaltyRate || 0, this.config).actionIntervalMs };
+  }
+  refreshBattleTiming() {
     const s = this.state, b = s.battle;
-    b.skillUsed = false;
-    b.actor = b.firstActor; b.ap = 3; b.attacks = 0;
+    if (s.phase !== 'BATTLE' || !b) return;
+    if (b.transition) { s.remaining = b.transition.remainingMs; s.duration = b.transition.durationMs; return; }
+    const intervals = this.battleIntervals(), next = nextAction(b, intervals, this.config.initiative.tieWinner);
+    s.remaining = next.wait; s.duration = intervals[next.actor];
   }
-  endAction() {
-    const b = this.state.battle;
-    if (b.ap === 0) {
-      const next = b.actor === 'hero' ? 'enemy' : 'hero';
-      if (next === b.firstActor) { b.turn++; this.startRound(); }
-      else { b.actor = next; b.ap = 3; b.attacks = 0; }
-    }
-    this.phase('BATTLE', this.config.battleActionMs);
-  }
-  battleAction() {
+  battleAction(actor) {
+    if (this.state.phase !== 'BATTLE' || !['hero','enemy'].includes(actor) || this.character.hp <= 0 || this.state.enemy?.hp <= 0) return;
     const s = this.state, b = s.battle, hero = stats(s, this.config), enemy = s.enemy, tune = this.config.balance;
-    const isHero = b.actor === 'hero', attacker = isHero ? hero : enemy, defender = isHero ? enemy : hero;
+    const isHero = actor === 'hero', attacker = isHero ? hero : enemy, defender = isHero ? enemy : hero;
     const weapon = isHero ? s.inventory.find(i => i.id === this.character.equipment.weapon) : enemy.weapon;
     const modern = weapon && Array.isArray(weapon.damageTypes), raw = modern && weapon.damageTypes.includes('raw');
     const target = isHero ? weaponDefense(weapon) : (enemy.hitDefense || 'DEF');
@@ -217,17 +213,18 @@ export class Game {
     const base = modern ? (raw ? weapon.fixedDamage : rollWeaponDamage(weapon, this.rng))
       : isHero ? (weapon ? (legacyMagic ? tune.legacyStaffBasic : tune.legacySwordBasic) + hero.power : 1) : enemy.base;
     const damageTypes = modern ? weapon.damageTypes : isHero ? [!weapon ? 'blunt' : legacyMagic ? 'fire' : 'slash'] : (enemy.damageTypes || ['blunt']);
-    const result = attack({ roll: this.rng(20) + 1, acc: attacker.ACC + (isHero ? maintainedSkillBonuses(s).ACC : 0) - Math.min(10, b.attacks * 5), defense: defender[target], str: attacker.STR, base,
+    const result = attack({ roll: this.rng(20) + 1, acc: attacker.ACC + (isHero ? maintainedSkillBonuses(s).ACC : 0), defense: defender[target], str: attacker.STR, base,
       pen: attacker.PEN, ar: defender.AR, damageTypes, typeModifiers: defender.typeModifiers,
       damageRate: modern ? weapon.damageRate || 0 : 0, fixedDamage: raw ? weapon.fixedDamage : undefined });
-    const ability = isHero ? '일반 공격' : '몸통 박치기';
+    const ability = isHero ? '일반 공격' : (enemy.attackName || '몸통 박치기');
     if (isHero) enemy.hp = Math.max(0, enemy.hp - result.damage); else this.character.hp = Math.max(0, this.character.hp - result.damage);
-    b.ap--; b.attacks++;
-    b.lastHit = { ...result, actor: b.actor, ability, target, attackerName: isHero ? this.character.name : enemy.name, defenderName: isHero ? enemy.name : this.character.name, at: Date.now(), cost: 1, ap: b.ap, round: b.turn };
+    b.actionSeq++; b.combatants[actor].actionSeq++;
+    if (isHero) b.skillUsed = false;
+    b.lastHit = { ...result, actor, ability, target, attackerName: isHero ? this.character.name : enemy.name, defenderName: isHero ? enemy.name : this.character.name, at: Date.now(), battleId: b.id, actionSeq: b.actionSeq, actorActionSeq: b.combatants[actor].actionSeq, combatTimeMs: b.elapsedMs };
     this.log('hit', `${b.lastHit.attackerName} → ${b.lastHit.defenderName} · ${result.label}! ${DAMAGE_NAMES[result.damageType]} 피해 ${result.damage}`, { hit: b.lastHit });
     if (enemy.hp <= 0) { this.reward(enemy.boss ? 'boss' : 'victory'); return; }
     if (this.character.hp <= 0) { this.phase('DOWNED', this.config.downedMs); this.log('downed', '잠시 쓰러졌습니다. 장비와 금화는 안전합니다. 여관으로 귀환합니다.'); return; }
-    this.endAction();
+    this.refreshBattleTiming();
   }
   finish(downed, reason = 'deadend') {
     const s = this.state; s.completed++; s.autoRoute = null;
@@ -262,7 +259,7 @@ export class Game {
         }
         break;
       }
-      case 'BATTLE': this.battleAction(); break;
+      case 'BATTLE': return; // The independent scheduler owns battle time.
       case 'TREASURE': if (s.pendingBossReturn) { s.pendingBossReturn = false; this.finish(false, 'boss'); } else this.nextChoice(); break;
       case 'DOWNED': this.finish(true); break;
       case 'RETURN_HOME':
@@ -270,14 +267,44 @@ export class Game {
         this.phase('HOME', this.config.homeMs); this.log('home', '여관에 도착했습니다. 다음 여행을 시작할 때 체력을 회복합니다.'); break;
     }
   }
-  tick(elapsed, rate) {
-    if (!this.state || (this.state.phase === 'HOME' && (!this.character || this.state.homePaused))) return false;
-    // One actual scheduled event per tick. No replay of stopped-server time.
-    this.state.remaining -= elapsed * rate;
-    if (this.state.remaining <= 0) { this.advance(); return true; } return false;
+  tick(elapsed, rate = 1) {
+    const s = this.state;
+    if (!s || !Number.isFinite(elapsed) || elapsed < 0 || !Number.isFinite(rate) || rate < 0) return false;
+    let pending = (s.pendingGameMs || 0) + elapsed * rate, changed = false;
+    const limit = this.config.actionSpeed?.maxEventsPerTick ?? DEFAULT_SPEED.maxEventsPerTick;
+    if (!Number.isSafeInteger(limit) || limit < 1) throw Error('Invalid event budget');
+    for (let count = 0; count < limit; count++) {
+      if (s.phase === 'HOME' && (!this.character || s.homePaused)) { pending = 0; break; }
+      if (s.phase === 'BATTLE') {
+        const b = s.battle;
+        if (!b || !s.enemy || this.character.hp <= 0 || s.enemy.hp <= 0) { pending = 0; break; }
+        const intervals = this.battleIntervals();
+        const next = b.transition ? { actor: b.transition.actor, wait: b.transition.remainingMs } : nextAction(b, intervals, this.config.initiative.tieWinner);
+        const due = pending + 1e-7 >= next.wait, step = due ? next.wait : pending;
+        if (b.transition) { b.elapsedMs += step; b.transition.remainingMs = Math.max(0, b.transition.remainingMs - step); }
+        else advanceReadiness(b, intervals, step);
+        pending = Math.max(0, pending - step);
+        if (!due) { this.refreshBattleTiming(); break; }
+        if (b.transition) delete b.transition;
+        else b.combatants[next.actor].readiness = Math.max(0, b.combatants[next.actor].readiness - 1);
+        this.battleAction(next.actor); changed = true;
+      } else {
+        const wait = Math.max(0, s.remaining);
+        if (pending + 1e-7 < wait) { s.remaining -= pending; pending = 0; break; }
+        pending = Math.max(0, pending - wait); s.remaining = 0;
+        this.advance(); changed = true;
+      }
+    }
+    s.pendingGameMs = pending;
+    this.refreshBattleTiming();
+    return changed;
   }
   command(cmd) {
+    try { return this.applyCommand(cmd); } finally { this.refreshBattleTiming(); }
+  }
+  applyCommand(cmd) {
     const s = this.state;
+    if (s.pendingGameMs > 1e-7 || (s.phase === 'BATTLE' && s.remaining <= 1e-7)) throw Error('이전 행동을 처리 중입니다. 잠시 후 다시 시도하세요.');
     if (cmd.type === 'CREATE_CHARACTER') { this.create(cmd); return; }
     if (cmd.type === 'SELECT_CHARACTER') { this.selectCharacter(cmd.characterId); return; }
     if (cmd.type === 'RETIRE_CHARACTER') { this.retireCharacter(cmd.characterId, cmd.confirmName); return; }
@@ -325,7 +352,7 @@ export class Game {
     }
     else if (cmd.type === 'USE_SKILL') {
       const result = useSkill(s, this.character.skills.find(i => i.id === cmd.itemId), stats(s, this.config), cmd);
-      this.log('skill', `${result.round == null ? '비전투' : `라운드 ${result.round}`} · ${result.name}: HP +${result.healed}`, result);
+      this.log('skill', `${result.heroActionSeq == null ? '비전투' : `개인 주기 ${result.heroActionSeq}`} · ${result.name}: HP +${result.healed}`, result);
     }
     else if (cmd.type === 'TOGGLE_SKILL') {
       const result = toggleSkill(s, this.character.skills.find(i => i.id === cmd.itemId), stats(s, this.config), cmd);
@@ -358,7 +385,12 @@ export class Game {
     const c = this.character;
     const { values: hero, defenses: defenseBreakdown } = statDetails(this.state, this.config);
     const weapon = state.inventory.find(i => i.id === c?.equipment.weapon);
-    return { ...structuredClone(state),
+    const battleTiming = state.phase === 'BATTLE' && state.battle ? Object.fromEntries(['hero','enemy'].map(actor => {
+      const values = actor === 'hero' ? hero : actionSpeed(state.enemy.DEX || 0, state.enemy.actionSpeedPenaltyRate || 0, this.config);
+      const readiness = state.battle.combatants[actor].readiness;
+      return [actor, { actionSpeed: values.actionSpeed, actionSpeedPenaltyRate: values.actionSpeedPenaltyRate, readiness, nextActionMs: state.battle.transition ? state.battle.transition.remainingMs + (state.battle.transition.actor === actor ? 0 : values.actionIntervalMs) : Math.max(0, 1 - readiness) * values.actionIntervalMs }];
+    })) : null;
+    return { ...structuredClone(state), battleTiming,
       ...(c ? structuredClone(c) : { name: '', appearanceId: null, level: 0, xp: 0, hp: 0, attributes: {}, equipment: {}, skillSlots: Array(6).fill(null), skillCooldowns: {} }),
       attributePoints: remainingPoints(c),
       characters: characters.map(c => ({ ...structuredClone(c), attributePoints: remainingPoints(c), maxHp: statDetails(this.state, this.config, c).values.maxHp })),

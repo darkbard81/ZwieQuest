@@ -22,6 +22,7 @@ export function itemDetailsHTML(item) {
     if (tags.length) pieces.push(`<span class="item-combat-tags">${tags.join('')}</span>`);
   }
   pieces.push(Object.entries(item.stats).map(([k, v]) => item.slot === 'armor' ? `<span class="item-stat-tag">${statLabelHTML(k, signed(v))}</span>` : statLabelHTML(k, signed(v))).join(item.slot === 'armor' ? ' ' : ' · '));
+  if (item.slot === 'armor') pieces.push(`행동속도 -${Math.round((item.actionSpeedPenaltyRate || 0) * 100)}%`);
   if (item.typeModifiers && Object.keys(item.typeModifiers).length) pieces.push(`<span class="armor-matchups">${Object.entries(item.typeModifiers).map(([t, v]) => damageTagHTML(t, signed(v))).join(' ')}</span>`);
   return pieces.filter(Boolean).join('<br>');
 }

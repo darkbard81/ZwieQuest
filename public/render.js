@@ -139,7 +139,7 @@ export async function createWorld(container) {
   }
   requestAnimationFrame(frame);
   return {
-    update(value) { const now = performance.now(); camera.update(value, now); state = value; loadMonster(value?.enemy); animator.update(value, now); monsterAnimator.update(value); if (!['BATTLE', 'TREASURE', 'DOWNED'].includes(value?.phase)) clearFeedback(); },
+    update(value) { const now = performance.now(); if ((state?.battle?.id ?? state?.lastBattleId) !== (value?.battle?.id ?? value?.lastBattleId)) clearTransient(); camera.update(value, now); state = value; loadMonster(value?.enemy); animator.update(value, now); monsterAnimator.update(value); if (!['BATTLE', 'TREASURE', 'DOWNED'].includes(value?.phase)) clearFeedback(); },
     clearFeedback,
     clearTransient,
     playEvents(events) {

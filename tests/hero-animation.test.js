@@ -66,3 +66,7 @@ test('event feed suppresses history, duplicate, reconnect, stale events and keep
  assert.deepEqual(feed.consume({state:null},true),[]);
  assert.deepEqual(feed.consume(snapshot(8,[{...hit,seq:8}]),true),[]);
 });
+test('a new battle at the same node clears the previous transient animation',()=>{
+ const a=createHeroAnimator();a.update(state('BATTLE',{battle:{id:'old'}}),0);a.events([event('enemy')],10);assert.equal(a.sample(20).action,'Side_Hit');
+ a.update(state('BATTLE',{battle:{id:'new'}}),30);assert.equal(a.sample(40).action,'Side_Attack');assert.equal(a.sample(40).frame,0);assert.equal(a.sample(40).transient,false);
+});

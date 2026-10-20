@@ -15,10 +15,9 @@ export function skillAvailability(state, item, now, connected = true) {
   else if (!item.enabled) { reason = '사용 불가'; kind = 'unavailable'; }
   else if (!item.useContexts?.includes(inCombat ? 'combat' : 'nonCombat')) { reason = inCombat ? '전투 외에만 사용' : '전투 중에만 사용'; kind = 'unavailable'; }
   else if (state.hp <= 0) { reason = '사용 불가'; kind = 'unavailable'; }
-  else if (toggle && item.toggleConsumesTurn === null) { reason = 'ON/OFF 턴 정책 미정'; kind = 'unavailable'; }
+  else if (toggle && item.toggleConsumesCycle === null) { reason = 'ON/OFF 주기 정책 미정'; kind = 'unavailable'; }
   else if (inCombat && item.remainingUses === 0 && !turningOff) { reason = '이번 전투 사용 횟수 소진'; kind = 'exhausted'; }
-  else if (inCombat && state.battle?.actor !== 'hero') { reason = '상대 턴'; kind = 'unavailable'; }
-  else if (inCombat && state.battle.skillUsed && (!toggle || item.toggleConsumesTurn)) { reason = '이번 턴 사용 완료'; kind = 'used'; }
+  else if (inCombat && state.battle.skillUsed && (!toggle || item.toggleConsumesCycle)) { reason = '이번 주기 사용 완료'; kind = 'used'; }
   else if (remaining > 0 && !turningOff) { reason = '재사용 대기'; kind = 'cooldown'; }
   else if (item.effectType === 'heal' && state.hp >= state.stats.maxHp) { reason = '체력 가득 참'; kind = 'unavailable'; }
   else if (item.effectType === 'heal' && !(item.heal > 0)) { reason = '회복량 없음'; kind = 'unavailable'; }
@@ -35,7 +34,7 @@ export function initSkills({ bar, slots, summary, status, onUse }) {
       const item = getItem(index), availability = skillAvailability(state, item, now(), connected);
       if (pending || !availability.ready) return;
       pending = true; refresh();
-      try { await onUse(item.id, state.phase === 'BATTLE' ? state.battle.id : null, state.phase === 'BATTLE' ? state.battle.turn : null, button, item.activationMode, !item.toggleOn); }
+      try { await onUse(item.id, state.phase === 'BATTLE' ? state.battle.id : null, state.phase === 'BATTLE' ? state.battle.combatants.hero.actionSeq : null, button, item.activationMode, !item.toggleOn); }
       finally { pending = false; refresh(); }
     };
     bar.append(button);
@@ -66,8 +65,11 @@ export function initSkills({ bar, slots, summary, status, onUse }) {
     summary.textContent = equipped.length ? equipped.map(item => `${item.name}: ${skillDescription(item)}`).join(' · ') : '가방의 스킬 탭에서 장착해 주세요.';
     const b = state.battle;
     status.textContent = state.phase === 'BATTLE' && b
-      ? `라운드 ${b.turn} · ${b.actor === 'hero' ? '모험가' : '몬스터'} 턴 · AP ${b.ap}/3 · ${b.skillUsed ? '이번 턴 스킬 사용 완료' : '자기 턴에 스킬 1개 사용 가능'}`
-      : '전투 중 자기 턴에 수동 사용 · AP 소모 없음';
+      ? `개인 행동 주기 ${b.combatants.hero.actionSeq} · ${b.skillUsed ? '이번 주기 스킬 사용 완료' : '직접 스킬 1회 사용 가능'} · ` + ['hero','enemy'].map(actor => {
+        const t = state.battleTiming?.[actor];
+        return t ? `${actor === 'hero' ? '모험가' : '몬스터'}: 속도 ${Number(t.actionSpeed.toFixed(2))}, 갑옷 -${Math.round(t.actionSpeedPenaltyRate * 100)}%, 준비 ${Math.min(100, Math.floor(t.readiness * 100))}% (${(t.nextActionMs / 1000).toFixed(2)} 게임초)` : '';
+      }).join(' / ')
+      : '전투 중 개인 행동 주기당 직접 스킬 1회 · 자동 공격은 계속 진행';
   }
   setInterval(() => { if (!document.hidden) refresh(); }, 100);
   return { update(next, time, at, online) { state = next; serverTime = time; receivedAt = at; connected = online; refresh(); }, disconnect() { connected = false; refresh(); } };

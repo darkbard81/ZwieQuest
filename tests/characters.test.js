@@ -14,7 +14,7 @@ test('account starts at inn with no characters, no auto departure; 1 to 3 charac
  const g=make();for(let n=0;n<20;n++)g.tick(100000,1.5);assert.equal(g.state.phase,'HOME');assert.equal(g.state.run,0);assert.equal(g.snapshot().activeCharacterId,null);
  for(let n=0;n<3;n++){const c=create(g,'동일 외형 '+n);assert.match(c.id,/^[0-9a-f-]{36}$/);assert.equal(c.level,1);assert.deepEqual(Object.values(c.attributes),[0,0,0,0,0,0]);assert.equal(remainingPoints(c),10);assert.equal(c.hp,10);assert.equal(c.skills.length,1);assert.equal(c.skillSlots[0],c.skills[0].id);}
  assert.equal(new Set(g.state.characters.flatMap(c=>[...Object.values(c.equipment),...c.skills.map(i=>i.id)])).size,9);
- for(const c of g.state.characters){const armor=g.state.inventory.find(i=>i.id===c.equipment.armor);assert.equal(armor.templateId,'robe');assert.equal(armor.name,'로브');assert.equal(armor.stats.AR,3);assert.equal(armor.stats.DEX,0);}
+ for(const c of g.state.characters){const armor=g.state.inventory.find(i=>i.id===c.equipment.armor);assert.equal(armor.templateId,'robe');assert.equal(armor.name,'로브');assert.equal(armor.stats.AR,3);assert.equal(armor.stats.DEX,undefined);}
  assert.equal(g.state.inventory.length,6);assert.ok(g.state.inventory.every(i=>['dagger','robe'].includes(i.templateId)&&i.gradeId==='normal'&&!i.special));
  assert.throws(()=>create(g,'4명'),/최대 3/);assert.equal(g.state.characters.length,3);assert.equal(g.state.inventory.length,6);
  cmd(g,'DEPART');assert.equal(g.state.phase,'CHOICE_WAIT');assert.equal(remainingPoints(g.character),10);assert.throws(()=>create(g,'모험 중'),/여관/);
@@ -60,13 +60,13 @@ test('server pause persists beyond 15 seconds and restart; resume resets countdo
  const reloaded=new Game(config,structuredClone(g.state));reloaded.tick(60000,1.5);assert.equal(reloaded.state.phase,'HOME');cmd(reloaded,'RESUME_HOME');assert.equal(reloaded.state.remaining,config.homeMs);reloaded.tick(config.homeMs,1);assert.equal(reloaded.state.phase,'CHOICE_WAIT');
 });
 test('legacy migration preserves active battle and common state, removes duplicate equipment references and is idempotent',()=>{
- const g=make(),a=create(g,'legacy','wizard');g.state.risk=0;g.beginBattle();g.state.battle.ap=1;g.state.battle.attacks=2;g.state.battle.skillUseCounts={heal:2};a.hp=3;a.level=8;a.xp=19;a.skillCooldowns.heal={startedAt:10,readyAt:40000,durationMs:39990};
+ const g=make(),a=create(g,'legacy','wizard');g.state.risk=0;g.beginBattle();g.state.battle.rulesVersion=4;g.state.battle.ap=1;g.state.battle.attacks=2;g.state.battle.skillUseCounts={heal:2};a.hp=3;a.level=8;a.xp=19;a.skillCooldowns.heal={startedAt:10,readyAt:40000,durationMs:39990};
  const old=structuredClone(g.state);delete old.characterVersion;delete old.characters;delete old.activeCharacterId;
  Object.assign(old,{classId:'wizard',appearanceId:'wizard',level:a.level,xp:a.xp,hp:a.hp,equipment:a.equipment,skillSlots:a.skillSlots,skillGrants:a.skillGrants,skillCooldowns:a.skillCooldowns,inactiveClasses:{warrior:{level:4,xp:7,equipment:{...a.equipment}}}});old.inventory.push(...structuredClone(a.skills));
  const before=structuredClone(old),migrated=new Game(config,old),c=migrated.character;
  assert.equal(c.level,8);assert.equal(c.xp,19);assert.equal(c.hp,3);assert.deepEqual(c.equipment,before.equipment);assert.deepEqual(c.skillSlots,before.skillSlots);assert.deepEqual(c.skillCooldowns,before.skillCooldowns);assert.equal(remainingPoints(c),14);
  assert.equal(migrated.state.characters.length,2);assert.equal(migrated.state.characters[1].level,4);assert.deepEqual(migrated.state.characters[1].equipment,{});assert.notEqual(c.skills[0].id,migrated.state.characters[1].skills[0].id);
  for(const key of ['maps','path','gold','remaining','enemy','checkpointHistory','autoRoute','currentNodeId'])assert.deepEqual(migrated.state[key],before[key],key);
- assert.equal(migrated.state.battle.ap,1);assert.equal(migrated.state.battle.attacks,2);assert.deepEqual(migrated.state.battle.skillUseCounts,{heal:2});assert.equal(migrated.state.classId,undefined);
+ assert.equal(migrated.state.battle.ap,undefined);assert.equal(migrated.state.battle.attacks,undefined);assert.deepEqual(migrated.state.battle.skillUseCounts,{heal:2});assert.equal(migrated.state.classId,undefined);
  assert.deepEqual(new Game(config,structuredClone(migrated.state),()=>{throw Error('No reroll');}).state,migrated.state);
 });

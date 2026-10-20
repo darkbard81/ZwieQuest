@@ -26,7 +26,7 @@ export function validateSkillCatalog(catalog) {
       if (!Number.isFinite(s.effect.amount) || s.effect.amount < 0) fail(`${s.id}: invalid accuracy amount`);
       if (!Array.isArray(s.effect.weaponCategories) || !s.effect.weaponCategories.length || s.effect.weaponCategories.some(id => !EQUIPMENT_CATALOG.weapons.some(w => w.id === id))) fail(`${s.id}: invalid weapon category`);
       if (s.useContexts.length !== 1 || s.useContexts[0] !== 'combat') fail(`${s.id}: accuracy toggle currently supports combat only`);
-      if (s.toggleConsumesTurn !== null && typeof s.toggleConsumesTurn !== 'boolean') fail(`${s.id}: toggleConsumesTurn must be boolean or null (unresolved)`);
+      if (s.toggleConsumesCycle !== null && typeof s.toggleConsumesCycle !== 'boolean') fail(`${s.id}: toggleConsumesCycle must be boolean or null (unresolved)`);
     } else fail(`${s.id}: unsupported effect/mode; add a server handler first`);
   }
   return catalog;
@@ -79,7 +79,7 @@ export function skillItemView(item, state, hero, catalog = SKILL_CATALOG) {
   return { ...item, name: def?.name || item.name, icon: def?.icon || '?', description: def?.description || '등록되지 않은 스킬입니다.', enabled: !!def?.enabled,
     useContexts: def?.useContexts || [], activationMode: def?.activationMode, effectType: def?.effect.type, perBattleLimit: def?.perBattleLimit ?? null,
     usesThisBattle: used, remainingUses: inCombat && def?.perBattleLimit != null ? Math.max(0, def.perBattleLimit - used) : null,
-    toggleOn: inCombat && !!state.battle?.skillToggles?.[item.templateId], toggleConsumesTurn: def?.toggleConsumesTurn ?? null,
+    toggleOn: inCombat && !!state.battle?.skillToggles?.[item.templateId], toggleConsumesCycle: def?.toggleConsumesCycle ?? null,
     ...(def ? skillValues(def, hero) : {}), cooldown: owner(state).skillCooldowns[item.templateId] || null };
 }
 export function equipSkill(state, item, unequip = false, slotIndex, catalog = SKILL_CATALOG) {
@@ -97,7 +97,7 @@ export function equipSkill(state, item, unequip = false, slotIndex, catalog = SK
   if (current !== -1) owner(state).skillSlots[current] = null;
   owner(state).skillSlots[target] = item.id;
 }
-function validateUse(state, item, command, catalog, consumesTurn) {
+function validateUse(state, item, command, catalog, consumesCycle) {
   if (!owner(state) || !item || !learned(state).some(i => i.id === item.id) || item.slot !== 'skill' || !owner(state).skillSlots.includes(item.id)) throw Error('장착 중인 스킬을 선택하세요.');
   const def = skillDefinition(item.templateId, catalog);
   if (!def?.enabled) throw Error('사용할 수 없는 스킬입니다.');
@@ -105,20 +105,19 @@ function validateUse(state, item, command, catalog, consumesTurn) {
   if (!def.useContexts.includes(b ? 'combat' : 'nonCombat')) throw Error(b ? '전투 외에 사용하는 스킬입니다.' : '스킬은 전투 중에만 사용할 수 있습니다.');
   if (owner(state).hp <= 0 || (b && state.enemy?.hp <= 0)) throw Error('지금은 스킬을 사용할 수 없습니다.');
   // Prevent a stale non-combat request from executing after a battle starts, or vice versa.
-  if ((b?.id ?? null) !== (command.battleId ?? null) || (b && command.turn !== b.turn)) throw Error('스킬을 선택한 턴이 지났습니다.');
-  if (b && (b.actor !== 'hero' || b.ap <= 0)) throw Error('자신의 턴에만 스킬을 사용할 수 있습니다.');
-  if (b && consumesTurn && b.skillUsed) throw Error('이번 턴에는 이미 스킬을 사용했습니다.');
+  if ((b?.id ?? null) !== (command.battleId ?? null) || (b && command.heroActionSeq !== b.combatants.hero.actionSeq)) throw Error('스킬을 선택한 행동 주기가 지났습니다.');
+  if (b && consumesCycle && b.skillUsed) throw Error('이번 행동 주기에는 이미 스킬을 사용했습니다.');
   return { def, b };
 }
 function checkActivation(state, def, b, now) {
   if (b && def.perBattleLimit !== null && (b.skillUseCounts?.[def.id] || 0) >= def.perBattleLimit) throw Error(`전투당 ${def.perBattleLimit}회 사용을 모두 소진했습니다.`);
   if ((owner(state).skillCooldowns[def.id]?.readyAt || 0) > now) throw Error('스킬 재사용 대기 중입니다.');
 }
-function recordActivation(state, def, b, values, now, consumesTurn) {
+function recordActivation(state, def, b, values, now, consumesCycle) {
   if (b) {
     b.skillUseCounts ||= {};
     b.skillUseCounts[def.id] = (b.skillUseCounts[def.id] || 0) + 1;
-    if (consumesTurn) b.skillUsed = true;
+    if (consumesCycle) b.skillUsed = true;
   }
   owner(state).skillCooldowns[def.id] = { startedAt: now, readyAt: now + values.cooldownMs, durationMs: values.cooldownMs };
 }
@@ -131,20 +130,20 @@ export function useSkill(state, item, hero, command, now = Date.now(), catalog =
   if (!healed) throw Error('회복할 체력이 없습니다.');
   owner(state).hp += healed;
   recordActivation(state, def, b, values, now, true);
-  return { skillId: def.id, name: def.name, healed, ...values, round: b?.turn ?? null, battleId: b?.id ?? null };
+  return { skillId: def.id, name: def.name, healed, ...values, heroActionSeq: b?.combatants.hero.actionSeq ?? null, battleId: b?.id ?? null };
 }
 export function toggleSkill(state, item, hero, command, now = Date.now(), catalog = SKILL_CATALOG) {
   const def = skillDefinition(item?.templateId, catalog);
   if (!def?.enabled || def.activationMode !== 'toggle') throw Error('사용할 수 없는 유지형 스킬입니다.');
-  if (def.toggleConsumesTurn === null) throw Error('ON/OFF 전환의 턴 사용 정책이 아직 정해지지 않았습니다.');
+  if (def.toggleConsumesCycle === null) throw Error('ON/OFF 전환의 행동 주기 사용 정책이 아직 정해지지 않았습니다.');
   if (typeof command.enabled !== 'boolean') throw Error('ON/OFF 상태를 지정하세요.');
-  const { b } = validateUse(state, item, command, catalog, def.toggleConsumesTurn);
+  const { b } = validateUse(state, item, command, catalog, def.toggleConsumesCycle);
   if (!!b.skillToggles?.[def.id] === command.enabled) return null;
   const values = skillValues(def, hero);
-  if (command.enabled) { checkActivation(state, def, b, now); recordActivation(state, def, b, values, now, def.toggleConsumesTurn); }
-  else if (def.toggleConsumesTurn) b.skillUsed = true;
+  if (command.enabled) { checkActivation(state, def, b, now); recordActivation(state, def, b, values, now, def.toggleConsumesCycle); }
+  else if (def.toggleConsumesCycle) b.skillUsed = true;
   b.skillToggles ||= {}; b.skillToggles[def.id] = command.enabled;
-  return { skillId: def.id, name: def.name, enabled: command.enabled, round: b.turn, battleId: b.id };
+  return { skillId: def.id, name: def.name, enabled: command.enabled, heroActionSeq: b.combatants.hero.actionSeq, battleId: b.id };
 }
 // Recompute from equipped templates each time; never mutate base stats or stack
 // a bonus on a previously boosted snapshot. Duplicate copies count only once.

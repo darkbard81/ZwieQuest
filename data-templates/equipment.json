@@ -306,7 +306,7 @@
       "slot": "armor",
       "AR": 3,
       "typeModifiers": {},
-      "DEX": 0
+      "armorCategory": "cloth"
     },
     {
       "id": "leather",
@@ -317,7 +317,7 @@
         "blunt": -2,
         "cold": -2
       },
-      "DEX": -1
+      "armorCategory": "light"
     },
     {
       "id": "padded",
@@ -328,7 +328,7 @@
         "pierce": -2,
         "fire": -2
       },
-      "DEX": -1
+      "armorCategory": "light"
     },
     {
       "id": "hide",
@@ -339,7 +339,7 @@
         "slash": -2,
         "corrosion": -2
       },
-      "DEX": -1
+      "armorCategory": "light"
     },
     {
       "id": "chainmail",
@@ -350,7 +350,7 @@
         "blunt": -2,
         "cold": -2
       },
-      "DEX": -2
+      "armorCategory": "medium"
     },
     {
       "id": "scale",
@@ -361,7 +361,7 @@
         "pierce": -2,
         "corrosion": -2
       },
-      "DEX": -2
+      "armorCategory": "medium"
     },
     {
       "id": "breastplate",
@@ -372,7 +372,7 @@
         "slash": -2,
         "lightning": -2
       },
-      "DEX": -2
+      "armorCategory": "medium"
     },
     {
       "id": "brigandine",
@@ -383,7 +383,7 @@
         "pierce": -4,
         "corrosion": -4
       },
-      "DEX": -3
+      "armorCategory": "heavy"
     },
     {
       "id": "plate",
@@ -394,7 +394,7 @@
         "blunt": -4,
         "lightning": -4
       },
-      "DEX": -3
+      "armorCategory": "heavy"
     }
   ],
   "saleBase": 12,
@@ -437,5 +437,27 @@
       "slot": "charm",
       "primaryStat": "RES"
     }
-  ]
+  ],
+  "armorCategories": {
+    "cloth": {
+      "name": "천옷",
+      "actionSpeedPenaltyRate": 0
+    },
+    "light": {
+      "name": "경량 갑옷",
+      "actionSpeedPenaltyRate": 0.1
+    },
+    "medium": {
+      "name": "중간 갑옷",
+      "actionSpeedPenaltyRate": 0.3
+    },
+    "heavy": {
+      "name": "중갑옷",
+      "actionSpeedPenaltyRate": 0.5
+    },
+    "natural": {
+      "name": "자연 외피",
+      "actionSpeedPenaltyRate": 0
+    }
+  }
 }

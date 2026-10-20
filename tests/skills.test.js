@@ -9,7 +9,7 @@ import { skillAvailability } from '../public/skills-view.js';
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
 const make = (cls = 'wizard') => { const c = structuredClone(config); c.initiative.enemyDEX = -10; const g = new Game(c, null, () => 0); g.create({name: '모험가', appearanceId: cls});g.state.homePaused=false; g.state.risk = 0; return g; };
 const item = g => g.character.skills.find(i => i.slot === 'skill');
-const command = g => ({ type: 'USE_SKILL', characterId:g.character.id, itemId: item(g).id, battleId: g.state.battle.id, turn: g.state.battle.turn });
+const command = g => ({ type: 'USE_SKILL', characterId:g.character.id, itemId: item(g).id, battleId: g.state.battle.id, heroActionSeq: g.state.battle.combatants.hero.actionSeq });
 const battle = g => { g.beginBattle(); g.state.enemy.hp = 100000; g.state.enemy.weapon.damageMin = g.state.enemy.weapon.damageMax = 0; g.character.hp = 1; };
 
 test('JSON validates duplicate IDs, unknown effects, invalid coefficients and fixed six-slot policy', () => {
@@ -23,7 +23,7 @@ test('new/old characters get heal once, default slot 1, with persistent delibera
     g.command({characterId: g.character?.id,  type: 'UNEQUIP', itemId: item(g).id }); const again = new Game(g.config, structuredClone(g.state)); assert.deepEqual(again.state, g.state);
     const old = structuredClone(g.state); old.characters[0].skills=[]; delete old.characters[0].skillSlots; delete old.characters[0].skillGrants; delete old.characters[0].skillCooldowns; old.characters[0].hp=5;
     old.battle = { actor: 'hero', ap: 1, attacks: 1, turn: 3, roundEffects: { AR: 99 }, heroReservedAP: 2, tacticUsed: true }; old.phase = 'BATTLE';
-    const restored = new Game(g.config, old); assert.equal(restored.character.hp, 5); assert.equal(restored.state.battle.ap, 1); assert.equal(restored.state.battle.attacks, 1); assert.equal(restored.state.battle.roundEffects, undefined); assert.equal(restored.state.tactic, undefined);
+    const restored = new Game(g.config, old); assert.equal(restored.character.hp, 5); assert.equal(restored.state.battle.ap, undefined); assert.equal(restored.state.battle.attacks, undefined); assert.equal(restored.state.battle.roundEffects, undefined); assert.equal(restored.state.tactic, undefined);
     assert.equal(restored.character.skillSlots[0], item(restored).id); assert.deepEqual(new Game(g.config, structuredClone(old)).state, old);
   }
 });
@@ -41,28 +41,27 @@ test('healing uses effective maxHP/INT, floors once, caps HP; cooldown uses sign
     const h = make(cls); battle(h); h.character.hp = stats(h.state, h.config).maxHp - 1; h.command(command(h)); assert.equal(h.character.hp, stats(h.state, h.config).maxHp);
   }
 });
-test('manual skill preserves AP/attack timer and penalties; no auto skill, per-player-turn lock independent of type/slots', () => {
+test('manual skill preserves readiness and attack timer; personal cycle lock is shared across types and slots', () => {
   const g = make(); battle(g); const before = structuredClone(g.state.battle), remaining = g.state.remaining;
-  g.command(command(g)); assert.equal(g.state.battle.ap, before.ap); assert.equal(g.state.battle.attacks, before.attacks); assert.equal(g.state.remaining, remaining);
+  g.command(command(g)); assert.deepEqual(g.state.battle.combatants, before.combatants); assert.equal(g.state.remaining, remaining);
   const alternate = { ...item(g), id: 'second', templateId: 'second-heal' }; g.character.skills.push(alternate); g.character.skillSlots[1] = alternate.id;
   const c = structuredClone(SKILL_CATALOG); c.skills.push({ ...c.skills[0], id: alternate.templateId });
   assert.throws(() => useSkill(g.state, alternate, stats(g.state, g.config), { ...command(g), itemId: alternate.id }, Date.now(), c), /이미/);
   g.command({characterId: g.character?.id,  type: 'UNEQUIP', itemId: item(g).id }); g.command({characterId: g.character?.id,  type: 'EQUIP', itemId: item(g).id }); assert.throws(() => g.command(command(g)), /이미/);
-  const hp = g.character.hp; for (let i = 0; i < 6; i++) g.battleAction(); assert.equal(g.state.battle.turn, 2); assert.equal(g.state.battle.skillUsed, false); assert.equal(g.character.hp, hp);
-  const hits = g.events.filter(e => e.type === 'hit' && e.hit.actor === 'hero').map(e => e.hit); assert.equal(hits.length, 3); assert.deepEqual(hits.map(h => h.calculation.acc - hits[0].calculation.acc), [0,-5,-10]);
+  const hp = g.character.hp; for (let i = 0; i < 6; i++) g.battleAction('hero'); assert.equal(g.state.battle.combatants.hero.actionSeq, 6); assert.equal(g.state.battle.skillUsed, false); assert.equal(g.character.hp, hp);
+  const hits = g.events.filter(e => e.type === 'hit' && e.hit.actor === 'hero').map(e => e.hit); assert.equal(hits.length, 6); assert.deepEqual(hits.map(h => h.calculation.acc - hits[0].calculation.acc), [0,0,0,0,0,0]);
   assert.throws(() => g.command(command(g)), /대기/);
 });
-test('reject outside combat, enemy turn, stale battle/round, unequipped and full HP without spending cooldown', () => {
+test('reject outside combat, stale battle/cycle, unequipped and full HP without spending cooldown', () => {
   const g = make(); assert.throws(() => g.command({characterId: g.character?.id,  type: 'USE_SKILL', characterId:g.character.id, itemId: item(g).id }), /전투/); battle(g);
-  const cmd = command(g); assert.throws(() => g.command({characterId: g.character?.id,  ...cmd, turn: 0 }), /턴이 지났/); assert.throws(() => g.command({characterId: g.character?.id,  ...cmd, battleId: 'old' }), /턴이 지났/);
-  g.state.battle.actor = 'enemy'; assert.throws(() => g.command(cmd), /자신의 턴/); g.state.battle.actor = 'hero';
+  const cmd = command(g); assert.throws(() => g.command({characterId: g.character?.id,  ...cmd, heroActionSeq: -1 }), /주기가 지났/); assert.throws(() => g.command({characterId: g.character?.id,  ...cmd, battleId: 'old' }), /주기가 지났/);
   g.command({characterId: g.character?.id,  type: 'UNEQUIP', itemId: item(g).id }); assert.throws(() => g.command(cmd), /장착/); g.command({characterId: g.character?.id,  type: 'EQUIP', itemId: item(g).id });
   g.character.hp = stats(g.state, g.config).maxHp; assert.throws(() => g.command(cmd), /회복할 체력/); assert.equal(g.state.battle.skillUsed, false); assert.deepEqual(g.character.skillCooldowns, {});
 });
-test('cooldown and turn lock persist after load/class/equipment changes; wall-clock expiry and new turn are both required', () => {
+test('cooldown and cycle lock persist after load and equipment changes; expiry and a new cycle are both required', () => {
   const g = make(); battle(g); const cmd = command(g); g.command(cmd); const cooldown = structuredClone(g.character.skillCooldowns);
   const r = new Game(g.config, JSON.parse(JSON.stringify(g.state))); assert.throws(() => r.command(cmd), /이미/);
-  for (let i = 0; i < 6; i++) r.battleAction(); assert.throws(() => r.command(command(r)), /대기/);
+  for (let i = 0; i < 6; i++) r.battleAction('hero'); assert.throws(() => r.command(command(r)), /대기/);
   r.character.skillCooldowns.heal.readyAt = Date.now() - 1; r.command(command(r)); assert.equal(r.state.battle.skillUsed, true);
   g.phase('HOME', 10000); g.command({characterId: g.character?.id,  type: 'SELECT_CHARACTER', characterId:g.character.id }); assert.deepEqual(g.character.skillCooldowns, cooldown);
 });

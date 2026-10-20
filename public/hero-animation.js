@@ -19,7 +19,7 @@ export function createHeroAnimator() {
   function clear() { sequence = []; }
   return {
     update(next, now) {
-      const key = next ? `${next.activeCharacterId || next.appearanceId}:${next.mapId}:${next.run}:${next.currentNodeId}:${next.phase}` : '';
+      const key = next ? `${next.activeCharacterId || next.appearanceId}:${next.mapId}:${next.run}:${next.currentNodeId}:${next.phase}:${next.battle?.id || next.lastBattleId || ""}` : '';
       if (key !== phaseKey) { phaseAt = !state && next?.phase === 'DOWNED' ? now - PLAYBACK.Side_Down.duration : now; clear(); }
       phaseKey = key; state = next;
     },

@@ -27,22 +27,23 @@ test('charm rarity and category rolls cover 60/25/10/4/1 and six categories equa
 test('all six equipped base stats enter unchanged derived formulas once for both classes',()=>{
  const effects={STR:{STR:1,FOR:1},CON:{CON:1,FOR:1,maxHp:5},DEX:{DEX:1,REF:1},PER:{PER:1,ACC:1,REF:1},INT:{INT:1,WIL:1},RES:{RES:1,DEF:1,WIL:1}};
  for(const cls of ['warrior','wizard'])for(const t of c.charms){const g=make(cls),before=stats(g.state,g.config);equip(g,charm(t.id));const after=stats(g.state,g.config);
-  for(const key of [...BASE_STATS,'ACC','DEF','FOR','REF','WIL','maxHp','AR','PEN','AP','LB'])assert.equal(after[key]-before[key],effects[t.primaryStat][key]||0,`${cls} ${t.id} ${key}`);
+  for(const key of [...BASE_STATS,'ACC','DEF','FOR','REF','WIL','maxHp','AR','PEN','LB'])assert.equal(after[key]-before[key],effects[t.primaryStat][key]||0,`${cls} ${t.id} ${key}`);
  }
 });
-test('DEX offsets plate penalty and changes next initiative; CON swaps never create HP',()=>{
- const g=make();g.character.attributes.DEX=2;equip(g,generateEquipment({slot:'armor',templateId:'plate',gradeId:'normal',rng:()=>0}));assert.equal(stats(g.state,g.config).DEX,-1);
- g.config.initiative.enemyDEX=0;g.beginBattle();assert.equal(g.state.battle.firstActor,'enemy');equip(g,charm('agility-charm','excellent'));assert.equal(stats(g.state,g.config).DEX,1);assert.equal(g.state.battle.firstActor,'enemy');g.beginBattle();assert.equal(g.state.battle.firstActor,'hero');
+test('DEX charms increase speed under heavy armor without removing its relative penalty; CON swaps never heal',()=>{
+ const g=make();g.character.attributes.DEX=2;equip(g,generateEquipment({slot:'armor',templateId:'plate',gradeId:'normal',rng:()=>0}));assert.equal(stats(g.state,g.config).DEX,2);
+ const before=stats(g.state,g.config);g.beginBattle();g.tick(100,1);const progress=g.state.battle.combatants.hero.readiness;
+ equip(g,charm('agility-charm','excellent'));const after=stats(g.state,g.config);assert.equal(after.DEX,4);assert.ok(after.actionSpeed>before.actionSpeed);assert.equal(after.actionSpeedPenaltyRate,.5);assert.equal(g.state.battle.combatants.hero.readiness,progress);
  const con=charm('vitality-charm','excellent');g.character.hp=20;equip(g,con);assert.equal(g.character.hp,20);g.character.hp=stats(g.state,g.config).maxHp;g.command({characterId: g.character?.id, type:'UNEQUIP',itemId:con.id});assert.equal(g.character.hp,stats(g.state,g.config).maxHp);const hp=g.character.hp;g.command({characterId: g.character?.id, type:'EQUIP',itemId:con.id});assert.equal(g.character.hp,hp);
 });
 test('INT accessory increases manual healing; STR boosts actual weapon damage',()=>{
  for(const cls of ['warrior','wizard']) {
   const g=make(cls);equip(g,charm('wisdom-charm','excellent'));g.config.initiative.enemyDEX=-10;g.beginBattle();g.character.hp=1;
   const effect=skillValues(SKILL_CATALOG.skills[0],stats(g.state,g.config));
-  g.command({characterId: g.character?.id, type:'USE_SKILL',itemId:g.character.skillSlots[0],battleId:g.state.battle.id,turn:g.state.battle.turn});assert.equal(g.character.hp,1+effect.heal);
+  g.command({characterId: g.character?.id, type:'USE_SKILL',itemId:g.character.skillSlots[0],battleId:g.state.battle.id,heroActionSeq:g.state.battle.combatants.hero.actionSeq});assert.equal(g.character.hp,1+effect.heal);
  }
  const a=make('warrior'),b=make('warrior');equip(b,charm('strength-charm','excellent'));
- for(const g of [a,b]){g.config.initiative.enemyDEX=-10;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=10000;g.state.enemy.DEF=-30;g.state.enemy.AR=0;g.rng=()=>11;g.battleAction();}
+ for(const g of [a,b]){g.config.initiative.enemyDEX=-10;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=10000;g.state.enemy.DEF=-30;g.state.enemy.AR=0;g.rng=()=>11;g.battleAction('hero');}
  const hit=b.state.battle.lastHit;assert.ok(hit.damage>a.state.battle.lastHit.damage);
 });
 test('legacy items are replaced once, preserve equipped IDs and new gear, and never reroll on reload',()=>{

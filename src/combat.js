@@ -1,4 +1,5 @@
 import { activeCharacter } from './characters.js';
+import { actionSpeed } from './action-speed.js';
 import { BASE_STATS } from './equipment.js';
 const LEVEL_BONUS_INTERVAL = 3;
 export const levelBonus = level => Math.floor((level - 1) / LEVEL_BONUS_INTERVAL);
@@ -43,10 +44,10 @@ export function stats(state, config) {
 // Values and their displayed breakdown share the same authoritative calculation.
 export function statDetails(state, config, character = activeCharacter(state)) {
   const cls = config.character;
-  if (!character) return { values: { ...Object.fromEntries([...BASE_STATS, 'ACC', 'DEF', 'REF', 'FOR', 'WIL', 'LB', 'PEN', 'AR', 'power'].map(k => [k, 0])), maxHp: 0, AP: 0, typeModifiers: {} }, defenses: {} };
+  if (!character) return { values: { ...Object.fromEntries([...BASE_STATS, 'ACC', 'DEF', 'REF', 'FOR', 'WIL', 'LB', 'PEN', 'AR', 'power'].map(k => [k, 0])), maxHp: 0, ...actionSpeed(0, 0, config), typeModifiers: {} }, defenses: {} };
   const lb = levelBonus(character.level);
   const gear = Object.values(character.equipment).map(id => state.inventory.find(i => i.id === id)).filter(Boolean);
-  const e = key => gear.reduce((sum, i) => sum + (i.stats[key] || 0), 0);
+  const e = key => gear.reduce((sum, i) => sum + (key === 'DEX' && i.slot === 'armor' ? 0 : i.stats[key] || 0), 0);
   const b = Object.fromEntries(BASE_STATS.map(key => [key, character.attributes[key] + e(key)]));
   const defenses = Object.fromEntries(Object.entries(DEFENSE_RULES).map(([key, rule]) => {
     const attributes = rule.attributes.map(key => ({ key, base: character.attributes[key], equipment: e(key), value: b[key] }));
@@ -59,7 +60,8 @@ export function statDetails(state, config, character = activeCharacter(state)) {
     ACC: cls.B.ACC + b.PER + lb + e('ACC'),
     ...Object.fromEntries(Object.entries(defenses).map(([key, detail]) => [key, detail.total])),
     maxHp: cls.hp + cls.hpGrowth * (character.level - 1) + 5 * b.CON + e('HP'),
-    PEN: e('PEN'), AR: e('AR'), power: e('power'), AP: 3,
+    PEN: e('PEN'), AR: e('AR'), power: e('power'),
+    ...actionSpeed(b.DEX, gear.find(i => i.slot === 'armor')?.actionSpeedPenaltyRate || 0, config),
     typeModifiers: { ...(gear.find(i => i.slot === 'armor')?.typeModifiers || {}) }
   };
   return { values, defenses };

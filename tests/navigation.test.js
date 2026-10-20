@@ -71,7 +71,7 @@ test('automatic route waits for encounters, resumes after combat/treasure, and a
   g.advance();g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:target});
   g.rng=n=>n===10000?(encounter==='battle'?0:2000):Math.min(11,n-1);g.advance();
   assert.equal(g.state.phase,encounter==='battle'?'BATTLE':'TREASURE');assert.equal(g.state.step,1);assert.ok(g.state.autoRoute);
-  if(encounter==='battle'){g.character.hp=10000;g.state.enemy.hp=1;g.state.enemy.DEF=-100;g.state.enemy.AR=0;g.state.battle.actor='hero';g.battleAction();assert.equal(g.state.phase,'TREASURE');}
+  if(encounter==='battle'){g.character.hp=10000;g.state.enemy.hp=1;g.state.enemy.DEF=-100;g.state.enemy.AR=0;g.state.battle.actor='hero';g.battleAction('hero');assert.equal(g.state.phase,'TREASURE');}
   g.rng=quiet;g.advance();assert.equal(g.state.phase,'TRAVEL');assert.equal(g.state.step,2);
   g.advance();g.advance();assert.equal(g.state.currentNodeId,target);assert.equal(g.state.autoRoute,null);
  }

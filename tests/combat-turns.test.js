@@ -10,19 +10,10 @@ function make(cls='warrior',first='hero',INT){
  const c=structuredClone(config);c.initiative.tieWinner=first;
  const g=new Game(c,null,n=>Math.min(11,n-1));g.create({name: '모험가', appearanceId: cls});g.state.homePaused=false;if(INT!==undefined)g.character.attributes.INT=INT;g.state.risk=0;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=100000;g.state.enemy.weapon.damageMin=g.state.enemy.weapon.damageMax=0;return g;
 }
-function finishRound(g){const round=g.state.battle.turn;let guard=0;while(g.state.battle.turn===round&&guard++<10)g.battleAction();assert.ok(guard<=6);}
-const hits=g=>g.events.filter(e=>e.type==='hit').map(e=>e.hit);
-
 test('15 category targets are identical for both classes and independent of added type',()=>{
  const expected={dagger:'REF',shortsword:'DEF',longsword:'DEF',rapier:'REF',greatsword:'DEF',handaxe:'DEF',battleaxe:'DEF',mace:'FOR',warhammer:'FOR',spear:'REF',halberd:'DEF','fire-staff':'WIL','ice-staff':'WIL','lightning-staff':'WIL','corrosion-staff':'WIL'};
  for(const cls of ['warrior','wizard'])for(const t of catalog.weapons)for(const special of [false,true]){
-  const g=make(cls),w=item(t.id,special);g.state.inventory.push(w);g.command({characterId: g.character?.id, type:'EQUIP',itemId:w.id});g.battleAction();assert.equal(g.state.battle.lastHit.target,expected[t.id]);assert.equal(w.hitDefense,expected[t.id]);assert.equal(w.classId,undefined);
+  const g=make(cls),w=item(t.id,special);g.state.inventory.push(w);g.command({characterId: g.character?.id, type:'EQUIP',itemId:w.id});g.battleAction('hero');assert.equal(g.state.battle.lastHit.target,expected[t.id]);assert.equal(w.hitDefense,expected[t.id]);assert.equal(w.classId,undefined);
  }
  assert.equal(weaponDefense({icon:'staff',classId:'warrior'}),'WIL');assert.equal(weaponDefense({icon:'sword',classId:'wizard'}),'DEF');
-});
-test('ordinary round has exactly three attacks per actor, correct penalties, no AP carry',()=>{
- for(const first of ['hero','enemy']){const g=make('warrior',first);g.events=[];finishRound(g);const h=hits(g);assert.equal(h.length,6);assert.deepEqual(h.map(x=>x.actor),[...Array(3).fill(first),...Array(3).fill(first==='hero'?'enemy':'hero')]);for(const actor of ['hero','enemy']){const a=h.filter(h=>h.actor===actor);assert.deepEqual(a.map(h=>h.cost),[1,1,1]);assert.deepEqual(a.map(h=>h.margin-a[0].margin),[0,-5,-10]);}assert.equal(g.state.battle.ap,3);assert.equal(g.state.battle.turn,2);assert.equal(g.state.battle.attacks,0);}
-});
-test('DEX penalty affects REF and initiative, not ACC or other stats; negatives are allowed',()=>{
- for(const cls of ['warrior','wizard']){const g=make(cls);delete g.character.equipment.armor;const base=stats(g.state,g.config);const a=item('plate');g.state.inventory.push(a);g.command({characterId: g.character?.id, type:'EQUIP',itemId:a.id});const after=stats(g.state,g.config);assert.equal(after.DEX,base.DEX-3);assert.equal(after.REF,base.REF-3);for(const k of ['ACC','DEF','FOR','WIL','STR','INT','CON','RES','PER','PEN','AP'])assert.equal(after[k],base[k]);g.config.initiative.enemyDEX=0;g.beginBattle();assert.equal(g.state.battle.firstActor,'enemy');}
 });

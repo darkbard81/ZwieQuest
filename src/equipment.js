@@ -11,6 +11,8 @@ export function validateCatalog(c) {
   if (normalTypes.length !== 7 || !c.damageTypes.raw) fail('damage types');
   for (const k of ['dropPercent', 'weaponSpecialPercent', 'armorSpecialPercent']) if (!Number.isFinite(c[k]) || c[k] < 0 || c[k] > 100) fail(k);
   if (![c.saleBase, c.saleGradeStep].every(v => Number.isInteger(v) && v >= 0)) fail('sale values');
+  if (!c.armorCategories || !Object.keys(c.armorCategories).length) fail('armor categories');
+  for (const category of Object.values(c.armorCategories)) if (!Number.isFinite(category.actionSpeedPenaltyRate) || category.actionSpeedPenaltyRate < 0 || category.actionSpeedPenaltyRate > .5) fail('armor speed penalty');
   const ids = new Set();
   for (const g of c.grades) {
     if (ids.has(g.id)) fail('duplicate grade'); ids.add(g.id);
@@ -32,7 +34,8 @@ export function validateCatalog(c) {
         if (t.damageTypes.length !== 1 || !Number.isInteger(t.fixedDamage) || t.fixedDamage < 0 || t.damageMin != null || t.damageMax != null || t.PEN != null) fail('raw must be fixed and exclusive');
       } else if (![t.damageMin, t.damageMax, t.ACC, t.PEN].every(Number.isInteger) || t.damageMin < 0 || t.damageMax < t.damageMin) fail('weapon range');
     } else if (t.slot === 'armor') {
-      if (!Number.isInteger(t.DEX) || t.DEX > 0 || t.DEX < -3) fail('armor DEX');
+      if (!c.armorCategories[t.armorCategory] || 'DEX' in t) fail('armor category / obsolete DEX');
+      if (t.actionSpeedPenaltyRate != null && t.actionSpeedPenaltyRate !== c.armorCategories[t.armorCategory].actionSpeedPenaltyRate) fail('armor speed penalty');
       if (!Number.isInteger(t.AR) || t.AR < 0 || !t.typeModifiers || Object.keys(t.typeModifiers).length > 2 || Object.entries(t.typeModifiers).some(([k, v]) => !normalTypes.includes(k) || !Number.isInteger(v) || v >= 0)) fail('armor values');
     } else if (t.slot === 'charm') {
       if (!BASE_STATS.includes(t.primaryStat) || t.classId != null) fail('accessory base stat');
@@ -82,7 +85,7 @@ export function generateEquipment({ slot, rng, gradeId, templateId, specials = t
       item.stats[item.secondaryStat] = g.secondaryBonus;
     }
   } else {
-    item.stats.AR = t.AR + g.AR; item.stats.DEX = t.DEX; item.dexRulesVersion = 2; item.typeModifiers = { ...t.typeModifiers };
+    item.stats.AR = t.AR + g.AR; item.armorCategory = t.armorCategory; item.actionSpeedPenaltyRate = catalog.armorCategories[t.armorCategory].actionSpeedPenaltyRate; item.armorSpeedRulesVersion = 1; item.typeModifiers = { ...t.typeModifiers };
     if (specials && chance(rng, catalog.armorSpecialPercent)) {
       const available = types.filter(d => !(d in item.typeModifiers)), type = available[rng(available.length)];
       const [min, max] = catalog.specialResistanceRange, amount = min + rng(max - min + 1);
@@ -101,10 +104,14 @@ export function weaponDefense(item) {
   if (!item) return 'DEF';
   return item.hitDefense || EQUIPMENT_CATALOG.weapons.find(t => t.id === item.templateId)?.hitDefense || (item.icon === 'staff' ? 'WIL' : 'DEF');
 }
-export function migrateArmorDEX(inventory) {
-  for (const item of inventory) if (item.slot === 'armor' && !(item.dexRulesVersion >= 2)) {
-    item.stats.DEX = EQUIPMENT_CATALOG.armors.find(t => t.id === item.templateId)?.DEX || 0;
-    item.dexRulesVersion = 2;
+export function migrateArmorSpeed(inventory) {
+  for (const item of inventory) if (item.slot === 'armor') {
+    delete item.stats.DEX;
+    delete item.dexRulesVersion;
+    const template = EQUIPMENT_CATALOG.armors.find(t => t.id === item.templateId);
+    item.armorCategory = template?.armorCategory || 'cloth';
+    item.actionSpeedPenaltyRate = EQUIPMENT_CATALOG.armorCategories[item.armorCategory].actionSpeedPenaltyRate;
+    item.armorSpeedRulesVersion = 1;
   }
 }
 

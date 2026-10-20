@@ -11,7 +11,7 @@ import { Game } from '../src/game.js';
 import { generateEquipment } from '../src/equipment.js';
 import { generateLegacyMap } from './fixtures/maps-v1.js';
 
-test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved gear, and persists equip/sell', { timeout: 20000 }, async () => {
+test('HTTP reload migrates old tactics/armor, preserves the single in-flight reservation and saved gear, and persists equip/sell', { timeout: 20000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'zwiequest-equipment-'));
   const port = 35000 + Math.floor(Math.random() * 9000), origin = `http://127.0.0.1:${port}`;
   let child, output = '', cookie;
@@ -43,10 +43,10 @@ test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved g
     game.state.risk = 0; game.beginBattle(); game.state.remaining = game.state.duration = 600000;
     game.state.tactic = 'pierce'; delete game.state.combatRulesVersion; delete game.state.battle.rulesVersion;
     game.state.battle.ap = 2; game.state.battle.attacks = 1;
-    const savedActor = game.state.battle.actor;
+    const savedActor = 'hero'; game.state.battle.actor=savedActor;
     const oldArmor = game.state.inventory.find(i => i.id === special.id);
     delete oldArmor.stats.DEX; delete oldArmor.dexRulesVersion;
-    const expectedArmor = { ...structuredClone(oldArmor), stats: { ...oldArmor.stats, DEX: -1 }, dexRulesVersion: 2 };
+    const expectedArmor = { ...structuredClone(oldArmor), stats: { ...oldArmor.stats }, armorSpeedRulesVersion: 1 };
     // Existing inventories still contain the former PNG URLs.
     for (const item of game.state.inventory) if (item.iconPath) item.iconPath=item.iconPath.replace(/\.webp$/, '.png');
     db.prepare('INSERT INTO account_state VALUES(?,?)').run(user.id, JSON.stringify(game.state)); db.close();
@@ -57,7 +57,7 @@ test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved g
       assert.match(item.iconPath,/\.webp$/);
       const image=await fetch(origin+item.iconPath);assert.equal(image.status,200);assert.match(image.headers.get('content-type'),/image\/webp/);
     }
-    assert.equal(state.tactic, undefined); assert.equal(state.battle.ap, 2); assert.equal(state.battle.attacks, 1); assert.equal(state.battle.actor, savedActor);
+    assert.equal(state.tactic, undefined); assert.equal(state.battle.ap, undefined); assert.equal(state.battle.attacks, undefined); assert.equal(state.battle.transition.actor, savedActor);
     const converted = state.inventory.find(i => i.id === legacy.id);assert.equal(converted.templateId,'longsword');assert.equal(converted.gradeId,'excellent');assert.equal(converted.stats.power,undefined);
     const convertedCharm=state.inventory.find(i=>i.id===oldCharm.id);assert.equal(convertedCharm.gradeId,'fine');assert.equal(convertedCharm.accessoryRulesVersion,1);assert.equal(convertedCharm.stats.ACC,undefined);assert.equal(state.equipment.charm,oldCharm.id);
     await request('/api/command',{type:'EQUIP',characterId:game.character.id,itemId:charm.id,requestId:randomUUID()});
@@ -72,7 +72,7 @@ test('HTTP reload migrates old tactics/armor, preserves in-flight AP and saved g
     assert.equal(state.equipment.armor, special.id); assert.equal(state.gold, 40);
     assert.deepEqual(state.inventory.find(i => i.id === special.id), expectedArmor);
     assert.equal(state.inventory.some(i => i.id === legacy.id), false);
-    assert.equal(state.battle.ap, 2); assert.equal(state.battle.actor, savedActor);
+    assert.equal(state.battle.ap, undefined); assert.equal(state.battle.transition.actor, savedActor);
     assert.equal(state.stats.AR, special.stats.AR); assert.deepEqual(state.stats.typeModifiers, special.typeModifiers);
   } finally { await stop(); rmSync(dir, { recursive: true, force: true }); }
 });

@@ -5,7 +5,6 @@
   "homeMs": 15000,
   "travelMs": 6000,
   "choiceMs": 9000,
-  "battleActionMs": 1100,
   "treasureMs": 3200,
   "returnMs": 7000,
   "downedMs": 4500,
@@ -33,7 +32,7 @@
     "charmRiskRareChance": 15
   },
   "initiative": {
-    "policy": "higher-dex",
+    "policy": "action-speed",
     "tieWinner": "hero",
     "enemyDEX": 1
   },
@@ -52,5 +51,12 @@
       "FOR": 10,
       "WIL": 10
     }
+  },
+  "actionSpeed": {
+    "base": 100,
+    "perDEX": 5,
+    "minimum": 1,
+    "baseIntervalMs": 2200,
+    "maxEventsPerTick": 500
   }
 }

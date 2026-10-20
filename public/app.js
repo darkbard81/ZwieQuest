@@ -5,6 +5,7 @@ import { initJournal } from './journal-view.js';
 import { sortInventory } from './inventory-order.js';
 import { initDefenseDetails } from './defense-details.js';
 import { initBestiary } from './bestiary-view.js';
+import { createBestiarySync } from './bestiary-sync.js';
 import { initInn } from './inn-view.js';
 import { appearanceFor } from './appearances.js';
 import { initSkills, skillDescription } from './skills-view.js';
@@ -29,11 +30,14 @@ $('#hide-other-equipment').checked = hideOtherEquipment;
 const equipmentViews = new Map();
 let statsHTML = '';
 const defenseDetails = initDefenseDetails($('#stats'), $('#defense-details'));
-const bestiary = initBestiary($('#bestiary-panel'));
+const bestiary = createBestiarySync(initBestiary($('#bestiary-panel')), () => api('/api/state'));
+function refreshBestiary() { if (user) bestiary.refresh().catch(error => console.warn('도감 갱신 실패:', error)); }
+document.addEventListener('info-tab-change', event => { if (event.detail === 'tab-bestiary') refreshBestiary(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshBestiary(); });
 const clientId = crypto.randomUUID(); let lastHeartbeat = 0;
 let world, choicePending = false;
 const combatFeed = createCombatFeed();
-const skills = initSkills({ bar: $('#skill-bar'), slots: $('#skill-slots'), summary: $('#skill-summary'), status: $('#battle-status'), onUse: (itemId, battleId, turn, button, mode, enabled) => command(mode === 'toggle' ? 'TOGGLE_SKILL' : 'USE_SKILL', { itemId, battleId, turn, ...(mode === 'toggle' ? { enabled } : {}) }, button) });
+const skills = initSkills({ bar: $('#skill-bar'), slots: $('#skill-slots'), summary: $('#skill-summary'), status: $('#battle-status'), onUse: (itemId, battleId, heroActionSeq, button, mode, enabled) => command(mode === 'toggle' ? 'TOGGLE_SKILL' : 'USE_SKILL', { itemId, battleId, heroActionSeq, ...(mode === 'toggle' ? { enabled } : {}) }, button) });
 const inn = initInn({ panel: $('#inn-selection'), portrait: $('#portrait'), countdown: $('#rest-countdown'), onCommand: (type, fields) => command(type, fields) });
 function updateInn() { inn.update(data?.state, receivedAt, data?.rate || 1, connected && !!user); }
 createWorld($('#world')).then(w => { world = w; if (data?.state) w.update(data.state); inn.setWorldReady(); }).catch(e => { $('#render-error').hidden = false; $('#render-error').textContent = '게임 화면을 불러오지 못했습니다. 새로고침해 주세요. ' + e.message; console.error(e); });
@@ -56,11 +60,13 @@ async function command(type, fields = {}, button) {
   finally { button?.classList.remove('busy'); }
 }
 function receive(next) {
+  const battleEnded = data?.state?.phase === 'BATTLE' && (next.state?.phase !== 'BATTLE' || next.state?.battle?.id !== data.state.battle?.id);
   const reset = data?.state?.progressId && next.state?.progressId && data.state.progressId !== next.state.progressId;
   if (reset) { journal.reset(); journalSeq = -1; inventoryKey = ''; choicePending = false; world?.clearTransient(); }
   const combatEvents = combatFeed.consume(next, connected && !reset);
   bestiary.update(next.state);
   data = next; receivedAt = performance.now(); connected = true;
+  if (battleEnded && !reset) refreshBestiary();
   $('#connection').classList.remove('lost'); $('#connection').innerHTML = `<i></i>${next.mode === 'ONLINE' ? '온라인' : '오프라인'} · ${next.rate}×`;
   $('#server-status').textContent = 'SERVER LIVE · SAVED';
   updateInn();
@@ -80,7 +86,7 @@ function receive(next) {
   $('#hero-world-hp').setAttribute('aria-valuemax', String(worldMaxHp));
   $('#hero-world-hp').setAttribute('aria-valuenow', String(worldHp));
   $('#xp-label').textContent = `${s.xp} / ${s.xpNext}`; $('#xp-fill').style.width = `${100 * s.xp / s.xpNext}%`;
-  const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${(s.combatStats || s.stats)[k]}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="attribute-heading">능력치 배분 <b>남은 ${s.attributePoints}점</b></div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<button type="button" data-stat="${k}" ${!s.activeCharacterId || !s.attributePoints || !connected ? 'disabled' : ''} aria-label="${statNames[k]} 1점 배분">${statLabelHTML(k)} <b>${s.stats[k]}</b></button>`).join('')}</div>`;
+  const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'LB', 'actionSpeed'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${Number((s.combatStats || s.stats)[k].toFixed(2))}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="attribute-heading">능력치 배분 <b>남은 ${s.attributePoints}점</b></div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<button type="button" data-stat="${k}" ${!s.activeCharacterId || !s.attributePoints || !connected ? 'disabled' : ''} aria-label="${statNames[k]} 1점 배분">${statLabelHTML(k)} <b>${s.stats[k]}</b></button>`).join('')}</div>`;
   // Preserve hovered defense badges across unchanged server snapshots.
   if (nextStatsHTML !== statsHTML) { $('#stats').innerHTML = nextStatsHTML; statsHTML = nextStatsHTML; }
   defenseDetails.update();

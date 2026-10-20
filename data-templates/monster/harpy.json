@@ -1,0 +1,255 @@
+{
+  "harpy": {
+    "hp": 10,
+    "hpGrowth": 2,
+    "A": {
+      "STR": 0,
+      "CON": 0,
+      "DEX": 0,
+      "PER": 0,
+      "INT": 0,
+      "RES": 0
+    },
+    "B": {
+      "ACC": 10,
+      "DEF": 10,
+      "REF": 10,
+      "FOR": 10,
+      "WIL": 10
+    },
+    "description": "깃털 날개와 날카로운 발톱을 지닌 조인형 몬스터. 하늘에서 급강하하며 속성을 두른 날개와 무기로 공격한다.",
+    "variation": [
+      {
+        "id": "slash_harpy",
+        "name": "하피(베기)",
+        "img_path": "public/assets/monster/harpy/05-harpy-slash.webp",
+        "skills": [],
+        "weapon": {
+          "id": "slash_harpy_weapon",
+          "name": "칼날 날개",
+          "slot": "weapon",
+          "damageTypes": [
+            "slash"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "REF"
+        },
+        "armor": {
+          "id": "slash_harpy_armor",
+          "name": "칼날 깃털",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "pierce": -2,
+            "blunt": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/harpy/icons/05-harpy-slash.webp",
+        "attackName": "칼날 날개"
+      },
+      {
+        "id": "pierce_harpy",
+        "name": "하피(관통)",
+        "img_path": "public/assets/monster/harpy/07-harpy-pierce.webp",
+        "skills": [],
+        "weapon": {
+          "id": "pierce_harpy_weapon",
+          "name": "가시창",
+          "slot": "weapon",
+          "damageTypes": [
+            "pierce"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "REF"
+        },
+        "armor": {
+          "id": "pierce_harpy_armor",
+          "name": "가시 깃털",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "slash": -2,
+            "blunt": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/harpy/icons/07-harpy-pierce.webp",
+        "attackName": "가시창"
+      },
+      {
+        "id": "blunt_harpy",
+        "name": "하피(부수기)",
+        "img_path": "public/assets/monster/harpy/06-harpy-blunt.webp",
+        "skills": [],
+        "weapon": {
+          "id": "blunt_harpy_weapon",
+          "name": "급강하 망치",
+          "slot": "weapon",
+          "damageTypes": [
+            "blunt"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "REF"
+        },
+        "armor": {
+          "id": "blunt_harpy_armor",
+          "name": "충격 깃털",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "slash": -2,
+            "pierce": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/harpy/icons/06-harpy-blunt.webp",
+        "attackName": "급강하 망치"
+      },
+      {
+        "id": "fire_harpy",
+        "name": "하피(소각)",
+        "img_path": "public/assets/monster/harpy/01-harpy-fire.webp",
+        "skills": [],
+        "weapon": {
+          "id": "fire_harpy_weapon",
+          "name": "불꽃 깃털",
+          "slot": "weapon",
+          "damageTypes": [
+            "fire"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "REF"
+        },
+        "armor": {
+          "id": "fire_harpy_armor",
+          "name": "불꽃 깃털",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "cold": -2,
+            "corrosion": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/harpy/icons/01-harpy-fire.webp",
+        "attackName": "불꽃 깃털"
+      },
+      {
+        "id": "cold_harpy",
+        "name": "하피(동결)",
+        "img_path": "public/assets/monster/harpy/02-harpy-cold.webp",
+        "skills": [],
+        "weapon": {
+          "id": "cold_harpy_weapon",
+          "name": "서리 발톱",
+          "slot": "weapon",
+          "damageTypes": [
+            "cold"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "REF"
+        },
+        "armor": {
+          "id": "cold_harpy_armor",
+          "name": "서리 깃털",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "fire": -2,
+            "lightning": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/harpy/icons/02-harpy-cold.webp",
+        "attackName": "서리 발톱"
+      },
+      {
+        "id": "lightning_harpy",
+        "name": "하피(충격)",
+        "img_path": "public/assets/monster/harpy/04-harpy-lightning.webp",
+        "skills": [],
+        "weapon": {
+          "id": "lightning_harpy_weapon",
+          "name": "번개 날개",
+          "slot": "weapon",
+          "damageTypes": [
+            "lightning"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "REF"
+        },
+        "armor": {
+          "id": "lightning_harpy_armor",
+          "name": "뇌광 깃털",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "fire": -2,
+            "corrosion": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/harpy/icons/04-harpy-lightning.webp",
+        "attackName": "번개 날개"
+      },
+      {
+        "id": "corrosion_harpy",
+        "name": "하피(부식)",
+        "img_path": "public/assets/monster/harpy/03-harpy-corrosion.webp",
+        "skills": [],
+        "weapon": {
+          "id": "corrosion_harpy_weapon",
+          "name": "부식 발톱",
+          "slot": "weapon",
+          "damageTypes": [
+            "corrosion"
+          ],
+          "damageMin": 1,
+          "damageMax": 10,
+          "ACC": -1,
+          "PEN": 5,
+          "hitDefense": "REF"
+        },
+        "armor": {
+          "id": "corrosion_harpy_armor",
+          "name": "독액 깃털",
+          "slot": "armor",
+          "AR": 3,
+          "typeModifiers": {
+            "cold": -2,
+            "lightning": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/harpy/icons/03-harpy-corrosion.webp",
+        "attackName": "부식 발톱"
+      }
+    ]
+  }
+}

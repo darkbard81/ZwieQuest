@@ -39,7 +39,7 @@
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
-      "toggleConsumesTurn": false,
+      "toggleConsumesCycle": false,
       "effect": {
         "type": "accuracyBonus",
         "amount": 1,

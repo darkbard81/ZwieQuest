@@ -45,7 +45,7 @@ export function validateMonsters(catalog, rules) {
 }
 validateMonsters(MONSTER_CATALOG, ENCOUNTER_CONFIG);
 
-export function generateMonster(mapId, rng, catalog = MONSTER_CATALOG, rules = ENCOUNTER_CONFIG) {
+export function generateMonster(mapId, rng, catalog = MONSTER_CATALOG, rules = ENCOUNTER_CONFIG, config = {}) {
   const candidates = eligibleVariations(mapId, catalog, rules);
   if (!candidates.length) throw Error(`No eligible monsters for ${mapId}`);
   const { monster, variation } = candidates[rng(candidates.length)], region = rules.regions[mapId];
@@ -58,13 +58,13 @@ export function generateMonster(mapId, rng, catalog = MONSTER_CATALOG, rules = E
   const armor = generateEquipment({ slot: 'armor', templateId: variation.armor.id, gradeId: grade.id, specials: false, rng, catalog: equipmentCatalog });
   delete weapon.iconPath; delete armor.iconPath;
   const profile = { level, attributes, equipment: { weapon: weapon.id, armor: armor.id } };
-  const { values } = statDetails({ inventory: [weapon, armor] }, { character: monster }, profile);
+  const { values } = statDetails({ inventory: [weapon, armor] }, { ...config, character: monster }, profile);
   return { ...values, id: randomUUID(), generationVersion: 1, boss: false, monsterId: monster.id, variationId: variation.id,
     name: grade.id === 'normal' ? variation.name : `${grade.name} ${variation.name}`, variationName: variation.name,
     description: monster.description, img_path: variation.img_path, icon_path: variation.icon_path,
     level, gradeId: grade.id, gradeName: grade.name, attributes, allocatedAttributes,
     hp: values.maxHp, weapon, armor, damageTypes: [...weapon.damageTypes], hitDefense: weapon.hitDefense,
-    skills: structuredClone(variation.skills), mapId };
+    skills: structuredClone(variation.skills), ...(variation.attackName ? { attackName: variation.attackName } : {}), mapId };
 }
 export function monsterRewards(enemy, characterLevel, xpPerLevel, rules = ENCOUNTER_CONFIG) {
   const r = rules.rewards, difference = enemy.level - characterLevel, eligible = difference >= 0;

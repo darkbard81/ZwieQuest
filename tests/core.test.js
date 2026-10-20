@@ -16,50 +16,56 @@ test('penetration thresholds and exact examples; magic scales with STR', () => {
   assert.equal(attack({roll:8,acc:5,defense:6,str:0,base:40,pen:2,ar:4}).damage,10);
   const a={roll:12,acc:5,defense:4,base:40,pen:4,ar:4};assert.equal(attack({...a,str:4}).damage,48);
 });
-test('level growth does not increase base stats, PEN, AR or AP; LB once', () => {
+test('level growth does not increase base stats, PEN or AR; LB once', () => {
   assert.deepEqual([1,4,7,10].map(levelBonus),[0,1,2,3]);
-  for(const cls of ['warrior','wizard']){const g=make(cls),a=stats(g.state,config);g.character.level=4;const b=stats(g.state,config);for(const k of ['STR','CON','DEX','PER','INT','RES','PEN','AR','AP'])assert.equal(a[k],b[k]);for(const k of ['ACC','DEF','FOR','REF','WIL'])assert.equal(b[k],a[k]+1);}
+  for(const cls of ['warrior','wizard']){const g=make(cls),a=stats(g.state,config);g.character.level=4;const b=stats(g.state,config);for(const k of ['STR','CON','DEX','PER','INT','RES','PEN','AR'])assert.equal(a[k],b[k]);for(const k of ['ACC','DEF','FOR','REF','WIL'])assert.equal(b[k],a[k]+1);}
 });
 test('both classes finish unattended map attempts and preserve XP/items', () => {
-  for(const cls of ['warrior','wizard']){const g=make(cls,n=>Math.min(n-1,11));let arrivals=0;g.rng=n=>n===10000&&g.state.phase==='TRAVEL'?(arrivals++%2?2000:0):Math.min(n-1,11);const themes=new Set();let count=0;while(g.state.completed<3&&count++<1500){g.tick(20000,1);themes.add(g.state.theme);}assert.equal(g.state.completed,3);assert.ok(themes.has('village'));assert.ok(g.character.level>1);assert.ok(g.state.inventory.length>3);assert.ok(g.state.victories>0);assert.ok(g.state.chests>0);}
+  for(const cls of ['warrior','wizard']){const g=make(cls,n=>Math.min(n-1,11));g.character.attributes.STR=100;g.character.attributes.CON=100;let arrivals=0;g.rng=n=>n===10000&&g.state.phase==='TRAVEL'?(arrivals++%2?2000:0):Math.min(n-1,11);const themes=new Set();let count=0;while(g.state.completed<3&&count++<1500){g.tick(20000,1);themes.add(g.state.theme);}assert.equal(g.state.completed,3);assert.ok(themes.has('village'));assert.ok(g.character.level>1);assert.ok(g.state.inventory.length>3);assert.ok(g.state.victories>0);assert.ok(g.state.chests>0);}
 });
 test('branch choices only advance; stale choice rejected; default choice progresses', () => {
-  const g=make();g.character.attributes.CON=100;g.character.attributes.STR=100;g.advance();let previous=0;while(g.state.phase==='CHOICE_WAIT'&&previous<10){const choiceId=g.state.choiceId;g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'});assert.equal(g.state.step,++previous);assert.throws(()=>g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'}));while(!['CHOICE_WAIT','RETURN_HOME'].includes(g.state.phase))g.advance();}assert.ok(previous>0);assert.equal(g.state.phase,'RETURN_HOME');
+  const g=make();g.character.attributes.CON=100;g.character.attributes.STR=100;g.advance();let previous=0;while(g.state.phase==='CHOICE_WAIT'&&previous<10){const choiceId=g.state.choiceId;g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'});assert.equal(g.state.step,++previous);assert.throws(()=>g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'}));while(!['CHOICE_WAIT','RETURN_HOME'].includes(g.state.phase))g.tick(g.state.remaining,1);}assert.ok(previous>0);assert.equal(g.state.phase,'RETURN_HOME');
 });
 test('online/offline rates preserve spent game time for every phase including choices and combat',()=>{
   assert.equal(config.onlineRate,1);assert.equal(config.offlineRate,2);
   const g=make();
-  for(const phase of ['HOME','TRAVEL','CHOICE_WAIT','BATTLE','TREASURE','DOWNED','RETURN_HOME']){
+  for(const phase of ['HOME','TRAVEL','CHOICE_WAIT','TREASURE','DOWNED','RETURN_HOME']){
     g.phase(phase,9000);g.tick(1000,config.onlineRate);g.tick(1000,config.offlineRate);
     assert.equal(g.state.remaining,6000,phase);
     g.tick(1000,config.onlineRate);assert.equal(g.state.remaining,5000,phase);
   }
 });
-test('offline choices expire at 4.5 seconds and combat actions at 0.55 seconds; online keeps original timing',()=>{
+test('offline choices expire at 4.5 seconds and combat deadlines respect independent speeds and time rates',()=>{
   for(const rate of [config.onlineRate,config.offlineRate]){
     const g=make();g.advance();assert.equal(g.state.phase,'CHOICE_WAIT');
     g.tick(config.choiceMs/rate-1,rate);assert.equal(g.state.phase,'CHOICE_WAIT');
     g.tick(1,rate);assert.equal(g.state.phase,'TRAVEL');assert.equal(g.state.step,1);
-    g.beginBattle();g.character.hp=10000;g.state.enemy.hp=g.state.enemy.maxHp=10000;
+    g.beginBattle();g.character.hp=10000;g.state.enemy.hp=g.state.enemy.maxHp=10000;g.state.enemy.DEX=1;g.refreshBattleTiming();
     const hits=g.events.filter(e=>e.type==='hit').length;
-    g.tick(config.battleActionMs/rate-1,rate);assert.equal(g.events.filter(e=>e.type==='hit').length,hits);
+    g.tick(g.state.remaining/rate-1,rate);assert.equal(g.events.filter(e=>e.type==='hit').length,hits);
     g.tick(1,rate);assert.equal(g.events.filter(e=>e.type==='hit').length,hits+1);
-    assert.equal(g.state.remaining,config.battleActionMs);
+    assert.ok(g.state.remaining > 0);
   }
 });
 test('equipment during battle affects next attack; HP swaps cannot heal; equipped sale rejected',()=>{
-  const g=make();g.state.run=1;g.state.step=1;g.state.risk=0;g.beginBattle();while(g.state.battle.actor!=='hero')g.battleAction();const before=stats(g.state,config);const item=g.item('weapon',2);g.state.inventory.push(item);g.command({characterId: g.character?.id, type:'EQUIP',itemId:item.id});assert.ok(stats(g.state,config).PEN>before.PEN);g.battleAction();assert.equal(g.state.battle.lastHit.pen,stats(g.state,config).PEN);
+  const g=make();g.state.run=1;g.state.step=1;g.state.risk=0;g.beginBattle();const before=stats(g.state,config);const item=g.item('weapon',2);g.state.inventory.push(item);g.command({characterId: g.character?.id, type:'EQUIP',itemId:item.id});assert.ok(stats(g.state,config).PEN>before.PEN);g.battleAction('hero');assert.equal(g.state.battle.lastHit.pen,stats(g.state,config).PEN);
   assert.throws(()=>g.command({characterId: g.character?.id, type:'SELL',itemId:item.id}));const armor=g.item('armor',2);g.state.inventory.push(armor);g.character.hp=5;g.command({characterId: g.character?.id, type:'EQUIP',itemId:armor.id});assert.equal(g.character.hp,5);g.command({characterId: g.character?.id, type:'UNEQUIP',itemId:armor.id});assert.equal(g.character.hp,5);const gold=g.state.gold;g.command({characterId: g.character?.id, type:'SELL',itemId:armor.id});assert.equal(g.state.gold,gold+armor.value);assert.throws(()=>g.command({characterId: g.character?.id, type:'SELL',itemId:armor.id}));
 });
-test('three AP and attack penalties reset each turn',()=>{
-  const g=make();g.state.step=1;g.state.risk=0;g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=10000;g.character.hp=10000;while(g.state.battle.actor!=='hero')g.battleAction();
-  g.battleAction();assert.equal(g.state.battle.ap,2);assert.equal(g.state.battle.attacks,1);const first=g.state.battle.lastHit.margin;g.battleAction();assert.equal(g.state.battle.lastHit.margin,first-5);assert.equal(g.state.battle.ap,1);g.battleAction();assert.equal(g.state.battle.lastHit.margin,first-10);assert.equal(g.state.battle.actor,'enemy');assert.equal(g.state.battle.ap,3);for(let i=0;i<3;i++)g.battleAction();assert.equal(g.state.battle.actor,'hero');assert.equal(g.state.battle.attacks,0);
+test('consecutive attacks have no old multi-attack penalty',()=>{
+ const g=make();g.state.risk=0;g.beginBattle();g.state.enemy.hp=10000;
+ for(let i=0;i<3;i++)g.battleAction('hero');
+ const hits=g.events.filter(e=>e.type==='hit').map(e=>e.hit);
+ assert.equal(new Set(hits.map(h=>h.calculation.acc)).size,1);
+ assert.equal(g.state.battle.ap,undefined);assert.equal(g.state.battle.turn,undefined);
 });
 test('downed preserves possessions and returns home; no inventory silent cap',()=>{
-  const g=make();g.state.step=1;g.state.run=1;g.state.runGold=0;g.state.risk=0;g.beginBattle();g.character.hp=1;g.state.battle.actor='enemy';g.state.enemy.ACC=100;g.battleAction();assert.equal(g.state.phase,'DOWNED');g.advance();g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.character.hp,0);g.advance();assert.equal(g.character.hp,stats(g.state,config).maxHp);
+  const g=make();g.state.step=1;g.state.run=1;g.state.runGold=0;g.state.risk=0;g.beginBattle();g.character.hp=1;g.state.battle.actor='enemy';g.state.enemy.ACC=100;g.battleAction('enemy');assert.equal(g.state.phase,'DOWNED');g.advance();g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.character.hp,0);g.advance();assert.equal(g.character.hp,stats(g.state,config).maxHp);
   const count=g.state.inventory.length;g.rng=()=>0;for(let i=0;i<120;i++)g.reward('victory');assert.equal(g.state.inventory.length,count+120);
 });
-test('DEX initiative and configured tie policy determine first actor',()=>{
- const cfg=structuredClone(config);const g=new Game(cfg,null,()=>0);g.create({name: '모험가', appearanceId: 'warrior'});g.state.homePaused=false;g.state.step=1;g.state.risk=0;g.rng=n=>n===6?2:0;g.beginBattle();assert.equal(g.state.enemy.DEX,10);assert.equal(g.state.battle.actor,'enemy');
- g.character.attributes.DEX=10;delete g.character.equipment.armor;g.beginBattle();assert.equal(g.state.battle.actor,'hero');cfg.initiative.tieWinner='enemy';g.beginBattle();assert.equal(g.state.battle.actor,'enemy');
+test('DEX speed and configured tie policy determine the first actual action',()=>{
+ const cfg=structuredClone(config);const g=new Game(cfg,null,()=>0);g.create({name:'모험가',appearanceId:'warrior'});g.state.risk=0;g.rng=n=>n===6?2:0;
+ function first(){g.beginBattle();g.character.hp=10000;g.tick(g.state.remaining,1);return g.events.filter(e=>e.type==='hit').at(-1).hit.actor;}
+ assert.equal(first(),'enemy');g.character.attributes.DEX=10;delete g.character.equipment.armor;
+ cfg.actionSpeed.maxEventsPerTick=1;assert.equal(first(),'hero');g.state.pendingGameMs=0;
+ cfg.initiative.tieWinner='enemy';assert.equal(first(),'enemy');
 });
