@@ -55,9 +55,9 @@ test('variation armor weaknesses differ and reference validated full and icon as
  for(const unsafe of ['https://test/x.webp','public/assets/monster/../../secret.webp',null])assert.equal(monsterAssetURL(unsafe),'');
  const duplicate=structuredClone(MONSTER_CATALOG);duplicate[0].variation.push(duplicate[0].variation[0]);assert.throws(()=>validateMonsters(duplicate,ENCOUNTER_CONFIG),/duplicate/);
 });
-test('XP is zero below character, 10 equal kills to level, higher bonus capped at twice',()=>{
+test('XP is one below character, 10 equal kills to level, higher bonus capped at twice',()=>{
  for(const C of [1,5,10,20,21])for(let d=-1;d<=8;d++){
-  const r=monsterRewards({level:C+d,gradeId:'normal'},C,40);assert.equal(r.xp,d<0?0:Math.floor(4*C*(1+.25*Math.min(d,4))));assert.equal(r.canDrop,d>=0);
+  const r=monsterRewards({level:C+d,gradeId:'normal'},C,40);assert.equal(r.xp,d<0?1:Math.floor(4*C*(1+.25*Math.min(d,4))));assert.equal(r.canDrop,true);
  }
  for(const grade of EQUIPMENT_CATALOG.grades){const r=monsterRewards({level:10,gradeId:grade.id},10,40);assert.equal(r.xp,40);assert.equal(r.gold,Math.floor(24*ENCOUNTER_CONFIG.rewards.goldMultipliers[grade.id]));}
  for(const C of [1,5,10,20]){
@@ -66,10 +66,25 @@ test('XP is zero below character, 10 equal kills to level, higher bonus capped a
   assert.equal(g.character.xp,0);
  }
 });
-test('lower monster gives gold only; no loot random draw; eligibility uses level before award',()=>{
- const g=make();g.character.level=2;g.beginBattle();const count=g.state.inventory.length;g.rng=()=>{throw Error('lower-level loot must not roll');};g.reward('victory');
- assert.equal(g.character.xp,0);assert.equal(g.state.gold,6);assert.equal(g.state.inventory.length,count);assert.equal(g.state.lastReward.goldOnly,true);
- g.rng=()=>0;g.character.level=1;g.character.xp=36;g.beginBattle();g.reward('victory');assert.equal(g.character.level,2);assert.equal(g.character.xp,0);assert.ok(g.state.lastReward.itemId);assert.equal(g.state.lastReward.goldOnly,false);
+test('lower monsters grant one XP, keep gold and use the same 25 percent loot boundary',()=>{
+ for(const roll of [0,2499,2500,9999]) {
+  const g=make();g.character.level=2;g.beginBattle();const count=g.state.inventory.length;
+  const draws=[];g.rng=n=>{draws.push(n);return n===10000?roll:0;};g.reward('victory');
+  assert.equal(g.character.xp,1);assert.equal(g.state.lastReward.xp,1);assert.equal(g.state.gold,6);
+  assert.equal(draws[0],10000);assert.equal(g.state.inventory.length,count+(roll<2500?1:0));
+  assert.equal(Boolean(g.state.lastReward.itemId),roll<2500);assert.equal(g.state.lastReward.goldOnly,false);
+  assert.match(g.events.at(-1).text,/경험치 \+1/);assert.doesNotMatch(g.events.at(-1).text,/골드만/);
+ }
+ for(const grade of EQUIPMENT_CATALOG.grades) {
+  const r=monsterRewards({level:1,gradeId:grade.id},100,40);assert.equal(r.xp,1);assert.equal(r.canDrop,true);
+ }
+});
+test('reward uses pre-award level; the fixed one XP can level up without suppressing loot',()=>{
+ for(const [level,xp,awarded] of [[1,36,4],[2,79,1]]){
+  const g=make();g.character.level=level;g.character.xp=xp;g.beginBattle();g.reward('victory');
+  assert.equal(g.state.lastReward.xp,awarded);assert.equal(g.character.level,level+1);assert.equal(g.character.xp,0);
+  assert.ok(g.state.lastReward.itemId);assert.equal(g.state.lastReward.goldOnly,false);
+ }
 });
 test('bestiary groups by encountered variation, records grade/level/history and persists without reroll',()=>{
  const [firstId,secondId]=eligibleVariations('village').slice(0,2).map(({variation})=>variation.id);

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { Game, THEMES } from './game.js';
 import { initializeBattleSkills } from './skills.js';
+import { ProbabilitySettings } from './probabilities.js';
 import { LocalAuth } from './auth.js';
 import { AccountAdmin, forgetAccount } from './admin.js';
 import { prepareAdminGame, regenerateAdminMaps, resetGameProgress } from './account-progress.js';
@@ -20,6 +21,8 @@ const db = new DatabaseSync(join(dataDir, 'zwiequest.sqlite'));
 db.exec('PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL; PRAGMA foreign_keys=ON; CREATE TABLE IF NOT EXISTS account_state(user_id TEXT PRIMARY KEY,body TEXT NOT NULL); CREATE TABLE IF NOT EXISTS user_events(user_id TEXT NOT NULL,seq INTEGER NOT NULL,at INTEGER NOT NULL,body TEXT NOT NULL,PRIMARY KEY(user_id,seq)); CREATE TABLE IF NOT EXISTS requests(user_id TEXT NOT NULL,id TEXT NOT NULL,body TEXT NOT NULL,PRIMARY KEY(user_id,id));');
 const auth = new LocalAuth(db, origin.startsWith('https://'));
 const accountAdmin = new AccountAdmin(db);
+const probabilitySettings = new ProbabilitySettings(db);
+config.probabilities = probabilitySettings.read().probabilities;
 const games = new Map(db.prepare('SELECT * FROM account_state').all().map(r => {
   const state = JSON.parse(r.body);
   if (state.battle && !state.battle.skillUseCounts) {
@@ -39,7 +42,7 @@ function getGame(id) {
 function mode(id) { return [...presence.values()].some(p => p.userId === id && Date.now() - p.at < config.presenceGraceMs) ? 'ONLINE' : 'OFFLINE'; }
 function rate(id) { return mode(id) === 'ONLINE' ? config.onlineRate : config.offlineRate; }
 const logs = id => db.prepare('SELECT body FROM user_events WHERE user_id=? ORDER BY seq DESC LIMIT 80').all(id).map(r => JSON.parse(r.body));
-function payload(id) { return { state: getGame(id).snapshot(), logs: logs(id), mode: mode(id), rate: rate(id), serverTime: Date.now(), config: { onlineRate: config.onlineRate, offlineRate: config.offlineRate, stepsPerRun: config.stepsPerRun }, themes: THEMES }; }
+function payload(id) { return { state: getGame(id).snapshot(), logs: logs(id), mode: mode(id), rate: rate(id), serverTime: Date.now(), config: { onlineRate: config.onlineRate, offlineRate: config.offlineRate, stepsPerRun: config.stepsPerRun, probabilities: config.probabilities }, themes: THEMES }; }
 function commit(id, command) {
   const game = getGame(id); db.exec('BEGIN IMMEDIATE');
   try {
@@ -88,6 +91,10 @@ const server = http.createServer(async (req, res) => {
     try { return json(res, 200, { accounts: accountAdmin.list(user.id) }); }
     catch (e) { if (e.status) return json(res, e.status, { error: e.message }); throw e; }
   }
+  if (url.pathname === '/api/admin/probabilities' && req.method === 'GET') {
+    if (!user.isAdmin) return json(res, 403, { error: '관리자만 확률 설정을 조회할 수 있습니다.' });
+    return json(res, 200, probabilitySettings.read());
+  }
   if (url.pathname === '/api/state' && req.method === 'GET') return json(res, 200, payload(user.id));
   if (url.pathname === '/api/events' && req.method === 'GET') {
     const clientId = url.searchParams.get('clientId'); if (!clientId || clientId.length > 80) return json(res, 400, { error: 'clientId가 필요합니다.' });
@@ -111,6 +118,16 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/auth/logout') { if (user) { tick(); endSession(user); } auth.revoke(user, res); return json(res, 200, { ok: true }); }
     if (!user) return json(res, 401, { error: '로그인이 필요합니다.' });
+    if (url.pathname === '/api/admin/probabilities') {
+      if (!user.isAdmin) return json(res, 403, { error: '관리자만 확률을 변경할 수 있습니다.' });
+      try {
+        tick(); // Finish elapsed work under the previous settings before applying new rolls.
+        const result = probabilitySettings.update(user.id, cmd);
+        config.probabilities = result.probabilities;
+        for (const id of games.keys()) broadcast(id);
+        return json(res, 200, { ok: true, ...result });
+      } catch (e) { if (e.status) return json(res, e.status, { error: e.message }); throw e; }
+    }
     if (url.pathname === '/api/admin/delete-account') {
       try {
         const deleted = accountAdmin.remove(user.id, cmd.userId, cmd.confirmUsername);

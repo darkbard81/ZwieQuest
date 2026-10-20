@@ -162,13 +162,13 @@ export class Game {
     if (!treasure && s.enemy?.generationVersion === 1 && s.bestiary[s.enemy.variationId]) s.bestiary[s.enemy.variationId].defeats++;
     this.character.xp += xp; s.gold += gold;
     if (treasure) s.chests++; else s.victories++;
-    // One shared 25% roll, then equal weapon / armor / accessory odds.
-    const slot = !treasure && rewards.canDrop && chance(this.rng, EQUIPMENT_CATALOG.dropPercent)
+    // One shared global drop roll, then equal weapon / armor / accessory odds.
+    const slot = !treasure && rewards.canDrop && chance(this.rng, this.config.probabilities?.dropPercent ?? EQUIPMENT_CATALOG.dropPercent)
       ? ['weapon', 'armor', 'charm'][this.rng(3)] : null;
     const item = slot ? this.item(slot) : null;
     if (item) s.inventory.push(item);
-    s.lastReward = { kind, goldOnly: treasure || (generated && !rewards.canDrop), itemId: item?.id || null, itemName: item?.name || null, xp, gold };
-    this.log(kind, treasure ? `보물 발견 · 금화 +${gold}` : `${boss ? '보스 격파' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : generated && !rewards.canDrop ? ' · 하위 레벨 몬스터: 골드만 획득' : ' · 장비 없음'}`, { battleId: s.battle?.id ?? null, xp, gold, itemId: item?.id || null, characterId: this.character.id });
+    s.lastReward = { kind, goldOnly: treasure, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
+    this.log(kind, treasure ? `보물 발견 · 금화 +${gold}` : `${boss ? '보스 격파' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : ' · 장비 없음'}`, { battleId: s.battle?.id ?? null, xp, gold, itemId: item?.id || null, characterId: this.character.id });
     while (this.character.xp >= this.character.level * this.config.xpPerLevel) {
       this.character.xp -= this.character.level * this.config.xpPerLevel; this.character.level++;
       this.log('level', `레벨 ${this.character.level}! 최대 HP 증가`);
@@ -249,7 +249,7 @@ export class Game {
         else if (node.kind === 'exit') this.enterRegion(node.region);
         else if (node.kind === 'boss') this.beginBattle(true);
         else {
-          const encounter = rollEncounter(this.rng);
+          const encounter = rollEncounter(this.rng, this.config.probabilities);
           if (encounter === 'battle') this.beginBattle();
           else if (encounter === 'treasure') this.reward('treasure');
           else { this.log('pass', '조용한 길을 지나 다음 갈림길에 도착했습니다.'); this.nextChoice(); }

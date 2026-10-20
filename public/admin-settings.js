@@ -1,3 +1,4 @@
+import { initProbabilitySettings } from './probability-settings.js';
 export function initAdminSettings({ api, getUser, getState = () => null, onReset = () => {} }) {
   const button = document.createElement('button'); button.id = 'admin-button'; button.className = 'quiet';
   button.textContent = '관리자 설정'; button.hidden = true;
@@ -5,7 +6,9 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
   const dialog = document.createElement('dialog'); dialog.id = 'admin-settings';
   dialog.setAttribute('aria-labelledby', 'admin-title');
   dialog.innerHTML = `<button class="dialog-close" type="button" aria-label="관리자 설정 닫기">×</button>
-    <p class="eyebrow">ACCOUNT SETTINGS</p><h2 id="admin-title">계정 관리</h2>
+    <p class="eyebrow">ACCOUNT SETTINGS</p><h2 id="admin-title">관리자 설정</h2>
+    <div class="admin-tabs" role="tablist" aria-label="관리자 설정 항목"><button id="admin-tab-accounts" type="button" role="tab" aria-selected="true" aria-controls="admin-panel-accounts">계정 관리</button><button id="admin-tab-probabilities" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-probabilities" tabindex="-1">확률관리</button></div>
+    <section id="admin-panel-accounts" role="tabpanel" aria-labelledby="admin-tab-accounts">
     <p class="muted">계정의 모험 진행을 초기화하거나 사용하지 않는 계정을 삭제할 수 있습니다.</p>
     <div class="admin-map-actions"><button id="admin-reveal-map" type="button">내 전체 지도·체크포인트 획득</button><button id="admin-reset-maps" class="danger" type="button">지도·체크포인트 초기화</button></div>
     <div class="admin-heading"><strong id="admin-count">계정 목록</strong><button id="admin-refresh" type="button">새로고침</button></div>
@@ -15,9 +18,27 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
       <label for="admin-confirm-name">대상 아이디를 정확히 입력하세요.</label>
       <input id="admin-confirm-name" autocomplete="off" autocapitalize="none" spellcheck="false" required maxlength="24">
       <div class="admin-actions"><button id="admin-cancel" type="button">취소</button><button id="admin-delete" class="danger" type="submit" disabled>계정 영구 삭제</button></div>
-    </form>`;
+    </form></section>
+    <section id="admin-panel-probabilities" role="tabpanel" aria-labelledby="admin-tab-probabilities" hidden></section>`;
   document.body.append(dialog);
   const find = selector => dialog.querySelector(selector);
+  let probabilityEditor;
+  function selectTab(name) {
+    if (busy || probabilityEditor?.isBusy()) return;
+    for (const id of ['accounts', 'probabilities']) {
+      const selected = name === id; find(`#admin-tab-${id}`).setAttribute('aria-selected', String(selected));
+      find(`#admin-tab-${id}`).tabIndex = selected ? 0 : -1; find(`#admin-panel-${id}`).hidden = !selected;
+    }
+    if (name === 'probabilities') { probabilityEditor ||= initProbabilitySettings({ panel: find('#admin-panel-probabilities'), api, getUser }); probabilityEditor.load(); }
+  }
+  for (const id of ['accounts', 'probabilities']) {
+    find(`#admin-tab-${id}`).onclick = () => selectTab(id);
+    find(`#admin-tab-${id}`).addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key) || busy || probabilityEditor?.isBusy()) return;
+      event.preventDefault(); const next = event.key === 'Home' ? 'accounts' : event.key === 'End' ? 'probabilities' : id === 'accounts' ? 'probabilities' : 'accounts';
+      selectTab(next); find(`#admin-tab-${next}`).focus();
+    });
+  }
   let target = null, busy = false, request = 0, action = 'delete', resetRequestId = null, resetProgressId = null;
   function status(text, error = false) { find('#admin-status').textContent = text; find('#admin-status').classList.toggle('error', error); }
   function cancel() { target = null; find('#admin-confirm').hidden = true; find('#admin-confirm-name').value = ''; find('#admin-delete').disabled = true; }
@@ -63,7 +84,7 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
     } catch (error) { if (revision === request) { status(error.message, true); find('#admin-list').replaceChildren(); cancel(); } }
     finally { if (revision === request) find('#admin-refresh').disabled = false; }
   }
-  button.onclick = () => { if (!getUser()?.isAdmin) return; dialog.showModal(); refresh(); };
+  button.onclick = () => { if (!getUser()?.isAdmin) return; dialog.showModal(); selectTab('accounts'); refresh(); };
   find('#admin-reveal-map').onclick = async () => {
     if (busy || !getUser()?.isAdmin) return;
     busy = true; find('#admin-reveal-map').disabled = true;
@@ -75,9 +96,9 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
   };
   find('#admin-reset-maps').onclick = () => { if (getUser()?.isAdmin) confirm(getUser(), 'maps'); };
   find('#admin-refresh').onclick = () => { if (!busy) refresh(); };
-  find('.dialog-close').onclick = () => { if (!busy) dialog.close(); };
-  dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
-  dialog.addEventListener('close', () => { request++; cancel(); });
+  find('.dialog-close').onclick = () => { if (!busy && !probabilityEditor?.isBusy()) dialog.close(); };
+  dialog.addEventListener('cancel', event => { if (busy || probabilityEditor?.isBusy()) event.preventDefault(); });
+  dialog.addEventListener('close', () => { request++; cancel(); probabilityEditor?.reset(); });
   find('#admin-cancel').onclick = () => { if (!busy) { cancel(); find('#admin-refresh').focus(); } };
   find('#admin-confirm-name').addEventListener('input', event => { find('#admin-delete').disabled = busy || !target || event.target.value !== target.username; });
   find('#admin-confirm').onsubmit = async event => {
@@ -96,5 +117,5 @@ export function initAdminSettings({ api, getUser, getState = () => null, onReset
       find('#admin-delete').disabled = !target || find('#admin-confirm-name').value !== target.username;
     }
   };
-  return { setUser(user) { button.hidden = !user?.isAdmin; if (!user?.isAdmin) { request++; dialog.close(); cancel(); find('#admin-list').replaceChildren(); } } };
+  return { setUser(user) { button.hidden = !user?.isAdmin; if (!user?.isAdmin) { request++; probabilityEditor?.reset(); dialog.close(); cancel(); find('#admin-list').replaceChildren(); } } };
 }

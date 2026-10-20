@@ -86,9 +86,9 @@ function buildMonster({ monster, variation }, level, grade, rng, mapId, config) 
 export function monsterRewards(enemy, characterLevel, xpPerLevel, rules = ENCOUNTER_CONFIG) {
   const r = rules.rewards, difference = enemy.level - characterLevel, eligible = difference >= 0;
   return {
-    xp: eligible ? Math.floor(characterLevel * xpPerLevel / r.equalLevelKills * (1 + r.xpBonusPerLevel * Math.min(difference, r.maxBonusLevels))) : 0,
+    xp: eligible ? Math.floor(characterLevel * xpPerLevel / r.equalLevelKills * (1 + r.xpBonusPerLevel * Math.min(difference, r.maxBonusLevels))) : 1,
     gold: Math.floor((r.goldBase + r.goldPerLevel * enemy.level) * r.goldMultipliers[enemy.gradeId]),
-    canDrop: eligible
+    canDrop: true
   };
 }
 export function recordMonsterEncounter(state, enemy) {
