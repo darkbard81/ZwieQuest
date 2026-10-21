@@ -17,11 +17,11 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
   const views = APPEARANCES.map(appearance => {
     const button = document.createElement('button'); button.type = 'button'; button.className = 'appearance-option'; button.dataset.appearance = appearance.id;
     button.innerHTML = `<span class="idle-preview" aria-hidden="true"></span><strong>${esc(appearance.name)}</strong>`;
-    const preview = button.querySelector('.idle-preview'); preview.style.backgroundImage = `url('${appearanceAssets(appearance.id)}/sprite.png?v=${appearance.assetVersion}')`;
+    const preview = button.querySelector('.idle-preview');
     const view = { appearance, button, preview, meta: null };
     button.onclick = () => { selectedAppearance = appearance.id; refresh(); };
     $('.appearance-list').append(button);
-    fetch(`${appearanceAssets(appearance.id)}/sprite.json?v=${appearance.assetVersion}`).then(r => { if (!r.ok) throw Error('외형 불러오기 실패'); return r.json(); }).then(meta => { view.meta = meta; refresh(); }).catch(() => { button.title = '외형 미리보기를 불러오지 못했습니다.'; });
+    fetch(`${appearanceAssets(appearance.id)}/sprite.json?v=${appearance.assetVersion}`).then(r => { if (!r.ok) throw Error('외형 불러오기 실패'); return r.json(); }).then(meta => { view.meta = meta; preview.style.backgroundImage = `url('${appearanceAssets(appearance.id)}/${meta.animations.Front_Idle.sheet}?v=${appearance.assetVersion}')`; refresh(); }).catch(() => { button.title = '외형 미리보기를 불러오지 못했습니다.'; });
     return view;
   });
   const canManage = () => connected && state?.phase === 'HOME' && !pending;

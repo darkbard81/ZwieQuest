@@ -2,7 +2,7 @@ const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<'
 export function skillDescription(item) {
   if (!item.enabled) return '사용할 수 없는 스킬';
   const e=item.effect || {}, duration=item.durationMs ? ` · ${(item.durationMs/1000).toFixed(1)}초(INT)` : '';
-  const effect = item.activationMode === 'toggle' ? `유지 효과 · 명중 +${item.accuracyBonus} · ${item.toggleOn ? 'ON' : 'OFF'}` : item.effectType === 'heal' ? `HP ${item.heal} 회복` : item.effectType === 'attack' ? `명중 vs ${e.defense} · 피해 +${Math.round(((e.damageMultiplier || 1)-1)*100)}%${e.accuracyBonus ? ` · 명중 +${e.accuracyBonus}` : ''}${e.penetrationBonus ? ` · 관통 +${e.penetrationBonus}` : ''} · 명중/치명타 시 ${item.statusName}${duration}` : item.effectType === 'status' ? `${item.statusName}: ${item.statusDescription || ''}${duration}` : item.effectType === 'mirror' ? `회피 +30 · 피명중마다 -10${duration}` : item.description;
+  const effect = item.effectType === 'equipmentMastery' ? `${item.description} · ${item.toggleOn ? 'ON' : 'OFF'}${item.masteryMatches ? '' : ' · 해당 장비 미착용'}` : item.activationMode === 'toggle' ? `유지 효과 · 명중 +${item.accuracyBonus} · ${item.toggleOn ? 'ON' : 'OFF'}` : item.effectType === 'heal' ? `HP ${item.heal} 회복` : item.effectType === 'attack' ? `명중 vs ${e.defense} · 피해 +${Math.round(((e.damageMultiplier || 1)-1)*100)}%${e.accuracyBonus ? ` · 명중 +${e.accuracyBonus}` : ''}${e.penetrationBonus ? ` · 관통 +${e.penetrationBonus}` : ''} · 명중/치명타 시 ${item.statusName}${duration}` : item.effectType === 'status' ? `${item.statusName}: ${item.statusDescription || ''}${duration}` : item.effectType === 'mirror' ? `회피 +30 · 피명중마다 -10${duration}` : item.description;
   const limit = item.perBattleLimit == null ? '전투당 제한 없음' : item.remainingUses == null ? `전투당 ${item.perBattleLimit}회` : `남은 ${item.remainingUses}/${item.perBattleLimit}회${item.remainingUses === 0 ? ' · 소진' : ''}`;
   const context = item.useContexts?.length === 2 ? '전투/비전투' : item.useContexts?.includes('nonCombat') ? '비전투' : '전투';
   return `${effect} · ${context} · ${limit}`;
@@ -24,11 +24,18 @@ export function skillAvailability(state, item, now, connected = true) {
   else if (['cleanse','dispel'].includes(item.effectType) && !(state.statusEffects?.[item.effectType === 'cleanse' ? 'hero' : 'enemy'] || []).some(s=>s.polarity===(item.effectType === 'cleanse' ? 'debuff' : 'buff'))) { reason='제거할 상태 없음'; kind='unavailable'; }
   else if (item.effectType === 'heal' && state.hp >= state.stats.maxHp) { reason = '체력 가득 참'; kind = 'unavailable'; }
   else if (item.effectType === 'heal' && !(item.heal > 0)) { reason = '회복량 없음'; kind = 'unavailable'; }
+  else if (inCombat && state.autoSkills && !toggle) { reason = '자동 모드 · 행동 시 무작위 사용'; kind = 'auto'; }
   else reason = toggle ? (turningOff ? 'OFF로 전환' : 'ON으로 전환') : inCombat ? '다음 행동에 예약 가능' : '사용 가능';
   return { kind, reason, remaining, ready: kind === 'ready', progress: 1 };
 }
-export function initSkills({ bar, slots, onUse }) {
+export function initSkills({ bar, slots, onUse, modeButton, onModeChange }) {
   let state = null, serverTime = 0, receivedAt = 0, connected = false, pending = false;
+  if (modeButton) modeButton.onclick = async () => {
+    if (pending || !connected || !state?.activeCharacterId || state.actionLocked) return;
+    pending = true; refresh();
+    try { await onModeChange(!state.autoSkills, modeButton); }
+    finally { pending = false; refresh(); }
+  };
   const views = Array.from({ length: 6 }, (_, index) => {
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'skill-button'; button.disabled = true;
@@ -48,6 +55,12 @@ export function initSkills({ bar, slots, onUse }) {
   const now = () => serverTime + Math.max(0, performance.now() - receivedAt);
   const getItem = index => state?.inventory.find(i => i.slot === 'skill' && i.id === state.skillSlots?.[index]);
   function refresh() {
+    if (modeButton) {
+      modeButton.textContent = state?.autoSkills ? '자동 스킬' : '수동 스킬';
+      modeButton.setAttribute('aria-pressed', String(!!state?.autoSkills));
+      modeButton.title = state?.autoSkills ? '수동 스킬로 전환' : '자동 스킬로 전환 · 기존 수동 예약 취소';
+      modeButton.disabled = pending || !connected || !state?.activeCharacterId || !!state.actionLocked;
+    }
     for (const [index, { button, slot }] of views.entries()) {
       const item = getItem(index), availability = skillAvailability(state, item, now(), connected);
       const description = item ? `${item.name} · ${skillDescription(item)}` : `스킬 슬롯 ${index + 1} · 비어 있음`;

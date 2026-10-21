@@ -6,6 +6,7 @@ import {join} from 'node:path';
 import {spawn} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
+import {DROP_WEIGHTS} from '../src/probabilities.js';
 import {LocalAuth} from '../src/auth.js';
 test('HTTP probability settings require admin, update all accounts, survive restart and reject conflicts', {timeout:20000},async()=>{
  const dir=mkdtempSync(join(tmpdir(),'zwiequest-probabilities-')),port=47000+Math.floor(Math.random()*4000),base=`http://127.0.0.1:${port}`;
@@ -20,7 +21,7 @@ test('HTTP probability settings require admin, update all accounts, survive rest
   await start();const a=await req('/api/auth/login',{username:admin.username,password:'123456'}),p=await req('/api/auth/login',{username:player.username,password:'123456'});
   assert.equal((await req(path)).status,401);assert.equal((await req(path,undefined,p.cookie)).status,403);
   const original=(await req(path,undefined,a.cookie)).body;assert.equal(original.revision,0);
-  const update={revision:0,requestId:randomUUID(),probabilities:{battlePercent:100,treasurePercent:0,passPercent:0,dropPercent:100}};
+  const update={revision:0,requestId:randomUUID(),probabilities:{...DROP_WEIGHTS,battlePercent:100,treasurePercent:0,passPercent:0,dropPercent:100}};
   assert.equal((await req(path,update,p.cookie)).status,403);assert.equal((await req(path,update,a.cookie,'https://other.example')).status,403);
   assert.equal((await req(path,{...update,probabilities:{...update.probabilities,passPercent:1}},a.cookie)).status,400);
   assert.equal((await req(path,undefined,a.cookie)).body.revision,0);
@@ -29,7 +30,7 @@ test('HTTP probability settings require admin, update all accounts, survive rest
   assert.deepEqual((await req('/api/state',undefined,p.cookie)).body.config.probabilities,update.probabilities);
   assert.equal((await req(path,update,a.cookie)).body.duplicate,true);
   assert.equal((await req(path,{...update,requestId:randomUUID()},a.cookie)).status,409);
-  const second={revision:1,requestId:randomUUID(),probabilities:{battlePercent:0,treasurePercent:100,passPercent:0,dropPercent:0}};
+  const second={revision:1,requestId:randomUUID(),probabilities:{...DROP_WEIGHTS,battlePercent:0,treasurePercent:100,passPercent:0,dropPercent:0}};
   db.exec("CREATE TRIGGER reject_probability BEFORE UPDATE ON probability_settings BEGIN SELECT RAISE(ABORT,'probability failure'); END;");
   assert.equal((await req(path,second,a.cookie)).status,500);assert.deepEqual((await req('/api/state',undefined,p.cookie)).body.config.probabilities,update.probabilities);
   db.exec('DROP TRIGGER reject_probability');assert.equal((await req(path,second,a.cookie)).status,200);

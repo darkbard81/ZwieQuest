@@ -1,6 +1,7 @@
 import { activeCharacter } from './characters.js';
 import { actionSpeed } from './action-speed.js';
 import { modifiers } from './status-effects.js';
+import { maintainedSkillBonuses } from './skills.js';
 import { BASE_STATS } from './equipment.js';
 const DEFENSE_RULES = {
   DEF: { attributes: { RES: 1 } },
@@ -27,13 +28,14 @@ export function effectiveArmor(ar, damageTypes = ['blunt'], typeModifiers = {}) 
   const damageType = damageTypes.reduce((best, type) => (typeModifiers[type] || 0) < (typeModifiers[best] || 0) ? type : best);
   return { damageType, effectiveAR: ar + (typeModifiers[damageType] || 0) };
 }
-export function attack({ roll, acc, defense, str, base, pen, ar, damageTypes = ['blunt'], typeModifiers = {}, damageRate = 0, tacticDamageRate = 0, fixedDamage, transformHit, skillDamageMultiplier = 1 }) {
+export function attack({ roll, acc, defense, str, base, pen, ar, damageTypes = ['blunt'], typeModifiers = {}, damageRate = 0, tacticDamageRate = 0, fixedDamage, transformHit, skillDamageMultiplier = 1, masteryDamageRate = 0 }) {
   const initial = hitResult(roll, acc, defense), hit = transformHit ? transformHit(initial) : initial;
   const armor = effectiveArmor(ar, damageTypes, typeModifiers);
   const raw = armor.damageType === 'raw';
   if (raw && (!Number.isInteger(fixedDamage) || fixedDamage < 0)) throw Error('Raw requires nonnegative fixed damage');
   const factors = raw ? null : { grade: 1 + damageRate, tactic: 1 + tacticDamageRate, strength: Math.max(0, 1 + .05 * str), hit: hit.multiplier, armor: penetration(pen, armor.effectiveAR) };
-  const damage = raw ? (hit.tier === 0 ? 0 : fixedDamage) : Math.floor(base * skillDamageMultiplier * factors.grade * factors.tactic * factors.strength * factors.hit * factors.armor);
+  if (factors && masteryDamageRate) factors.mastery = Math.max(0, 1 + masteryDamageRate);
+  const damage = raw ? (hit.tier === 0 ? 0 : fixedDamage) : Math.floor(base * (factors.mastery ?? 1) * skillDamageMultiplier * factors.grade * factors.tactic * factors.strength * factors.hit * factors.armor);
   return { ...hit, ...armor, damage, base, damageRate, tacticDamageRate, pen: raw ? null : pen, ar,
     calculation: { acc, defense, factors, ...(skillDamageMultiplier !== 1 ? { skillDamageMultiplier } : {}), fixedDamage: raw ? fixedDamage : null } };
 }
@@ -69,6 +71,9 @@ export function statDetails(state, config, character = activeCharacter(state)) {
     ...actionSpeed(b.DEX, gear.find(i => i.slot === 'armor')?.actionSpeedPenaltyRate || 0, config, gear.find(i => i.slot === 'weapon')?.actionSpeedPenaltyRate || 0),
     typeModifiers: { ...(gear.find(i => i.slot === 'armor')?.typeModifiers || {}) }
   };
+  const mastery=character.id===state.activeCharacterId?maintainedSkillBonuses(state):{};
+  const speedRate=Math.max(.1,1+(mastery.actionSpeedRate||0));
+  values.actionSpeed*=speedRate; values.actionIntervalMs/=speedRate;
   values.actionIntervalMs *= m.actionTimeMultiplier || 1; values.actionSpeed /= m.actionTimeMultiplier || 1;
   return { values, defenses };
 }

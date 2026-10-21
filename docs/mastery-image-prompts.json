@@ -1,0 +1,161 @@
+{
+  "mode": "built-in image_gen",
+  "transparent_background": false,
+  "date": "2026-10-21",
+  "runtime": {
+    "width": 256,
+    "height": 256,
+    "format": "WebP",
+    "quality": 90,
+    "conversion": "cwebp -resize 256 256 -q 90 -m 6"
+  },
+  "expectedCount": 12,
+  "completedCount": 12,
+  "missing": [],
+  "assets": [
+    {
+      "id": "light-weapon-mastery",
+      "file": "art-workbench/mastery-icons/originals/light-weapon-mastery-v1.png",
+      "sha256": "1a5e192ab8f0b8006c47f1bd5b65b05de313b1ccf56d642b37330274e48a7050",
+      "bytes": 2156185,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/light-weapon-mastery-v1.webp",
+      "runtimeSha256": "11da336364875346b696ad68b76eb1044e4f8cd1dc507a3416887fb08b66c05d",
+      "runtimeBytes": 22716,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, light-weapon-mastery. Subject: A slender silver rapier and a compact steel dagger crossed in a poised elegant fencing stance, golden swept hilt, crisp silver edges, dark teal and amber training-hall background. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "sword-mastery",
+      "file": "art-workbench/mastery-icons/originals/sword-mastery-v1.png",
+      "sha256": "10c4a7d2c5476a8cd807c48e2c0bc3186529a07775aeefbf12cbb850fe1501d8",
+      "bytes": 2044567,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/sword-mastery-v1.webp",
+      "runtimeSha256": "a110567cde6ec03a3d0eb4adbbef07d844688539c422dfb2d8793d2055c38d32",
+      "runtimeBytes": 20850,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, sword-mastery. Subject: One balanced straight double-edged longsword with a broad silver blade and simple golden crossguard, upright diagonal composition, deep crimson and warm bronze forge background. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "axe-mastery",
+      "file": "art-workbench/mastery-icons/originals/axe-mastery-v1.png",
+      "sha256": "c6efc0ea623b6ea7b82004558bfd22ff8e78d394b402815caecd2a0569d0968c",
+      "bytes": 2331362,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/axe-mastery-v1.webp",
+      "runtimeSha256": "1f44c1a3d82d7dbe39f7d02902237dde5257c0bc0ce0e025be548d35b019b6ac",
+      "runtimeBytes": 24978,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, axe-mastery. Subject: One compact single-bladed hand axe with a strongly curved steel cutting edge and sturdy wood handle, amber sparks and dark rust-brown forge background. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "mace-mastery",
+      "file": "art-workbench/mastery-icons/originals/mace-mastery-v1.png",
+      "sha256": "46e9a9d2fd32beb66bdd686a4f5c5f2c0f8d296ba5cae06a419eca31987f1b89",
+      "bytes": 2144623,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/mace-mastery-v1.webp",
+      "runtimeSha256": "bceaaf1d2cf70318502d9808e8fd70211df8900f3f4eacae2a482344dff74a48",
+      "runtimeBytes": 24688,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, mace-mastery. Subject: One heavy flanged steel mace with a blunt spiked crown and leather-wrapped shaft, luminous bronze highlights and dark charcoal orange forge background. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "spear-mastery",
+      "file": "art-workbench/mastery-icons/originals/spear-mastery-v1.png",
+      "sha256": "cb29f46a3e561ff257e92472a55ba72459ab340e96da6ec6d46bfa746fc93324",
+      "bytes": 2351930,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/spear-mastery-v1.webp",
+      "runtimeSha256": "1fcfa7388b4f083193f7468fda4a2b7a05bb30d30e839adbe72e83956e362afc",
+      "runtimeBytes": 24686,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, spear-mastery. Subject: One long slender spear with a prominent narrow leaf-shaped steel point and long straight wooden shaft, diagonal thrust composition, dark forest-green and golden battlefield mist background. Emphasize the simple pointed spearhead. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "polearm-mastery",
+      "file": "art-workbench/mastery-icons/originals/polearm-mastery-v1.png",
+      "sha256": "c0f80f93f89865e708b6bc71ac6f2b5b44fb81419a720a5c07f6d56cfc0441dc",
+      "bytes": 2770100,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/polearm-mastery-v1.webp",
+      "runtimeSha256": "25f8ae546b64dbc515ae401b86201b5dfba0994957210596732b0fde094f2bd3",
+      "runtimeBytes": 29588,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, polearm-mastery. Subject: One imposing halberd head with a broad axe blade, long top spike and curved rear hook on a wooden shaft, clear asymmetrical silhouette, dark turquoise and steel-blue castle courtyard background. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "heavy-weapon-mastery",
+      "file": "art-workbench/mastery-icons/originals/heavy-weapon-mastery-v1.png",
+      "sha256": "fb1adae07d295dab285ebded5796ae8bb660594630b7d61ca934d421b989a357",
+      "bytes": 2622862,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/heavy-weapon-mastery-v1.webp",
+      "runtimeSha256": "471a5990128f0d3dbadf733fbdae4a865e826388e1b80c7c165c31b08e339d97",
+      "runtimeBytes": 29928,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, heavy-weapon-mastery. Subject: One massive two-handed greatsword with a very broad long blade, long leather grip and substantial crossguard, dramatic diagonal composition, glowing red and charcoal forge background. Distinctly oversized and weighty. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "staff-mastery",
+      "file": "art-workbench/mastery-icons/originals/staff-mastery-v1.png",
+      "sha256": "ee4c2294cc6b75ee2cdddececaf3e950e3a87766ba7460acfe9efb142aee786b",
+      "bytes": 2598469,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/staff-mastery-v1.webp",
+      "runtimeSha256": "1b5b6a8f1ad15d7d6266bb60672ddd4c42da5a27774542c5873c496bef571a76",
+      "runtimeBytes": 30000,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, staff-mastery. Subject: One ornate elemental wooden staff crowned by a luminous crystal surrounded by intertwined orange fire and blue frost energy, dark amethyst arcane mist background. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "cloth-armor-mastery",
+      "file": "art-workbench/mastery-icons/originals/cloth-armor-mastery-v1.png",
+      "sha256": "1a7c1848340f9fe453e68a539947031ceec63830f09123900c443e5f2f723a76",
+      "bytes": 2720504,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/cloth-armor-mastery-v1.webp",
+      "runtimeSha256": "65124d77e42e5c51c22c64778737cacb4cf68553eaaaef2407a8fd821be62cc8",
+      "runtimeBytes": 29576,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, cloth-armor-mastery. Subject: One flowing hooded mage robe of deep violet fabric with gold trim and a simple cloth sash, no wearer, no metal armor, luminous violet and midnight blue library background. Strong cloth folds and draped silhouette. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "light-armor-mastery",
+      "file": "art-workbench/mastery-icons/originals/light-armor-mastery-v1.png",
+      "sha256": "431e8f5f0ff9ed579a218c8214153e46a5130af53b6937ba6a0d51091cd0ab08",
+      "bytes": 2799451,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/light-armor-mastery-v1.webp",
+      "runtimeSha256": "1f83746a2de3c02674b6a7e363d92c342d4cb6c644a9a0e07eadcc6bbccdebb2",
+      "runtimeBytes": 32392,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, light-armor-mastery. Subject: One fitted brown leather chest armor with crossed leather straps, small buckles and supple shoulder guards, no wearer, warm ochre and forest green ranger camp background. Clearly supple leather rather than metal. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "medium-armor-mastery",
+      "file": "art-workbench/mastery-icons/originals/medium-armor-mastery-v1.png",
+      "sha256": "8d8be06992df57a990b643e6f034f6f75a3688e8abd6bc2540fc45094254e22a",
+      "bytes": 3141445,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/medium-armor-mastery-v1.webp",
+      "runtimeSha256": "3442aa6de8a2b16c2d1a017c43f572075f17452a2d17a5213289e0195d9f9e0a",
+      "runtimeBytes": 31210,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, medium-armor-mastery. Subject: One steel chainmail hauberk with short articulated shoulder guards and a small fitted breastplate, no wearer, visible chain texture around the chest plate, deep teal and muted bronze armory background. Clearly mixed chainmail and partial metal armor. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    },
+    {
+      "id": "heavy-armor-mastery",
+      "file": "art-workbench/mastery-icons/originals/heavy-armor-mastery-v1.png",
+      "sha256": "328bddf771c5183c8f6f71e174f4cb03c04880e81b973c2d4b9b1189603e239a",
+      "bytes": 2901634,
+      "width": 1254,
+      "height": 1254,
+      "runtimeFile": "public/assets/skills/heavy-armor-mastery-v1.webp",
+      "runtimeSha256": "84ece3e5aebc1c2172e7640c1162f2314ab09ace9f8710dd485ad1e7094e7c5f",
+      "runtimeBytes": 31118,
+      "prompt": "Use case: stylized-concept. Create ONE square fantasy RPG mastery skill icon for ZwieQuest, heavy-armor-mastery. Subject: One imposing full plate steel cuirass with large layered pauldrons and thick gorget, no wearer, polished silver with gold edges, deep royal blue and charcoal castle armory background. Clearly massive complete plate protection. Polished hand-painted fantasy illustration matching richly colored jewel-like fantasy ability icons. Fully opaque richly painted background filling the square, no transparency. One large central readable equipment motif, clear silhouette, high contrast, rich directional lighting and subtle vignette, recognizable when reduced to 40px. No outer frame, no words, letters, numbers, watermark, user interface, people or body parts."
+    }
+  ]
+}

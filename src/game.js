@@ -4,10 +4,11 @@ import { CHARACTER_VERSION, MAX_CHARACTERS, activeCharacter, newCharacter, migra
 import { attack, stats, statDetails } from './combat.js';
 import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
 import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
+import { rollDropSlot } from './probabilities.js';
 import { rollEncounter } from './encounters.js';
 import { generateMonster, generateBoss, monsterRewards, recordMonsterEncounter } from './monsters.js';
 import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorSpeed, migrateWeaponBalance, migrateLegacyEquipment } from './equipment.js';
-import { skillDefinition, grantTreasureSkill, applySkillEffect, initializeSkills, initializeBattleSkills, skillItemView, equipSkill, useSkill, resolvePendingSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
+import { skillDefinition, grantTreasureSkill, applySkillEffect, initializeSkills, initializeBattleSkills, skillItemView, equipSkill, useSkill, resolvePendingSkill, resolveAutoSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
 import { COMBAT_RULES_VERSION, DEFAULT_SPEED, enemyActionSpeed, newCombatants, migrateBattle, nextAction, advanceReadiness } from './action-speed.js';
 export const THEMES = Object.entries(MAP_DEFS).map(([id, def]) => ({ id, name: def.name, subtitle: def.subtitle }));
 export class Game {
@@ -33,7 +34,7 @@ export class Game {
       const migrated = migrateCharacters(state);
       if (state.characters.length > MAX_CHARACTERS || (state.characters.length && !activeCharacter(state))) throw Error('잘못된 캐릭터 저장 상태입니다.');
       for (const character of state.characters) {
-        initializeSkills({ characters: [character], activeCharacterId: character.id });
+        initializeSkills({ characters: [character], activeCharacterId: character.id, battle:character.id===this.state.activeCharacterId?this.state.battle:null });
         const maxHp = statDetails(state, config, character).values.maxHp;
         character.hp = character.hp == null ? maxHp : Math.min(character.hp, maxHp);
       }
@@ -93,7 +94,7 @@ export class Game {
       const item = generateEquipment({ slot, templateId, gradeId: 'normal', specials: false, rng: this.rng });
       s.inventory.push(item); character.equipment[slot] = item.id;
     }
-    initializeSkills({ characters: [character], activeCharacterId: character.id });
+    initializeSkills({ characters: [character], activeCharacterId: character.id, battle:character.id===this.state.activeCharacterId?this.state.battle:null });
     s.characters.push(character);
     character.hp = statDetails(s, this.config, character).values.maxHp;
     s.activeCharacterId ||= character.id; s.homePaused = true;
@@ -164,14 +165,15 @@ export class Game {
     if (!treasure && s.enemy?.generationVersion === 1 && s.bestiary[s.enemy.variationId]) s.bestiary[s.enemy.variationId].defeats++;
     this.character.xp += xp; s.gold += gold;
     if (treasure) s.chests++; else s.victories++;
-    // One shared global drop roll, then equal weapon / armor / accessory odds.
-    const slot = !treasure && rewards.canDrop && chance(this.rng, this.config.probabilities?.dropPercent ?? EQUIPMENT_CATALOG.dropPercent)
-      ? ['weapon', 'armor', 'charm'][this.rng(3)] : null;
-    const item = slot ? this.item(slot) : null;
+    // Both encounters share the drop gate and the same configurable category weights.
+    const slot = rewards.canDrop && chance(this.rng, this.config.probabilities?.dropPercent ?? EQUIPMENT_CATALOG.dropPercent)
+      ? rollDropSlot(this.rng, this.config.probabilities) : null;
+    const item = slot && slot!=='skill' ? this.item(slot) : null;
     if (item) s.inventory.push(item);
-    const skillItem = treasure ? grantTreasureSkill(s, this.rng) : null;
-    s.lastReward = { kind, skillId: skillItem?.templateId || null, skillName: skillItem?.name || null, goldOnly: treasure && !skillItem, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
-    this.log(kind, treasure ? `보물 발견 · 금화 +${gold}${skillItem ? ` · ${skillItem.name} 스킬 습득` : ' · 모든 스킬 습득 완료'}` : `${boss ? '보스 격파' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}${item ? `, ${item.rarity} ${item.name}` : ' · 장비 없음'}`, { battleId: s.battle?.id ?? null, xp, gold, itemId: item?.id || null, characterId: this.character.id });
+    const skillItem = slot==='skill' ? grantTreasureSkill(s, this.rng) : null;
+    s.lastReward = { kind, dropSlot:slot, skillId: skillItem?.templateId || null, skillName: skillItem?.name || null, goldOnly: treasure && !skillItem && !item, itemId: item?.id || null, itemName: item?.name || null, xp, gold };
+    const loot=skillItem ? ` · ${skillItem.name} 스킬 습득` : item ? ` · ${item.rarity} ${item.name}` : slot==='skill' ? ' · 모든 스킬 습득 완료' : ' · 추가 획득 없음';
+    this.log(kind, (treasure ? `보물 발견 · 금화 +${gold}` : `${boss ? '보스 격파' : '전투 승리'} · 경험치 +${xp}, 금화 +${gold}`)+loot, { battleId: s.battle?.id ?? null, xp, gold, itemId: item?.id || null, skillId:skillItem?.templateId || null, characterId: this.character.id });
     while (this.character.xp >= this.character.level * this.config.xpPerLevel) {
       this.character.xp -= this.character.level * this.config.xpPerLevel; this.character.level++;
       this.log('level', `레벨 ${this.character.level}! 최대 HP 증가`);
@@ -208,7 +210,7 @@ export class Game {
     const isHero=actor==='hero',attacker=isHero?hero:enemy,am=modifiers(b,actor);
     let skill=null;
     if(isHero){
-      const result=resolvePendingSkill(s,hero);
+      const result=this.character.autoSkills ? resolveAutoSkill(s,hero,this.rng) : resolvePendingSkill(s,hero);
       if(result?.cancelled)this.log('skill-cancelled',`스킬 예약 취소 · ${result.reason}`,result);
       else skill=result;
     } else if(!am.actionLocked && b.combatants.enemy.actionSeq>=2) {
@@ -229,12 +231,12 @@ export class Game {
     const damageTypes=modern?weapon.damageTypes:isHero?[!weapon?'blunt':legacyMagic?'fire':'slash']:(enemy.damageTypes||['blunt']);
     const result=attack({roll:this.rng(20)+1,acc:attacker.ACC+(isHero?maintainedSkillBonuses(s).ACC:0)+(skill?.effect.accuracyBonus||0),defense:defender[target],str:attacker.STR,base,
       pen:attacker.PEN+(skill?.effect.penetrationBonus||0),ar:defender.AR,damageTypes,typeModifiers:defender.typeModifiers,
-      damageRate:modern?weapon.damageRate||0:0,fixedDamage:raw?weapon.fixedDamage:undefined,skillDamageMultiplier:skill?.effect.damageMultiplier||1,
+      damageRate:modern?weapon.damageRate||0:0,fixedDamage:raw?weapon.fixedDamage:undefined,skillDamageMultiplier:skill?.effect.damageMultiplier||1,masteryDamageRate:isHero?(maintainedSkillBonuses(s).damageRate||0):0,
       transformHit:hit=>convertHit(hit,am,modifiers(b,targetActor),this.rng)});
     const recipient=targetActor==='hero'?this.character:s.enemy;recipient.hp=Math.max(0,recipient.hp-result.damage);
     if(targetActor!==actor && result.tier>=2)consumeMirror(b,targetActor);
     if(skill && result.tier>=2 && recipient.hp>0) {
-      result.statusResult=applyStatus(b,targetActor,skill.effect.statusId,skill.effect.durationMs,attacker,actor,recipient.statusResistance||{},skill.skillId);
+      result.statusResult=applyStatus(b,targetActor,skill.effect.statusId,skill.effect.durationMs,attacker,actor,recipient.statusResistance||{},skill.skillId,defender);
     }
     if(targetActor!==actor && result.tier===3 && am.interruptOnCrit && !modifiers(b,targetActor).interruptImmune && recipient.hp>0) {
       b.combatants[targetActor].readiness=0;
@@ -365,7 +367,7 @@ export class Game {
       if (cmd.type === 'DEPART') this.advance();
       return;
     }
-    const personal = ['ALLOCATE_STAT', 'EQUIP', 'UNEQUIP', 'USE_SKILL', 'TOGGLE_SKILL'];
+    const personal = ['ALLOCATE_STAT', 'EQUIP', 'UNEQUIP', 'USE_SKILL', 'TOGGLE_SKILL', 'SET_AUTO_SKILLS'];
     if (personal.includes(cmd.type) && (!this.character || cmd.characterId !== this.character.id)) throw Error('출전 캐릭터가 변경되었습니다. 현재 캐릭터에서 다시 선택하세요.');
     if (personal.includes(cmd.type) && s.phase === 'BATTLE' && modifiers(s.battle, 'hero').actionLocked) throw Error('매혹·지배 중에는 캐릭터를 조작할 수 없습니다.');
     if (cmd.type === 'ALLOCATE_STAT') {
@@ -398,6 +400,13 @@ export class Game {
       const gold = items.reduce((sum, item) => sum + item.value, 0);
       s.inventory = s.inventory.filter(item => !ids.has(item.id)); s.gold += gold;
       this.log('sell', `일반 아이템 ${items.length}개 일괄 판매 · 금화 +${gold}`, { count: items.length, gold });
+    }
+    else if (cmd.type === 'SET_AUTO_SKILLS') {
+      if (typeof cmd.enabled !== 'boolean') throw Error('자동 스킬 사용 여부를 지정하세요.');
+      if (this.character.autoSkills === cmd.enabled) return;
+      this.character.autoSkills = cmd.enabled;
+      if (cmd.enabled && s.battle) delete s.battle.pendingSkill;
+      this.log('skill-mode', `${this.character.name} · ${cmd.enabled ? '자동 스킬' : '수동 스킬'}`, { characterId: this.character.id, automatic: cmd.enabled });
     }
     else if (cmd.type === 'USE_SKILL') {
       const result = useSkill(s, this.character.skills.find(i => i.id === cmd.itemId), stats(s, this.config), cmd);

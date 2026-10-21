@@ -39,9 +39,9 @@ test('1% special boundaries, nonduplicated types, armor +1..+4, prefixes and suf
  for(const t of c.armors)for(let v=0;v<4;v++){let call=0;const i=generate(t.id,'legendary',{specials:true,rng:()=>[0,0,v][call++]});assert.equal(Object.keys(i.typeModifiers).length,Object.keys(t.typeModifiers).length+1);assert.ok(Object.keys(i.typeModifiers).length<=3);assert.equal(i.special.amount,v+1);assert.equal(t.typeModifiers[i.special.type],undefined);assert.ok(!('raw' in i.typeModifiers));assert.ok(i.name.startsWith(t.name+' - '));}
  let n=0;const leather=generate('leather','legendary',{specials:true,rng:()=>[0,2,2][n++]});assert.equal(leather.name,'가죽 갑옷 - 소각저항');assert.equal(effectiveArmor(leather.stats.AR,['fire'],leather.typeModifiers).effectiveAR,12);assert.equal(effectiveArmor(leather.stats.AR,['blunt'],leather.typeModifiers).effectiveAR,7);
 });
-test('victory and boss equipment roll is exactly 25%, chests give no equipment, defeat gives none; boss idempotent',()=>{
- for(const kind of ['victory','boss']){let drops=0;const g=make();for(let roll=0;roll<10000;roll++){g.state.run++;g.rng=n=>n===10000?roll:0;const before=g.state.inventory.length;g.reward(kind);drops+=g.state.inventory.length-before;if(g.state.inventory.length>before)assert.ok(['weapon','armor','charm'].includes(g.state.inventory.at(-1).slot));}assert.equal(drops,2500);}
- const g=make();const before=g.state.inventory.length;g.reward('boss');const after=g.state.inventory.length;g.reward('boss');assert.equal(g.state.inventory.length,after);g.reward('treasure');assert.equal(g.state.inventory.length,after);assert.equal(g.state.lastReward.itemId,null);const n=g.state.inventory.length;g.phase('DOWNED',1);g.advance();assert.equal(g.state.inventory.length,n);assert.ok(after>=before);
+test('victory and boss equipment roll is exactly 25%, chests use the same roll, defeat gives none; boss idempotent',()=>{
+ for(const kind of ['victory','boss','treasure']){let drops=0;const g=make();for(let roll=0;roll<10000;roll++){g.state.run++;g.rng=n=>n===10000?roll:0;const before=g.state.inventory.length;g.reward(kind);drops+=g.state.inventory.length-before;if(g.state.inventory.length>before)assert.ok(['weapon','armor','charm'].includes(g.state.inventory.at(-1).slot));}assert.equal(drops,2500);}
+ const g=make();const before=g.state.inventory.length;g.reward('boss');const after=g.state.inventory.length;g.reward('boss');assert.equal(g.state.inventory.length,after);g.rng=()=>0;g.reward('treasure');assert.equal(g.state.inventory.length,after+1);assert.ok(g.state.lastReward.itemId);const n=g.state.inventory.length;g.phase('DOWNED',1);g.advance();assert.equal(g.state.inventory.length,n);assert.ok(after>=before);
 });
 test('loot is unrestricted, both classes wear armor, starter cannot roll free legendary',()=>{
  for(const cls of ['warrior','wizard']){const g=make(cls);assert.equal(g.state.inventory[0].gradeId,'normal');assert.equal(g.state.inventory[0].special,null);for(let j=0;j<30;j++){const i=g.item('weapon');assert.equal(i.classId,undefined);}const a=generate('plate','legendary');g.state.inventory.push(a);g.command({characterId: g.character?.id, type:'EQUIP',itemId:a.id});assert.equal(stats(g.state,config).AR,13);}
@@ -63,11 +63,11 @@ test('UI shows integer damage, compact combat tags, armor modifiers and safe cat
 });
 
 test('both classes receive each equipment slot from victory and bosses, with one shared drop roll',()=>{
- for(const cls of ['warrior','wizard'])for(const kind of ['victory','boss'])for(const [pick,slot] of ['weapon','armor','charm'].entries()){
+ for(const cls of ['warrior','wizard'])for(const kind of ['victory','boss','treasure'])for(const [pick,slot] of ['weapon','armor','charm'].entries()){
   const g=make(cls),before=g.state.inventory.length,calls=[];
-  g.rng=n=>{calls.push(n);return n===3?pick:0;};g.reward(kind);
+  g.rng=n=>{calls.push(n);return n===4?pick:0;};g.reward(kind);
   assert.equal(g.state.inventory.length,before+1);const item=g.state.inventory.at(-1);
-  assert.equal(item.slot,slot);assert.equal(g.state.lastReward.itemId,item.id);assert.equal(calls[0],10000);assert.equal(calls[1],3);
+  assert.equal(item.slot,slot);assert.equal(g.state.lastReward.itemId,item.id);assert.equal(calls[0],10000);assert.equal(calls[1],4);
   if(slot==='charm'){assert.equal(item.tier,0);assert.equal(item.primaryStat,'STR');assert.deepEqual(item.stats,{STR:1});g.command({characterId: g.character?.id, type:'EQUIP',itemId:item.id});assert.equal(g.character.equipment.charm,item.id);const restored=new Game(config,JSON.parse(JSON.stringify(g.state)));assert.deepEqual(restored.state.inventory.at(-1),item);}
   const noDrop=make(cls),count=noDrop.state.inventory.length;noDrop.rng=n=>{assert.equal(n,10000);return 2500;};noDrop.reward(kind);assert.equal(noDrop.state.inventory.length,count);assert.equal(noDrop.state.lastReward.itemId,null);
  }

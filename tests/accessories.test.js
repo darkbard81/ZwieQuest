@@ -53,9 +53,9 @@ test('legacy items are replaced once, preserve equipped IDs and new gear, and ne
  const saved=structuredClone(migrated.state),again=new Game(g.config,structuredClone(saved),()=>{throw Error('Unexpected reroll');});assert.deepEqual(again.state,saved);
  }
 });
-test('fresh starter gear uses the current catalog; treasure grants gold and an unlearned skill at every risk',()=>{
+test('fresh starter gear uses the current catalog; skill-category treasure grants gold and an unlearned skill at every risk',()=>{
  for(const cls of ['warrior','wizard']){const g=make(cls);assert.equal(g.state.inventory.length,2);assert.deepEqual(g.state.inventory.map(i=>i.slot),['weapon','armor']);assert.ok(g.state.inventory.every(i=>i.templateId));assert.ok(g.state.inventory.filter(i=>i.slot!=='skill').every(i=>i.gradeId==='normal'));assert.equal(g.character.equipment.charm,undefined);
-  g.rng=()=>0;const before=structuredClone(g.state.inventory);g.character.xp=39;
+  g.rng=()=>0;g.config={...g.config,probabilities:{dropPercent:100,weaponWeight:0,armorWeight:0,charmWeight:0,skillWeight:1}};const before=structuredClone(g.state.inventory);g.character.xp=39;
   for(const [index,risk] of [0,3,10].entries()){
    g.state.risk=risk;const gold=g.state.gold,expected=g.config.balance.treasureGold+risk*g.config.balance.riskGold;g.reward('treasure');
    assert.deepEqual(g.state.inventory,before);assert.equal(g.state.lastReward.itemId,null);assert.equal(g.state.lastReward.xp,0);assert.equal(g.state.lastReward.goldOnly,false);assert.ok(g.state.lastReward.skillId);assert.equal(g.character.xp,39);assert.equal(g.character.level,1);assert.equal(g.state.gold,gold+expected);assert.equal(g.state.chests,index+1);assert.ok(g.events.at(-1).text.startsWith(`보물 발견 · 금화 +${expected}`));

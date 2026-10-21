@@ -1,9 +1,11 @@
 import { EQUIPMENT_CATALOG } from './equipment.js';
-export const DEFAULT_PROBABILITIES = Object.freeze({ battlePercent: 20, treasurePercent: 5, passPercent: 75, dropPercent: EQUIPMENT_CATALOG.dropPercent });
+export const DROP_WEIGHTS = Object.freeze({ weaponWeight:1, armorWeight:1, charmWeight:1, skillWeight:1 });
+export const DEFAULT_PROBABILITIES = Object.freeze({ battlePercent: 20, treasurePercent: 5, passPercent: 75, dropPercent: EQUIPMENT_CATALOG.dropPercent, ...DROP_WEIGHTS });
 export function validateProbabilities(value) {
   const keys = Object.keys(DEFAULT_PROBABILITIES);
   if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length !== keys.length || keys.some(k => !Number.isInteger(value[k]) || value[k] < 0 || value[k] > 100)) throw Object.assign(Error('확률은 0~100 사이의 정수여야 합니다.'), { status: 400 });
   if (value.battlePercent + value.treasurePercent + value.passPercent !== 100) throw Object.assign(Error('전투·보물·통과 확률의 합계는 100%여야 합니다.'), { status: 400 });
+  if (!Object.keys(DROP_WEIGHTS).some(k=>value[k]>0)) throw Object.assign(Error('획득 종류 비율은 하나 이상 0보다 커야 합니다.'), { status:400 });
   return Object.freeze(Object.fromEntries(keys.map(k => [k, value[k]])));
 }
 // All accounts share this durable configuration; per-account resets never change it.
@@ -15,7 +17,7 @@ export class ProbabilitySettings {
   }
   read() {
     const row = this.db.prepare('SELECT * FROM probability_settings WHERE id=1').get();
-    return { revision: row.revision, probabilities: validateProbabilities(JSON.parse(row.body)), updatedAt: row.updated_at };
+    return { revision: row.revision, probabilities: validateProbabilities({ ...DROP_WEIGHTS, ...JSON.parse(row.body) }), updatedAt: row.updated_at };
   }
   update(userId, input) {
     const probabilities = validateProbabilities(input.probabilities);
@@ -36,4 +38,13 @@ export class ProbabilitySettings {
       this.db.exec('COMMIT'); return result;
     } catch (error) { this.db.exec('ROLLBACK'); throw error; }
   }
+}
+
+export function rollDropSlot(rng, probabilities = {}) {
+  const entries=Object.entries(DROP_WEIGHTS).map(([key,value])=>[key.replace('Weight',''), probabilities[key] ?? value]);
+  const total=entries.reduce((sum,[,weight])=>sum+weight,0);
+  if (!Number.isSafeInteger(total) || total<=0) throw Error('Invalid drop weights');
+  let roll=rng(total);
+  for(const [slot,weight] of entries){if(roll<weight)return slot;roll-=weight;}
+  throw Error('Invalid drop roll');
 }

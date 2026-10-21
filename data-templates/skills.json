@@ -428,6 +428,306 @@
           "dagger"
         ]
       }
+    },
+    {
+      "id": "light-weapon-mastery",
+      "name": "경량 검 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/light-weapon-mastery-v1.webp",
+      "description": "경량 검 착용 중 ON일 때 명중 +2, 행동속도 +10%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "weapon",
+        "category": "light",
+        "accuracyBonus": 2,
+        "actionSpeedRate": 0.1,
+        "damageRate": -0.1
+      }
+    },
+    {
+      "id": "sword-mastery",
+      "name": "한손 검 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/sword-mastery-v1.webp",
+      "description": "한손 검 착용 중 ON일 때 명중 +2, 행동속도 -5%, 피해 +10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "weapon",
+        "category": "sword",
+        "accuracyBonus": 2,
+        "actionSpeedRate": -0.05,
+        "damageRate": 0.1
+      }
+    },
+    {
+      "id": "axe-mastery",
+      "name": "한손 도끼 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/axe-mastery-v1.webp",
+      "description": "한손 도끼 착용 중 ON일 때 명중 -2, 행동속도 +0%, 피해 +25%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "weapon",
+        "category": "axe",
+        "accuracyBonus": -2,
+        "actionSpeedRate": 0,
+        "damageRate": 0.25
+      }
+    },
+    {
+      "id": "mace-mastery",
+      "name": "한손 둔기 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/mace-mastery-v1.webp",
+      "description": "한손 둔기 착용 중 ON일 때 명중 +3, 행동속도 -10%, 피해 +0%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "weapon",
+        "category": "mace",
+        "accuracyBonus": 3,
+        "actionSpeedRate": -0.1,
+        "damageRate": 0
+      }
+    },
+    {
+      "id": "spear-mastery",
+      "name": "창 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/spear-mastery-v1.webp",
+      "description": "창 착용 중 ON일 때 명중 +3, 행동속도 +0%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "weapon",
+        "category": "spear",
+        "accuracyBonus": 3,
+        "actionSpeedRate": 0,
+        "damageRate": -0.1
+      }
+    },
+    {
+      "id": "polearm-mastery",
+      "name": "장병기 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/polearm-mastery-v1.webp",
+      "description": "장병기 착용 중 ON일 때 명중 +0, 행동속도 -10%, 피해 +20%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "weapon",
+        "category": "polearm",
+        "accuracyBonus": 0,
+        "actionSpeedRate": -0.1,
+        "damageRate": 0.2
+      }
+    },
+    {
+      "id": "heavy-weapon-mastery",
+      "name": "중량 무기 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/heavy-weapon-mastery-v1.webp",
+      "description": "중량 무기 착용 중 ON일 때 명중 +0, 행동속도 -15%, 피해 +30%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "weapon",
+        "category": "heavy",
+        "accuracyBonus": 0,
+        "actionSpeedRate": -0.15,
+        "damageRate": 0.3
+      }
+    },
+    {
+      "id": "staff-mastery",
+      "name": "지팡이 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/staff-mastery-v1.webp",
+      "description": "지팡이 착용 중 ON일 때 명중 -1, 행동속도 +0%, 피해 +20%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "weapon",
+        "category": "staff",
+        "accuracyBonus": -1,
+        "actionSpeedRate": 0,
+        "damageRate": 0.2
+      }
+    },
+    {
+      "id": "cloth-armor-mastery",
+      "name": "천옷 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/cloth-armor-mastery-v1.webp",
+      "description": "천옷 착용 중 ON일 때 명중 -1, 행동속도 +0%, 피해 +15%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "armor",
+        "category": "cloth",
+        "accuracyBonus": -1,
+        "actionSpeedRate": 0,
+        "damageRate": 0.15
+      }
+    },
+    {
+      "id": "light-armor-mastery",
+      "name": "경량 갑옷 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/light-armor-mastery-v1.webp",
+      "description": "경량 갑옷 착용 중 ON일 때 명중 +0, 행동속도 +15%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "armor",
+        "category": "light",
+        "accuracyBonus": 0,
+        "actionSpeedRate": 0.15,
+        "damageRate": -0.1
+      }
+    },
+    {
+      "id": "medium-armor-mastery",
+      "name": "중간 갑옷 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/medium-armor-mastery-v1.webp",
+      "description": "중간 갑옷 착용 중 ON일 때 명중 +2, 행동속도 -5%, 피해 +0%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "armor",
+        "category": "medium",
+        "accuracyBonus": 2,
+        "actionSpeedRate": -0.05,
+        "damageRate": 0
+      }
+    },
+    {
+      "id": "heavy-armor-mastery",
+      "name": "중갑옷 숙련",
+      "icon": "✦",
+      "iconPath": "/assets/skills/heavy-armor-mastery-v1.webp",
+      "description": "중갑옷 착용 중 ON일 때 명중 +0, 행동속도 +20%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "toggle",
+      "perBattleLimit": null,
+      "toggleConsumesCycle": false,
+      "treasureDrop": true,
+      "effect": {
+        "type": "equipmentMastery",
+        "equipmentSlot": "armor",
+        "category": "heavy",
+        "accuracyBonus": 0,
+        "actionSpeedRate": 0.2,
+        "damageRate": -0.1
+      }
     }
   ]
 }

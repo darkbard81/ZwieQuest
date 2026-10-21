@@ -1,0 +1,637 @@
+{
+  "encoding": "cwebp 1.6.0 -lossless -q 100 -m 6 -exact -metadata all",
+  "files": [
+    {
+      "source": "public/assets/barbarian/sheets/Front_Idle.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Front_Idle.png",
+      "output": "public/assets/barbarian/sheets/Front_Idle.webp",
+      "sourceBytes": 5453065,
+      "webpBytes": 3714126,
+      "sourceSha256": "51303b8d6e18a6062b6037cc061b50cf0f2c522313d5b4c7395ba5c6c6f189cb",
+      "webpSha256": "d78b8f23f10de8c724f85d2edd7c5bccfd10a8577934e3db036b533c54a7cad7",
+      "decodedRgbaSha256": "51d7d6da6562bc21b3de904781e1ad0d99eb45818f29a21e524dbecb9fc8ef48",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/barbarian/sheets/Front_Victory.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Front_Victory.png",
+      "output": "public/assets/barbarian/sheets/Front_Victory.webp",
+      "sourceBytes": 5438493,
+      "webpBytes": 3757570,
+      "sourceSha256": "c82f2310e1b194637bfec8ab2ec068dcd56fe9e96114522e0059630ce7937f72",
+      "webpSha256": "c4a6281ccc9143214cc33a2ed0166f18bb59b6242b7af55d3e40feb1686d6ad0",
+      "decodedRgbaSha256": "5ca1986cecc5dfecf42612e25a944a5ea77b663cc3c7765fb9a53b33b863d6e7",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/barbarian/sheets/Side_Attack.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Side_Attack.png",
+      "output": "public/assets/barbarian/sheets/Side_Attack.webp",
+      "sourceBytes": 5469596,
+      "webpBytes": 3885928,
+      "sourceSha256": "8486efdb066e431468a7028d566ab37e2e4ddb1d048388aa29d41cfa83b7c388",
+      "webpSha256": "6ee1ed52177ff129dc0dc28952c042dab77808d8b22f69e6c0e5e0e29dee2d3e",
+      "decodedRgbaSha256": "6cdcd6909ac615aabf77fb22835445014df51a26522ad80ac1cdd11ea1f8c184",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/barbarian/sheets/Side_Down.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Side_Down.png",
+      "output": "public/assets/barbarian/sheets/Side_Down.webp",
+      "sourceBytes": 5051113,
+      "webpBytes": 3595426,
+      "sourceSha256": "30be3db9d942f13c95a96bfa5169276dc078652847d0863adc46946b1361cc0a",
+      "webpSha256": "8db546155ff343bf7d9c6e92d5e14e77fd8ad0325697a49fb227fddbd81d574e",
+      "decodedRgbaSha256": "44f93192de09bc9b86d9fcba0ce2f325cbb40d2c877b2a05c850992bfe845b66",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/barbarian/sheets/Side_Hit.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Side_Hit.png",
+      "output": "public/assets/barbarian/sheets/Side_Hit.webp",
+      "sourceBytes": 5157212,
+      "webpBytes": 3631088,
+      "sourceSha256": "cb6786248445816aab802b4d3b40075c848163adeb1df7cc83a440f66f3c9c3e",
+      "webpSha256": "3a1118a1b55d5fdc9b93eaf17d6b5286e292c7f8d1a3b39f30ca576fb306f834",
+      "decodedRgbaSha256": "1f96c1b61f048f1e33b7b580460222ea0081b93e9f7098de55fce1dc8b62e131",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/barbarian/sheets/Side_Walk.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Side_Walk.png",
+      "output": "public/assets/barbarian/sheets/Side_Walk.webp",
+      "sourceBytes": 5319085,
+      "webpBytes": 3713258,
+      "sourceSha256": "ceb35e00e9e9f1b5533e443b0c8484ac7db5dcb3d246b291376db013df17228b",
+      "webpSha256": "adc962c88864547886c7bbd5347f21279a458d0cb7bec9afa14f2a805585fc22",
+      "decodedRgbaSha256": "a9d03bd83e40e2c68044802b6193b3a46878e74d6824f781edbee9624ded20eb",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/beach.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/backgrounds/beach.png",
+      "output": "public/assets/beach.webp",
+      "sourceBytes": 2985144,
+      "webpBytes": 2121632,
+      "sourceSha256": "f2759522a6fb79f1209e6b759e1527986cfeec0c1db5d606654b3fdd6ce98965",
+      "webpSha256": "84b1cde429facc446be5a09106e010f5d42ba6cbd30ce1889ab4def77e0c2bdf",
+      "decodedRgbaSha256": "a9802aa87d225fe9b9134cb1b08c3f8d5d97fe8dbb2f728014190a290d5b62ec",
+      "size": [
+        1672,
+        941
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/cat/sheets/Front_Idle.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Front_Idle.png",
+      "output": "public/assets/cat/sheets/Front_Idle.webp",
+      "sourceBytes": 3970755,
+      "webpBytes": 2782266,
+      "sourceSha256": "42965dcf6ceff6dbfa597cf307d9e51ece0af01e9fe8b6649f283696d4d42012",
+      "webpSha256": "0647b8f314ff4b0125b444426ea4b9523fe471b664f5d29eccce30ff5e6307fd",
+      "decodedRgbaSha256": "0fa073696507494f2409d62da19b678e022eb44d76b802bc995c3facef888d09",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/cat/sheets/Front_Victory.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Front_Victory.png",
+      "output": "public/assets/cat/sheets/Front_Victory.webp",
+      "sourceBytes": 5440695,
+      "webpBytes": 3562800,
+      "sourceSha256": "bacbbdb8d727298c798b92560501c5ceb1778df4ac053459424cfd6405f6a568",
+      "webpSha256": "8eb991acd80a76e6b8a281f2a62e3212490a68723b45e0a8f7cec7cc7536ffca",
+      "decodedRgbaSha256": "56dbd66043155880d07d860c9c684e6df5157ff387e924278316d7bea9f56e09",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/cat/sheets/Side_Attack.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Side_Attack.png",
+      "output": "public/assets/cat/sheets/Side_Attack.webp",
+      "sourceBytes": 4034625,
+      "webpBytes": 2648808,
+      "sourceSha256": "3629f400558f18ea156824bbe404f1d652780a26a370c1cec092e6325a053716",
+      "webpSha256": "f54f39a2913cba854979ba3a2106382c178d50ae5b91d136397c17bb1c2f2857",
+      "decodedRgbaSha256": "6a9a8f7eec5935f29cd208be9bf0c83cabdbaa1fcbf9fa7794b2221a995b81a9",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/cat/sheets/Side_Down.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Side_Down.png",
+      "output": "public/assets/cat/sheets/Side_Down.webp",
+      "sourceBytes": 4034302,
+      "webpBytes": 2642532,
+      "sourceSha256": "954a6d32673c2a21652b3620ff2f3b8e8e4bb341d892b027d969faa4520e28eb",
+      "webpSha256": "4b6b4803f19c018fbf70eea7c06ec8669203d7df57d2f907d3ffd9528351814c",
+      "decodedRgbaSha256": "6b60d2ad5d2f1fe5e4cfcdaa8e54e2b53eaf4501b30c1d28f0c75b684f405eef",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/cat/sheets/Side_Hit.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Side_Hit.png",
+      "output": "public/assets/cat/sheets/Side_Hit.webp",
+      "sourceBytes": 3907034,
+      "webpBytes": 2577924,
+      "sourceSha256": "dd968ec4e8f9fe9dda0cc77afea8ca98a1bfac7cbceec07f54022d28ab596cc7",
+      "webpSha256": "a0971776d63d97ffe23d9223706a5190ea4a87f9928bcb7343e7850b0a7c3cc8",
+      "decodedRgbaSha256": "d56fe7d4fc00f3fa5d0a5118d7ca8cf33b5280ba9f6678fc2ac355c0faf53635",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/cat/sheets/Side_Walk.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Side_Walk.png",
+      "output": "public/assets/cat/sheets/Side_Walk.webp",
+      "sourceBytes": 4370140,
+      "webpBytes": 2887916,
+      "sourceSha256": "94ea21efdcdbf5933bb0cfc0038bcf214355bbac27da0b879ca1eb05b9a2593d",
+      "webpSha256": "44a8fa5fa936a2fe25e97d9eef8f737354e0dfaccfea695c18b0a4a1cd1cc407",
+      "decodedRgbaSha256": "9575c72d80ff297cd159b0bc08a1c4619a2e3b0538418a7f1f6b2879aba1fc6a",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/desert.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/backgrounds/desert.png",
+      "output": "public/assets/desert.webp",
+      "sourceBytes": 3017555,
+      "webpBytes": 2072920,
+      "sourceSha256": "35fa126aa4da76858397abe82e560f23ecf9c760f7bfe34b856a9e63eaa9b4cf",
+      "webpSha256": "36245dcba4dcb26d78dbfcf75921af0a3e92a4464188d449bb9d0a83a95394cf",
+      "decodedRgbaSha256": "797ee5a6437ad5b873ffcaf8b31d89c6cc308077692b64582623d31814ec8db5",
+      "size": [
+        1672,
+        940
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/lamia/sheets/Front_Idle.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Front_Idle.png",
+      "output": "public/assets/lamia/sheets/Front_Idle.webp",
+      "sourceBytes": 5960909,
+      "webpBytes": 4010902,
+      "sourceSha256": "5c5aeba83ab39e94cdd394ccbc987fa9e9bc7954c00dc1a9b2baeba00a4e57c5",
+      "webpSha256": "bb5c8cdf3f0ee101dce805ce1f96881143f05f1905663d7d6315daa079f7bf09",
+      "decodedRgbaSha256": "97b49ea5ee31bed4d237edbc83cc6683eb1742313cbc8ac86b77583b6bd33c57",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/lamia/sheets/Front_Victory.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Front_Victory.png",
+      "output": "public/assets/lamia/sheets/Front_Victory.webp",
+      "sourceBytes": 6516186,
+      "webpBytes": 4387054,
+      "sourceSha256": "5f64f649e83efaaea8303808346b9f0a5ac03c2e04fe7b5766798124081559f5",
+      "webpSha256": "583fec562d302eba6a91fd1675a9a076b39cdef6f61095b313e90f2f03cda83c",
+      "decodedRgbaSha256": "851642dee1a31f9bdcd870ac5089789d8d6d745a6ac510f0e0d46ff1087615ac",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/lamia/sheets/Side_Attack.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Side_Attack.png",
+      "output": "public/assets/lamia/sheets/Side_Attack.webp",
+      "sourceBytes": 6263041,
+      "webpBytes": 4264932,
+      "sourceSha256": "916aa5a69e19dca3d4f8b0e8dd734712c8c632b4bb5a98f05413291c149b0472",
+      "webpSha256": "aafec5af965bbfc71567cbff816d893f9cf90bfe743a33afa4e37afd7276cb82",
+      "decodedRgbaSha256": "a0970aa882a529244f90274c99f40d07cdb1897a2a60ab1596c66731142e8d9a",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/lamia/sheets/Side_Down.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Side_Down.png",
+      "output": "public/assets/lamia/sheets/Side_Down.webp",
+      "sourceBytes": 5254744,
+      "webpBytes": 3492192,
+      "sourceSha256": "1bfcb10078a71940b53c4fbfa0e6be3f815982133e6d35fa8cdd91b080d7a1d8",
+      "webpSha256": "8c9fa2c671a8e542fa1ac8a7df1e4fd449136505282e68bfebbf658d56ac5729",
+      "decodedRgbaSha256": "01a633cc66e0327933b2e0a93423e22c987bd7f5ba42d36a55319c2a6c616fab",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/lamia/sheets/Side_Hit.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Side_Hit.png",
+      "output": "public/assets/lamia/sheets/Side_Hit.webp",
+      "sourceBytes": 5931272,
+      "webpBytes": 3957942,
+      "sourceSha256": "662df4264749795d265b862d1c1b18f19ce962a082cbf61ea0483fc04421bdf2",
+      "webpSha256": "cc90cfc88dc18f052559bffa4644c340b7e6ce92548bff012f4831197c07f167",
+      "decodedRgbaSha256": "dce3639b45145181d8bd8cc258b22c584847e36fb3dc00834497315350ff8300",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/lamia/sheets/Side_Walk.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Side_Walk.png",
+      "output": "public/assets/lamia/sheets/Side_Walk.webp",
+      "sourceBytes": 5657814,
+      "webpBytes": 3734898,
+      "sourceSha256": "d8c78033bc83a1f2512399f247fc268c8f56b5d5c35b6afe1869d5728ce44bb7",
+      "webpSha256": "d8bdaefe3d8727e263e19b06c3706ab4cbbb667169daff9739405a28e3007f22",
+      "decodedRgbaSha256": "f5f2d92a41c30f10d7fd70f71fcb0f1e9eee8ee6fe3a788a7ecaccc2d0bca0f0",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/pub.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/backgrounds/pub.png",
+      "output": "public/assets/pub.webp",
+      "sourceBytes": 2005505,
+      "webpBytes": 1506156,
+      "sourceSha256": "faf87e51da1affd83882f42d1c52107d3bc379a03c01b77b87817eb84173c148",
+      "webpSha256": "db0dbb252dd490132d26cbdcc8b99e98ebdae59916cb6c6d399c202f809360af",
+      "decodedRgbaSha256": "03183a828f07c2180078cef60e5c93aac539b003a725fa9f39e618618654735f",
+      "size": [
+        1448,
+        1086
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/ranger/sheets/Front_Idle.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Front_Idle.png",
+      "output": "public/assets/ranger/sheets/Front_Idle.webp",
+      "sourceBytes": 3591761,
+      "webpBytes": 2556722,
+      "sourceSha256": "6bbcb2617ad412b9d9d65c347834665b6800c2e744dc6012ce07bf2a73e4410e",
+      "webpSha256": "be48761c6190108420fb9686e1c1246e83ef74a3066a87ac1babc7f16e70bdaf",
+      "decodedRgbaSha256": "9255eb71b901a185cb3e3154a6d639797c9b549ff167141eb24e884000537b41",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/ranger/sheets/Front_Victory.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Front_Victory.png",
+      "output": "public/assets/ranger/sheets/Front_Victory.webp",
+      "sourceBytes": 3756948,
+      "webpBytes": 2652294,
+      "sourceSha256": "50db1b7834349a90825e4323a73ab7bae52024ddaf334df8775ede479f9ea5b2",
+      "webpSha256": "a600b2ab05d050ee491ffbfdbdd6b32cdfd5e0c7434d21fab2e003442912dcbe",
+      "decodedRgbaSha256": "b20cbd281039493a4ea298b733d7bf56d2cd5edd19091c1304c91fd17c246a07",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/ranger/sheets/Side_Attack.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Side_Attack.png",
+      "output": "public/assets/ranger/sheets/Side_Attack.webp",
+      "sourceBytes": 3726375,
+      "webpBytes": 2657028,
+      "sourceSha256": "4ba6e0d029c72a2c987b2cc9c3fd293453fc3455911002646ebfe57555f9aae1",
+      "webpSha256": "29d369093301afe2519c21da17c5fcf970f20449e45c376607ac2037a3c76aba",
+      "decodedRgbaSha256": "c27dc0dff61e1de83aeb251e8b1139f8278f0965e7f82527806eb804fab7b0f3",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/ranger/sheets/Side_Down.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Side_Down.png",
+      "output": "public/assets/ranger/sheets/Side_Down.webp",
+      "sourceBytes": 3298091,
+      "webpBytes": 2344702,
+      "sourceSha256": "471c4d4ea909bb8d76b87814bbd17680b034cd44a35481a49a27b71a5712bb2d",
+      "webpSha256": "f4b09cb5ff7ba235702b212864b533b5179468a056f88aa69dd651fae405c776",
+      "decodedRgbaSha256": "b9f4be846c9afeb267b7c0867331ecb168b5321940a5c4755cf1bc41bae3d43f",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/ranger/sheets/Side_Hit.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Side_Hit.png",
+      "output": "public/assets/ranger/sheets/Side_Hit.webp",
+      "sourceBytes": 3522420,
+      "webpBytes": 2509668,
+      "sourceSha256": "06f8e2166437cfaecfe6c4ff041bdfc9d6528fc445aef6c6a3f8cd42e39579d2",
+      "webpSha256": "30a2f56bed7c093c97cca729b87786b8d3638083f7328aa54679a7f32dcc5136",
+      "decodedRgbaSha256": "acb515cb74dc42718e5be1915b3e343a1d5eac11f30e644ddc5074d70b85373f",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/ranger/sheets/Side_Walk.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Side_Walk.png",
+      "output": "public/assets/ranger/sheets/Side_Walk.webp",
+      "sourceBytes": 3663408,
+      "webpBytes": 2625184,
+      "sourceSha256": "f2fa08770c81fa5e09dbedc18d51bb3829489480eb4f9fbd099a87f21754bb8b",
+      "webpSha256": "e57672ef9588cbf9741c3f59c2e1a80ce02da89eb96e09d9d35fdc7c6632af58",
+      "decodedRgbaSha256": "e1761353dc17d575f5fa1045bddc6d325e483295269d14f6e91bb22e71c15234",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/snow.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/backgrounds/snow.png",
+      "output": "public/assets/snow.webp",
+      "sourceBytes": 2812495,
+      "webpBytes": 2077752,
+      "sourceSha256": "4075cae83bc62a72b0f2c50197036b7cc419b1b4fdb1be2e18a650951d538b72",
+      "webpSha256": "3e0b8676cf639301c9078b6e454c097e42dc062a6e6d19b2f0caecd369e42b4c",
+      "decodedRgbaSha256": "e907dcebccf0bc8e3c460febe04208bd4943c918261245332c917305adacc3a2",
+      "size": [
+        1672,
+        941
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/village.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/backgrounds/village.png",
+      "output": "public/assets/village.webp",
+      "sourceBytes": 3287344,
+      "webpBytes": 2454748,
+      "sourceSha256": "f3309491af22888b6c48ef6d6f209e993915f40d9cf7df4df2ca46b47fd44f86",
+      "webpSha256": "65219a5b93d1a17f588850dcdff8b4cd9882a88a7357a23af0e2e697c262c753",
+      "decodedRgbaSha256": "903b58bf99469525a0344698267d670c7dada5a7632f31c572c55edca2a3ff76",
+      "size": [
+        1672,
+        941
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/volcano.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/backgrounds/volcano.png",
+      "output": "public/assets/volcano.webp",
+      "sourceBytes": 2623422,
+      "webpBytes": 1856608,
+      "sourceSha256": "0057e75c39ec8d48a72b9bdd473be1f35d0c739df44ee5c8692f411ef619ae7f",
+      "webpSha256": "2d70eb2726a7317ca1cb7dc52777a0c77dc204a995ef3173e4cd255c674fac6a",
+      "decodedRgbaSha256": "5fcdf7f26edc819d80c2ae7d6302a3e5eba05683ab646ac07349d406a906fce7",
+      "size": [
+        1672,
+        941
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/warrior/sheets/Front_Idle.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Front_Idle.png",
+      "output": "public/assets/warrior/sheets/Front_Idle.webp",
+      "sourceBytes": 3311811,
+      "webpBytes": 2264936,
+      "sourceSha256": "1492060d0eb72b2a0a2d2c517288810d9c4f549e671bf3bf6774a57010171c75",
+      "webpSha256": "055668063a11134419dccb7fb84d0777fe32947dca27322a7b16cbce8ac4d6c8",
+      "decodedRgbaSha256": "be11e2f793978690400b9416703c8cbff9ef65e37ea8c5d8a37478fd5db36397",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/warrior/sheets/Front_Victory.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Front_Victory.png",
+      "output": "public/assets/warrior/sheets/Front_Victory.webp",
+      "sourceBytes": 4540069,
+      "webpBytes": 3240980,
+      "sourceSha256": "8f5f5c62a55b00fc8896bd7b97d64ed1f4cc4ba1c903c104f014e8bfdd9e354e",
+      "webpSha256": "054ab525fe6442ac7719b0b7113a837be6eb2b93f63d30a9bd2ad085ef8cb980",
+      "decodedRgbaSha256": "d5b357bf85916ba4969e6f161c44eaf0ac7c114dac8baebc2a12ea5b8136c39d",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/warrior/sheets/Side_Attack.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Side_Attack.png",
+      "output": "public/assets/warrior/sheets/Side_Attack.webp",
+      "sourceBytes": 3062811,
+      "webpBytes": 2196510,
+      "sourceSha256": "b485b61f81432f1867125c6c7a8c3c557a3329f483ed6f2655aed5fc87efeec7",
+      "webpSha256": "a1f935938981f91685cb7df82b21527d2ae89f8546daec2a8caf9b6a649097ca",
+      "decodedRgbaSha256": "14ec4ffd2c7466a58b33acecd8f16dccf7121d29c606a558c4fa844002432dd2",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/warrior/sheets/Side_Down.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Side_Down.png",
+      "output": "public/assets/warrior/sheets/Side_Down.webp",
+      "sourceBytes": 2754473,
+      "webpBytes": 1935526,
+      "sourceSha256": "c11593987d562a5ebcc8cef0692dfd83b32eec47c9c7d93e1dcdae63e7e5e516",
+      "webpSha256": "26ff2b2beedbcc1002b01f22e7eced818eca73e4b2ab18793fccd5748eb08ab1",
+      "decodedRgbaSha256": "6def00ecf84b9b18aa6a38b8b97e46f9606439adcab354cf117f2cf4e8a58b50",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/warrior/sheets/Side_Hit.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Side_Hit.png",
+      "output": "public/assets/warrior/sheets/Side_Hit.webp",
+      "sourceBytes": 2856163,
+      "webpBytes": 2034660,
+      "sourceSha256": "7256b2618a1634fc7ebb46de5a1df6e53b03ce981862cc61933de1094e6f119e",
+      "webpSha256": "2e6e198c1b48f119be5f589261e766e7215d5f77f9848bacdb5a27a27ed5c2c3",
+      "decodedRgbaSha256": "9a27a81b21f4a0c87b56e2272eed06c13dc0555f424dd40ebecbce9e9242ddf5",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/warrior/sheets/Side_Walk.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Side_Walk.png",
+      "output": "public/assets/warrior/sheets/Side_Walk.webp",
+      "sourceBytes": 2966890,
+      "webpBytes": 2089600,
+      "sourceSha256": "2cf9bb068fbc69028b9e14e5c86e35e67ed1af46d465bcd77f38f2457071027d",
+      "webpSha256": "4e7315bf4e3cef5bd3dc5316aef0d0a790947bd036157dee54538ee07a136bca",
+      "decodedRgbaSha256": "267c6d72382ea653a1ab940675334a455dda4d625cd0b154a51c8941a7fc0ec9",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/wizard/sheets/Front_Idle.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Front_Idle.png",
+      "output": "public/assets/wizard/sheets/Front_Idle.webp",
+      "sourceBytes": 3991142,
+      "webpBytes": 2825872,
+      "sourceSha256": "799a3ddba4c5fbe6eddbee1a1f6aecb0cbeea7bf966a380ddfc53b486cc30d35",
+      "webpSha256": "15e1c3261e27dc98ee95b333f3730f589116fef99a5223be11e43ee2c9da3b57",
+      "decodedRgbaSha256": "8ea4ff4c01facb50745c6b2a8abaaf55ac8fd3787fddc1e3eef3f453430e8b91",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/wizard/sheets/Front_Victory.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Front_Victory.png",
+      "output": "public/assets/wizard/sheets/Front_Victory.webp",
+      "sourceBytes": 4140869,
+      "webpBytes": 2943734,
+      "sourceSha256": "86ced26b65ff7cd6e1321d50ad0e1bb41e7364dc87898eb8020bc11a014ebd03",
+      "webpSha256": "2167c742bb91c911aed6fdb7c2b978eccd6bb2fb3cae325a4a56120107747f83",
+      "decodedRgbaSha256": "0e5240fac494d3dc1bfffdbe5437b1ebda9ce6c8a197652d4a6e15dd3088505e",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/wizard/sheets/Side_Attack.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Side_Attack.png",
+      "output": "public/assets/wizard/sheets/Side_Attack.webp",
+      "sourceBytes": 4855681,
+      "webpBytes": 3622538,
+      "sourceSha256": "7a0daff2e762689ad7a71e860299b7f3e58688ab92862836e4294ddab7dbe481",
+      "webpSha256": "c3e1a21ceab7e7e0ab03cfe0a631b7b9f8d1e5125bd05f2f90a0222209270d74",
+      "decodedRgbaSha256": "e4efeffb287128d049dda859b40aa6da65542c17a8ab6d9a39f7d75e0e7b0624",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/wizard/sheets/Side_Down.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Side_Down.png",
+      "output": "public/assets/wizard/sheets/Side_Down.webp",
+      "sourceBytes": 3466116,
+      "webpBytes": 2504126,
+      "sourceSha256": "e53ea577dde36cea161575bf8b5aeeab4d50264e9566b26a1c35c73cfe60743b",
+      "webpSha256": "20b88273b412d88305262a2925200e33bfb94e3cbc5251872125edee084a43db",
+      "decodedRgbaSha256": "708df4f86180b00867aed56aed1a0686954d3fca3103acaff9a908277665b471",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/wizard/sheets/Side_Hit.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Side_Hit.png",
+      "output": "public/assets/wizard/sheets/Side_Hit.webp",
+      "sourceBytes": 3814608,
+      "webpBytes": 2797836,
+      "sourceSha256": "b50a326df59632e4758d8f50f6d49f7db82ada33f0738efff50844cd59b7c32f",
+      "webpSha256": "58bc4364095c6ef215366a791487a4490affdc0caca9761c3ade3b8a15b25ac5",
+      "decodedRgbaSha256": "b7578ff21a3a41d89927c6764778ec0bd6f4209b28e5a72979529ab2de8c2c9e",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    },
+    {
+      "source": "public/assets/wizard/sheets/Side_Walk.png",
+      "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Side_Walk.png",
+      "output": "public/assets/wizard/sheets/Side_Walk.webp",
+      "sourceBytes": 3656630,
+      "webpBytes": 2659046,
+      "sourceSha256": "d4128647e33ac68cd81cdb75dd51a0916c1bf14384bc3663a8133f6870b9e2ca",
+      "webpSha256": "cf8dc8d8b410000031b38b6bfb08e2630ef4b91a3d341b6bbeba21ae32b8897b",
+      "decodedRgbaSha256": "c367278c60ecaac580de3c06505fc934e38c0e8777facf81c034f333fc433fa4",
+      "size": [
+        4096,
+        1536
+      ],
+      "rgbaExact": true
+    }
+  ],
+  "sourceBytes": 174937812,
+  "webpBytes": 121798340
+}

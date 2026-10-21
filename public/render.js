@@ -15,20 +15,41 @@ export async function createWorld(container) {
   const stage = new Container();
   await Assets.init({ preferences: { preferWorkers: false } });
   const names = ['village', 'volcano', 'beach', 'desert', 'snow', 'pub', 'icons'];
-  const loaded = await Promise.all([
-    ...names.map(name => Assets.load(REGIONS[name]?.canvas || `/assets/${name}.png`)),
-    ...APPEARANCES.map(({ id, assetVersion = 'inn-1' }) => Assets.load(`${appearanceAssets(id)}/sprite.png?v=${assetVersion}`)),
-    ...APPEARANCES.map(({ id, assetVersion = 'inn-1' }) => fetch(`${appearanceAssets(id)}/sprite.json?v=${assetVersion}`).then(response => response.json()))
-  ]);
+  const loaded = await Promise.all(names.map(name => Assets.load(REGIONS[name]?.canvas || (name === 'pub' ? '/assets/pub.webp' : `/assets/${name}.png`))));
   const backgrounds = Object.fromEntries(names.slice(0, -1).map((name, i) => [name, loaded[i]]));
-  const heroes = {};
-  for (const [i, { id: name }] of APPEARANCES.entries()) {
-    const texture = loaded[names.length + i], meta = loaded[names.length + APPEARANCES.length + i];
-    const frames = Object.fromEntries(Object.entries(meta.frames).map(([key, value]) => {
-      const f = value.frame;
-      return [key, new Texture({ source: texture.source, frame: new Rectangle(f.x, f.y, f.w, f.h) })];
-    }));
-    heroes[name] = { meta, frames };
+  const heroes = Object.fromEntries(await Promise.all(APPEARANCES.map(async appearance => {
+    const response = await fetch(`${appearanceAssets(appearance.id)}/sprite.json?v=${appearance.assetVersion}`);
+    if (!response.ok) throw Error('캐릭터 메타데이터 불러오기 실패');
+    return [appearance.id, { meta: await response.json(), appearance, frames: {}, actions: new Map(), loading: new Map(), releasing: new Map() }];
+  })));
+  let activeHeroId = 'warrior';
+  function releaseAction(h, action) {
+    const asset = h.actions.get(action); if (!asset || action === 'Front_Idle') return;
+    for (const name of h.meta.animations[action].frameNames) { h.frames[name]?.destroy(); delete h.frames[name]; }
+    h.actions.delete(action);
+    const releasing = Assets.unload(asset.url).finally(() => { if (h.releasing.get(action) === releasing) h.releasing.delete(action); });
+    h.releasing.set(action, releasing);
+  }
+  function loadHeroAction(id, action) {
+    const h = heroes[id]; if (h.actions.has(action)) return Promise.resolve();
+    if (h.loading.has(action)) return h.loading.get(action);
+    const url = `${appearanceAssets(id)}/${h.meta.animations[action].sheet}?v=${h.appearance.assetVersion}`;
+    const loading = Promise.resolve(h.releasing.get(action)).then(() => Assets.load(url)).then(texture => {
+      h.actions.set(action, { url });
+      for (const name of h.meta.animations[action].frameNames) {
+        const f = h.meta.frames[name].frame;
+        h.frames[name] = new Texture({ source: texture.source, frame: new Rectangle(f.x, f.y, f.w, f.h) });
+      }
+      if (action !== 'Front_Idle' && id !== activeHeroId) releaseAction(h, action);
+    }).finally(() => h.loading.delete(action));
+    h.loading.set(action, loading); return loading;
+  }
+  // Keep the six Idle sheets, plus only the active appearance's action sheets.
+  await Promise.all(APPEARANCES.map(({ id }) => loadHeroAction(id, 'Front_Idle')));
+  function prepareAppearance(id) {
+    activeHeroId = id;
+    for (const [other, h] of Object.entries(heroes)) if (other !== id) for (const action of h.actions.keys()) releaseAction(h, action);
+    for (const action of Object.keys(heroes[id].meta.animations)) loadHeroAction(id, action).catch(error => console.warn('캐릭터 동작 불러오기 실패', id, action, error));
   }
   const atlas = loaded[names.length - 1], cells = Array.from({ length: 4 }, (_, i) => new Texture({
     source: atlas.source, frame: new Rectangle(i * atlas.width / 4, atlas.height / 2, atlas.width / 4, atlas.height / 2)
@@ -99,12 +120,13 @@ export async function createWorld(container) {
       view.sprite.position.set(guest.x, guest.y);
       view.shade.position.set(guest.x, guest.y);
     }
-    hero.texture = h.frames[meta.animations[motion.action].frameNames[motion.frame]];
+    const requestedTexture = h.frames[meta.animations[motion.action].frameNames[motion.frame]];
+    hero.texture = requestedTexture || h.frames.Front_Idle_00;
     hero.anchor.set(meta.anchor.x / meta.frameWidth, meta.anchor.y / meta.frameHeight);
-    const size = (s.phase === 'HOME' ? 154 : 192) / meta.frameHeight;
+    const size = meta.displaySize / meta.frameHeight;
     hero.scale.set(mirrorAppearance(meta, motion) ? -size : size, size);
-    currentAnimation = { ...motion, appearanceId: appearance.id };
-    const x = ['BATTLE', 'TREASURE'].includes(s.phase) ? 166 : 245;
+    currentAnimation = { ...motion, appearanceId: appearance.id, assetPending: !requestedTexture };
+    const x = ['BATTLE', 'TREASURE', 'DOWNED'].includes(s.phase) ? 148 : 245;
     const groundY = s.phase === 'HOME' ? 242 : 317;
     hero.position.set(x, groundY);
     hero.tint = motion.hurt ? 0xffdddd : 0xffffff; shadow.position.set(x, groundY);
@@ -116,10 +138,12 @@ export async function createWorld(container) {
       const monsterTexture = monsterMotion ? monsterTextures.get(monsterAssetURL(monsterMotion.enemy.img_path)) : null;
       const theme = monsterMotion?.theme || s.theme;
       object.texture = monsterTexture || cells[monsterMotion ? { village: 1, volcano: 2, beach: 3, desert: 2, snow: 3 }[theme] : 0];
-      const size = monsterTexture ? 196 : monsterMotion?.enemy.boss ? 112 : 84;
+      // Monsters share the hero's logical cell and anchor; treasure keeps its own size.
+      const size = monsterMotion ? meta.displaySize : 84;
+      object.anchor.set(.5, monsterMotion ? meta.anchor.y / meta.frameHeight : 1);
       object.width = size * (monsterMotion?.scaleX ?? 1);
       object.height = size * (monsterMotion?.scaleY ?? 1);
-      object.position.set((monsterTexture ? 374 : 398) + (monsterMotion?.x ?? 0), monsterTexture ? 330 : 317);
+      object.position.set((monsterMotion ? 364 : 398) + (monsterMotion?.x ?? 0), groundY);
       object.tint = monsterMotion?.tint ?? 0xffffff;
       object.alpha = monsterMotion?.alpha ?? 1;
       currentMonsterImage = monsterTexture ? monsterAssetURL(monsterMotion.enemy.img_path) : null;
@@ -130,7 +154,7 @@ export async function createWorld(container) {
       else {
         feedback.alpha = age <= 650 ? 1 : (950 - age) / 300;
         const halfWidth = feedback.width / 2;
-        feedback.x = Math.max(12 + halfWidth, Math.min(500 - halfWidth, feedbackTarget === 'hero' ? x : 398));
+        feedback.x = Math.max(12 + halfWidth, Math.min(500 - halfWidth, feedbackTarget === 'hero' ? x : object.x));
         feedback.y = (feedbackTarget === 'hero' ? 80 : 128) - (reduced ? 0 : Math.min(feedbackTarget === 'hero' ? 8 : 18, age / 40));
       }
     }
@@ -139,7 +163,7 @@ export async function createWorld(container) {
   }
   requestAnimationFrame(frame);
   return {
-    update(value) { const now = performance.now(); if ((state?.battle?.id ?? state?.lastBattleId) !== (value?.battle?.id ?? value?.lastBattleId)) clearTransient(); camera.update(value, now); state = value; loadMonster(value?.enemy); animator.update(value, now); monsterAnimator.update(value); if (!['BATTLE', 'TREASURE', 'DOWNED'].includes(value?.phase)) clearFeedback(); },
+    update(value) { const now = performance.now(); if ((state?.battle?.id ?? state?.lastBattleId) !== (value?.battle?.id ?? value?.lastBattleId)) clearTransient(); camera.update(value, now); state = value; prepareAppearance(appearanceFor(value).id); loadMonster(value?.enemy); animator.update(value, now); monsterAnimator.update(value); if (!['BATTLE', 'TREASURE', 'DOWNED'].includes(value?.phase)) clearFeedback(); },
     clearFeedback,
     clearTransient,
     playEvents(events) {
@@ -161,8 +185,9 @@ export async function createWorld(container) {
       renderer: renderer.name, isPixiRenderer: renderer instanceof CanvasRenderer || renderer.name === 'webgl',
       feedback: { visible: feedback.visible, label: feedback.text, target: feedbackTarget, count: feedbackCount,
         bounds: feedback.visible ? { x: feedback.x - feedback.width / 2, y: feedback.y - feedback.height / 2, width: feedback.width, height: feedback.height } : null },
-      background: state?.phase === 'HOME' ? 'pub' : state?.theme, camera: cameraView, heroDisplay: { cellSize: state?.phase === 'HOME' ? 154 : 192, x: hero.x, y: hero.y, mirrored: hero.scale.x < 0 }, objectDisplay: { x: object.x, y: object.y, width: object.width, visible: object.visible, image: currentMonsterImage, motion: currentMonsterMotion, alpha: object.alpha, tint: object.tint },
+      background: state?.phase === 'HOME' ? 'pub' : state?.theme, camera: cameraView, heroDisplay: { cellSize: 256, sourceCellSize: heroes[appearanceFor(state).id].meta.frameWidth, anchor: { x: hero.anchor.x, y: hero.anchor.y }, x: hero.x, y: hero.y, mirrored: hero.scale.x < 0 }, objectDisplay: { x: object.x, y: object.y, width: object.width, height: object.height, anchor: { x: object.anchor.x, y: object.anchor.y }, visible: object.visible, image: currentMonsterImage, motion: currentMonsterMotion, alpha: object.alpha, tint: object.tint },
       innCharacters: innGuests.filter(v => v.sprite.visible).map(v => ({ characterId: v.characterId, action: 'Front_Idle', frame: v.frame, x: v.sprite.x, y: v.sprite.y })),
+      spriteSheets: Object.fromEntries(Object.entries(heroes).map(([id,h])=>[id,[...h.actions.keys()]])),
       framesRendered, animation: currentAnimation, displayObjects: stage.children.length, fps, width: renderer.canvas.width, height: renderer.canvas.height }; }
   };
 }

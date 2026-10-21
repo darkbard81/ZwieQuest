@@ -1,6 +1,7 @@
 {
   "barbarian": {
-    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/barbarian",
+    "source": "art-workbench/sprites/source-512-20261021T054544Z/barbarian",
+    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/barbarian",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -10,20 +11,43 @@
       "Side_Down",
       "Side_Hit"
     ],
-    "frameReplacement": {
-      "action": "Side_Attack",
-      "frame": 0,
-      "previousSourceFrameIndex": 12,
-      "sourceFrameIndex": 4,
-      "sourceTimeSeconds": 0.16666666666666666,
-      "reason": "Eyes-open neutral combat wait from original attack video; only cell 00 replaced.",
-      "sameNormalization": true
+    "playbackContract": "shared-v2-512",
+    "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
+    "displaySize": 256,
+    "previousRecord": {
+      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/barbarian",
+      "facing": "right",
+      "animations": [
+        "Front_Idle",
+        "Front_Victory",
+        "Side_Walk",
+        "Side_Attack",
+        "Side_Down",
+        "Side_Hit"
+      ],
+      "frameReplacement": {
+        "action": "Side_Attack",
+        "frame": 0,
+        "previousSourceFrameIndex": 12,
+        "sourceFrameIndex": 4,
+        "sourceTimeSeconds": 0.16666666666666666,
+        "reason": "Eyes-open neutral combat wait from original attack video; only cell 00 replaced.",
+        "sameNormalization": true
+      },
+      "previousSource": "art-workbench/sprites/Barbarian/battle-ready-20261017T080605Z",
+      "playbackContract": "shared-v1"
     },
-    "previousSource": "art-workbench/sprites/Barbarian/battle-ready-20261017T080605Z",
-    "playbackContract": "shared-v1"
+    "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
+    "deployment": {
+      "format": "lossless WebP",
+      "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets",
+      "pixelEquality": "RGB and alpha, including fully transparent pixels",
+      "report": "public/assets/lossless-webp-manifest.json"
+    }
   },
   "ranger": {
-    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/ranger",
+    "source": "art-workbench/sprites/source-512-20261021T054544Z/ranger",
+    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/ranger",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -33,23 +57,46 @@
       "Side_Down",
       "Side_Hit"
     ],
-    "idleReplacement": {
-      "action": "Front_Idle",
-      "motion": "compact hand-to-brow scouting gesture",
-      "frameCount": 24,
-      "durationMs": 2000,
-      "sourceRun": "art-workbench/sprites/Ranger/idle-contract-20261017T092306Z",
-      "sourceRangeSeconds": [
-        0,
-        3.1666666666666665
+    "playbackContract": "shared-v2-512",
+    "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
+    "displaySize": 256,
+    "previousRecord": {
+      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/ranger",
+      "facing": "right",
+      "animations": [
+        "Front_Idle",
+        "Front_Victory",
+        "Side_Walk",
+        "Side_Attack",
+        "Side_Down",
+        "Side_Hit"
       ],
-      "other120FramesUnchanged": true
+      "idleReplacement": {
+        "action": "Front_Idle",
+        "motion": "compact hand-to-brow scouting gesture",
+        "frameCount": 24,
+        "durationMs": 2000,
+        "sourceRun": "art-workbench/sprites/Ranger/idle-contract-20261017T092306Z",
+        "sourceRangeSeconds": [
+          0,
+          3.1666666666666665
+        ],
+        "other120FramesUnchanged": true
+      },
+      "previousSource": "art-workbench/sprites/Ranger/idle-scout-smooth-20261017T090415Z",
+      "playbackContract": "shared-v1"
     },
-    "previousSource": "art-workbench/sprites/Ranger/idle-scout-smooth-20261017T090415Z",
-    "playbackContract": "shared-v1"
+    "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
+    "deployment": {
+      "format": "lossless WebP",
+      "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets",
+      "pixelEquality": "RGB and alpha, including fully transparent pixels",
+      "report": "public/assets/lossless-webp-manifest.json"
+    }
   },
   "cat": {
-    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/cat",
+    "source": "art-workbench/sprites/source-512-20261021T054544Z/cat",
+    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/cat",
     "facing": "left",
     "animations": [
       "Front_Idle",
@@ -59,19 +106,42 @@
       "Side_Down",
       "Side_Hit"
     ],
-    "outlineRemoval": {
-      "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
-      "originalBackup": "art-workbench/sprites/Cat/original-white-outline-20261017T081151Z",
-      "rgbPreserved": true,
-      "interiorBeyond4pxPreserved": true,
-      "frameGeometryAndTimingPreserved": true,
-      "generationUsed": false
+    "playbackContract": "shared-v2-512",
+    "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
+    "displaySize": 256,
+    "previousRecord": {
+      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/cat",
+      "facing": "left",
+      "animations": [
+        "Front_Idle",
+        "Front_Victory",
+        "Side_Walk",
+        "Side_Attack",
+        "Side_Down",
+        "Side_Hit"
+      ],
+      "outlineRemoval": {
+        "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
+        "originalBackup": "art-workbench/sprites/Cat/original-white-outline-20261017T081151Z",
+        "rgbPreserved": true,
+        "interiorBeyond4pxPreserved": true,
+        "frameGeometryAndTimingPreserved": true,
+        "generationUsed": false
+      },
+      "previousSource": "art-workbench/sprites/Cat/no-white-outline-20261017T081915Z",
+      "playbackContract": "shared-v1"
     },
-    "previousSource": "art-workbench/sprites/Cat/no-white-outline-20261017T081915Z",
-    "playbackContract": "shared-v1"
+    "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
+    "deployment": {
+      "format": "lossless WebP",
+      "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets",
+      "pixelEquality": "RGB and alpha, including fully transparent pixels",
+      "report": "public/assets/lossless-webp-manifest.json"
+    }
   },
   "lamia": {
-    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/lamia",
+    "source": "art-workbench/sprites/source-512-20261021T054544Z/lamia",
+    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/lamia",
     "facing": "left",
     "animations": [
       "Front_Idle",
@@ -81,20 +151,42 @@
       "Side_Down",
       "Side_Hit"
     ],
-    "outlineRemoval": {
-      "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
-      "originalBackup": "art-workbench/sprites/Lamia/original-white-outline-20261017T081151Z",
-      "rgbPreserved": true,
-      "interiorBeyond4pxPreserved": true,
-      "frameGeometryAndTimingPreserved": true,
-      "generationUsed": false
+    "playbackContract": "shared-v2-512",
+    "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
+    "displaySize": 256,
+    "previousRecord": {
+      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/lamia",
+      "facing": "left",
+      "animations": [
+        "Front_Idle",
+        "Front_Victory",
+        "Side_Walk",
+        "Side_Attack",
+        "Side_Down",
+        "Side_Hit"
+      ],
+      "outlineRemoval": {
+        "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
+        "originalBackup": "art-workbench/sprites/Lamia/original-white-outline-20261017T081151Z",
+        "rgbPreserved": true,
+        "interiorBeyond4pxPreserved": true,
+        "frameGeometryAndTimingPreserved": true,
+        "generationUsed": false
+      },
+      "previousSource": "art-workbench/sprites/Lamia/no-white-outline-20261017T081915Z",
+      "playbackContract": "shared-v1"
     },
-    "previousSource": "art-workbench/sprites/Lamia/no-white-outline-20261017T081915Z",
-    "playbackContract": "shared-v1"
+    "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
+    "deployment": {
+      "format": "lossless WebP",
+      "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets",
+      "pixelEquality": "RGB and alpha, including fully transparent pixels",
+      "report": "public/assets/lossless-webp-manifest.json"
+    }
   },
   "warrior": {
-    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/warrior",
-    "previousSource": null,
+    "source": "art-workbench/sprites/source-512-20261021T054544Z/warrior",
+    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/warrior",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -104,11 +196,34 @@
       "Side_Down",
       "Side_Hit"
     ],
-    "playbackContract": "shared-v1"
+    "playbackContract": "shared-v2-512",
+    "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
+    "displaySize": 256,
+    "previousRecord": {
+      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/warrior",
+      "previousSource": null,
+      "facing": "right",
+      "animations": [
+        "Front_Idle",
+        "Front_Victory",
+        "Side_Walk",
+        "Side_Attack",
+        "Side_Down",
+        "Side_Hit"
+      ],
+      "playbackContract": "shared-v1"
+    },
+    "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
+    "deployment": {
+      "format": "lossless WebP",
+      "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets",
+      "pixelEquality": "RGB and alpha, including fully transparent pixels",
+      "report": "public/assets/lossless-webp-manifest.json"
+    }
   },
   "wizard": {
-    "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/wizard",
-    "previousSource": null,
+    "source": "art-workbench/sprites/source-512-20261021T054544Z/wizard",
+    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/wizard",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -118,6 +233,29 @@
       "Side_Down",
       "Side_Hit"
     ],
-    "playbackContract": "shared-v1"
+    "playbackContract": "shared-v2-512",
+    "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
+    "displaySize": 256,
+    "previousRecord": {
+      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/wizard",
+      "previousSource": null,
+      "facing": "right",
+      "animations": [
+        "Front_Idle",
+        "Front_Victory",
+        "Side_Walk",
+        "Side_Attack",
+        "Side_Down",
+        "Side_Hit"
+      ],
+      "playbackContract": "shared-v1"
+    },
+    "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
+    "deployment": {
+      "format": "lossless WebP",
+      "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets",
+      "pixelEquality": "RGB and alpha, including fully transparent pixels",
+      "report": "public/assets/lossless-webp-manifest.json"
+    }
   }
 }

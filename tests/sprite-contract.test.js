@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { losslessWebpInfo } from './helpers/webp.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { APPEARANCES } from '../public/appearances.js';
@@ -14,8 +15,10 @@ const contract = [
   ['Side_Hit', 360, false, false]
 ];
 function validate(meta, id) {
-  assert.equal(meta.schemaVersion, 3, id);
-  assert.deepEqual([meta.frameWidth, meta.frameHeight, meta.columns, meta.rows], [256, 256, 8, 18], id);
+  assert.equal(meta.schemaVersion, 4, id);
+  assert.deepEqual([meta.frameWidth, meta.frameHeight, meta.columns, meta.rows], [512, 512, 8, 3], id);
+  assert.equal(meta.displaySize,256);assert.equal(meta.layout,'action-sheets');
+  assert.deepEqual(meta.normalization.translation,[0,0]);assert.equal(meta.normalization.perFrameAlignment,false);
   assert.equal(Object.keys(meta.frames).length, 144, id);
   assert.deepEqual(Object.keys(meta.animations).sort(), contract.map(([name]) => name).sort(), id);
   for (const [row, [action, duration, loop, hold]] of contract.entries()) {
@@ -28,7 +31,10 @@ function validate(meta, id) {
     let total = 0;
     for (const [i, name] of anim.frameNames.entries()) {
       const f = meta.frames[name];
-      assert.deepEqual(f.frame, {x:i%8*256,y:(row*3+Math.floor(i/8))*256,w:256,h:256}, `${label}/${i}`);
+      assert.equal(f.image,`sheets/${action}.webp`);
+      assert.equal(f.sourceFrameIndex,anim.sourceFrameIndices[i]);
+      assert.ok(Math.abs(f.sourceTimeSeconds-f.sourceFrameIndex/anim.sourceFps)<1e-8);
+      assert.deepEqual(f.frame, {x:i%8*512,y:Math.floor(i/8)*512,w:512,h:512}, `${label}/${i}`);
       assert.ok(Math.abs(f.durationMs-duration/24)<1e-8, `${label}/${i} durationMs`);
       total += f.durationMs;
     }
@@ -47,9 +53,10 @@ for (const appearance of APPEARANCES) {
   test(`${appearance.id}: sprite.json animation/frame times, loops and atlas layout match the common contract`, () => {
     const dir = new URL(`../public/assets/${appearance.id}/`, import.meta.url);
     validate(JSON.parse(readFileSync(new URL('sprite.json',dir))),appearance.id);
-    const png=readFileSync(new URL('sprite.png',dir));
-    assert.equal(png.subarray(1,4).toString(),'PNG');
-    assert.deepEqual([png.readUInt32BE(16),png.readUInt32BE(20),png[25]],[2048,4608,6],'PNG dimensions and RGBA type');
+    for(const [action] of contract){
+      const data=readFileSync(new URL(`sheets/${action}.webp`,dir));
+      assert.deepEqual(losslessWebpInfo(data),{width:4096,height:1536,alpha:true},'lossless WebP dimensions and transparency');
+    }
     assert.equal(appearance.idleDurationMs,undefined);assert.equal(appearance.idleFrameCount,undefined);
   });
 }

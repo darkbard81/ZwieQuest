@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { losslessWebpInfo } from './helpers/webp.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { REGIONS } from '../public/regions.js';
@@ -27,7 +28,7 @@ test('region rename preserves every saved route and in-flight progress without r
   assert.deepEqual(Object.fromEntries(THEMES.map(({ id, name }) => [id, name])), names);
 });
 
-test('all route backgrounds and replaced canvases preserve existing RGB PNG dimensions', () => {
+test('route PNGs and lossless WebP canvas backgrounds preserve dimensions', () => {
   const dimensions = (url, expected) => {
     const data = readFileSync(new URL(`../public${url.split('?')[0]}`, import.meta.url));
     assert.equal(data.subarray(1, 4).toString(), 'PNG');
@@ -35,6 +36,12 @@ test('all route backgrounds and replaced canvases preserve existing RGB PNG dime
     assert.equal(data[24], 8); assert.equal(data[25], 2, 'opaque RGB');
   };
   for (const region of Object.values(REGIONS)) dimensions(region.route, [1536, 1024]);
-  dimensions(REGIONS.desert.canvas, [1672, 940]);
-  dimensions(REGIONS.beach.canvas, [1672, 941]);
+  const expected = {"village": [1672, 941], "volcano": [1672, 941], "beach": [1672, 941], "desert": [1672, 940], "snow": [1672, 941], "pub": [1448, 1086]};
+  for(const [id,size] of Object.entries(expected)){
+    const url=id==='pub'?'/assets/pub.webp':REGIONS[id].canvas;
+    assert.ok(url.split('?')[0].endsWith('.webp'));
+    const info=losslessWebpInfo(readFileSync(new URL(`../public${url.split('?')[0]}`,import.meta.url)));
+    assert.deepEqual([info.width,info.height],size,id);
+    assert.equal(info.alpha,false,id+' remains opaque');
+  }
 });

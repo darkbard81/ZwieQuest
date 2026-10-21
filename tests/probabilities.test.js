@@ -7,14 +7,14 @@ import { ProbabilitySettings, DEFAULT_PROBABILITIES, validateProbabilities } fro
 import { rollEncounter } from '../src/encounters.js';
 import { Game } from '../src/game.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
-const settings=(battlePercent,treasurePercent,dropPercent=25)=>({battlePercent,treasurePercent,passPercent:100-battlePercent-treasurePercent,dropPercent});
+const settings=(battlePercent,treasurePercent,dropPercent=25)=>({...DEFAULT_PROBABILITIES,battlePercent,treasurePercent,passPercent:100-battlePercent-treasurePercent,dropPercent});
 test('exclusive encounter thresholds cover all rolls including zero and full segments',()=>{
  for(const p of [DEFAULT_PROBABILITIES,settings(0,0),settings(100,0),settings(0,100),settings(30,40),settings(1,99)]){
   const counts={battle:0,treasure:0,pass:0};for(let n=0;n<10000;n++)counts[rollEncounter(()=>n,p)]++;
   assert.deepEqual(counts,{battle:p.battlePercent*100,treasure:p.treasurePercent*100,pass:p.passPercent*100});
  }
 });
-test('shared runtime settings govern existing games and all-level loot without changing chest rewards',()=>{
+test('shared runtime settings govern existing games and all-level loot and chest rewards',()=>{
  const shared={...config,probabilities:settings(0,0,0)};
  const games=[0,1].map(()=>{const g=new Game(shared,null,()=>0);g.create({name:'확률 검증',appearanceId:'warrior'});g.character.level=20;return g;});
  for(const p of [settings(100,0,100),settings(0,100,0),settings(0,0,25)]){
@@ -26,7 +26,7 @@ test('shared runtime settings govern existing games and all-level loot without c
  }
  for(const dropPercent of [0,100]){
   shared.probabilities=settings(20,5,dropPercent);
-  for(const g of games){g.beginBattle();g.reward('victory');assert.equal(Boolean(g.state.lastReward.itemId),dropPercent===100);assert.equal(g.state.lastReward.xp,1);g.reward('treasure');assert.equal(g.state.lastReward.itemId,null);}
+  for(const g of games){g.beginBattle();g.reward('victory');assert.equal(Boolean(g.state.lastReward.itemId),dropPercent===100);assert.equal(g.state.lastReward.xp,1);g.reward('treasure');assert.equal(Boolean(g.state.lastReward.itemId),dropPercent===100);}
  }
 });
 test('settings validate, persist atomically, reject stale writes and deduplicate retries',()=>{
@@ -44,4 +44,19 @@ test('settings validate, persist atomically, reject stale writes and deduplicate
   db.exec('DROP TRIGGER reject_probability');store.update('admin',b);
   assert.equal(store.update('admin',a).revision,2);assert.deepEqual(store.read().probabilities,b.probabilities);
  }finally{db.close();}
+});
+
+test('loot partition rounds legacy weights to 100%, retains zero categories and maps boundaries to valid weights', async()=>{
+ const {lootBoundaries,lootWeights}=await import('../public/probability-settings.js');
+ assert.deepEqual(lootBoundaries({weaponWeight:1,armorWeight:1,charmWeight:1,skillWeight:1}),[25,50,75]);
+ assert.deepEqual(lootBoundaries({weaponWeight:1,armorWeight:1,charmWeight:1,skillWeight:0}),[34,67,100]);
+ assert.deepEqual(lootWeights([20,55,80]),{weaponWeight:20,armorWeight:35,charmWeight:25,skillWeight:20});
+ assert.deepEqual(lootWeights([50,50,50]),{weaponWeight:50,armorWeight:0,charmWeight:0,skillWeight:50});
+ assert.deepEqual(lootWeights([0,0,0]),{weaponWeight:0,armorWeight:0,charmWeight:0,skillWeight:100});
+ for(let weapon=0;weapon<5;weapon++)for(let armor=0;armor<5;armor++)for(let charm=0;charm<5;charm++)for(let skill=0;skill<5;skill++){
+  if(!(weapon+armor+charm+skill))continue;
+  const original={weaponWeight:weapon,armorWeight:armor,charmWeight:charm,skillWeight:skill};
+  const normalized=lootWeights(lootBoundaries(original));assert.equal(Object.values(normalized).reduce((a,b)=>a+b,0),100);
+  for(const key of Object.keys(normalized)){assert.ok(Number.isInteger(normalized[key])&&normalized[key]>=0&&normalized[key]<=100);if(!original[key])assert.equal(normalized[key],0);}
+ }
 });

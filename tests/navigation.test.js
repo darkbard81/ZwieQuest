@@ -105,7 +105,7 @@ test('every map rolls on arrival, ignores old fixed assignments, and never rerol
   assert.ok(Object.values(restored.state.maps[mapId].nodes).every(n=>!Object.hasOwn(n,'event')));
  }
  const g=make();g.advance();g.choose('left');const arrival=structuredClone(g.state);
- for(const [roll,phase] of [[0,'BATTLE'],[2000,'TREASURE'],[2500,'CHOICE_WAIT']]) {g.state=structuredClone(arrival);g.rng=()=>roll;g.advance();assert.equal(g.state.phase,phase);}
+ for(const [roll,phase] of [[0,'BATTLE'],[2000,'TREASURE'],[2500,'CHOICE_WAIT']]) {g.state=structuredClone(arrival);g.rng=n=>n===10000?roll:0;g.advance();assert.equal(g.state.phase,phase);}
 });
 
 test('dead ends, exits and bosses keep their terminal behavior without rolling ordinary encounters', () => {

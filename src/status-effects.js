@@ -18,7 +18,8 @@ export function modifiers(b, actor) {
   return out;
 }
 export const durationMs = (base, intellect) => Math.round(base * Math.max(STATUS_CATALOG.duration.minimumMultiplier, 1 + (intellect || 0) * STATUS_CATALOG.duration.intelligenceRate));
-export function applyStatus(b, actor, id, baseMs, source, sourceActor = actor, resistance = {}, sourceSkillId = null) {
+export const resolveDurationMultiplier = resolve => Math.max(STATUS_CATALOG.duration.resolveMinimumMultiplier, 1 - (resolve || 0) * STATUS_CATALOG.duration.resolveReductionRate);
+export function applyStatus(b, actor, id, baseMs, source, sourceActor = actor, resistance = {}, sourceSkillId = null, targetStats = {}) {
   initializeStatuses(b);
   let def = statusDefinition(id);
   if (!def) throw Error(`Unknown status: ${id}`);
@@ -34,7 +35,9 @@ export function applyStatus(b, actor, id, baseMs, source, sourceActor = actor, r
   const old = list[index], oldDef = statusDefinition(old?.id);
   if (oldDef && oldDef.polarity !== def.polarity) { list.splice(index, 1); return { applied:false, cancelled:true, id:def.id }; }
   if (oldDef?.tier > def.tier) return { applied:false, reason:'stronger' };
-  const remainingMs = durationMs(baseMs, source.INT) * (def.polarity === 'debuff' ? caster.debuffDurationMultiplier * target.hostileDurationMultiplier : 1);
+  // Snapshot the recipient before this application; negative Resolve extends hostile effects.
+  const resolveMultiplier = resolveDurationMultiplier(targetStats.RES);
+  const remainingMs = durationMs(baseMs, source.INT) * (def.polarity === 'debuff' ? resolveMultiplier * caster.debuffDurationMultiplier * target.hostileDurationMultiplier : 1);
   if (oldDef?.tier === def.tier) { if (remainingMs > old.remainingMs) { old.remainingMs = remainingMs; old.durationMs = remainingMs; old.sourceSkillId = sourceSkillId; } return { applied:true, id:def.id }; }
   const entry = { id:def.id, remainingMs, durationMs:remainingMs, sourceSkillId, ...(def.modifiers.periodMs ? { tickRemainingMs:def.modifiers.periodMs } : {}) };
   if (index >= 0) list[index] = entry; else list.push(entry);

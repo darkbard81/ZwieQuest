@@ -19,7 +19,7 @@ export function combatLogHTML(entry) {
   if (h.damageType === 'raw') {
     damage = `${tag('고정', c.fixedDamage)} · ${tag('방어도 무시')} → ${tag('피해', h.damage, '미스이면 0, 그 외에는 고정 피해 그대로 적용')}`;
   } else {
-    const labels = { grade: '등급', tactic: '전술', strength: '힘', hit: outcome, armor: '방어 보정' };
+    const labels = { grade: '등급', tactic: '전술', strength: '힘', hit: outcome, armor: '방어 보정', mastery: '숙련' };
     const allFactors = {...c.factors, ...(c.skillDamageMultiplier ? {skill:c.skillDamageMultiplier} : {})}; labels.skill='스킬';
     const factors = Object.entries(allFactors).filter(([, value]) => value !== 1).map(([key, value]) => `${labels[key]} ${percent(value)}`);
     const multiplier = Object.values(allFactors).reduce((total, value) => total * value, 1);

@@ -2,7 +2,9 @@
   "schemaVersion": 1,
   "duration": {
     "intelligenceRate": 0.05,
-    "minimumMultiplier": 0.25
+    "minimumMultiplier": 0.25,
+    "resolveReductionRate": 0.03,
+    "resolveMinimumMultiplier": 0.25
   },
   "statuses": [
     {

@@ -19,10 +19,10 @@ const ids=(g,actor)=>g.state.battle.statuses[actor].map(s=>s.id);
 function drain(g,total,steps=[total],rate=1){let i=0;while(total>0){const step=Math.min(total,steps[i++%steps.length]);g.tick(step/rate,rate);total-=step;}for(let n=0;g.state.pendingGameMs>0||g.state.remaining<=1e-7;n++){assert.ok(n<1000,'bounded drain');g.tick(0);}return g;}
 const records=g=>g.events.filter(e=>['hit','skill','status'].includes(e.type)).map(e=>[e.type,e.hit?.actor||e.actor,e.hit?.skillId||e.skillId,Math.round(e.hit?.combatTimeMs??e.combatTimeMs),e.hit?.damage??e.healed]);
 
-test('18 enabled skills: two attacks for each defense, six inspirations, four utilities and real opaque icons',()=>{
- const enabled=SKILL_CATALOG.skills.filter(d=>d.enabled);assert.equal(enabled.length,18);assert.equal(enabled.filter(d=>d.effect.type==='status').length,6);
+test('30 enabled skills including 12 equipment masteries: two attacks for each defense, six inspirations, four utilities and real opaque icons',()=>{
+ const enabled=SKILL_CATALOG.skills.filter(d=>d.enabled);assert.equal(enabled.length,30);assert.equal(enabled.filter(d=>d.effect.type==='status').length,6);
  for(const target of ['DEF','REF','FOR','WIL'])assert.equal(enabled.filter(d=>d.effect.defense===target).length,2);
- for(const d of enabled){assert.equal(d.cooldown,undefined);assert.ok(existsSync(new URL(`../public${d.iconPath}`,import.meta.url)));assert.equal(d.perBattleLimit,d.id==='heal'?2:1);}
+ for(const d of enabled){assert.equal(d.cooldown,undefined);assert.ok(existsSync(new URL(`../public${d.iconPath}`,import.meta.url)));assert.equal(d.perBattleLimit,d.activationMode==='toggle'?null:d.id==='heal'?2:1);}
  assert.deepEqual(enabled.filter(d=>['heal','mirror','cleanse','dispel'].includes(d.effect.type)).map(d=>d.effect.type).sort(),['cleanse','dispel','heal','mirror']);
 });
 test('all 36 definitions apply exact one attribute +/-5, with no tier multiplication, and expose all derived modifiers',()=>{
@@ -110,11 +110,11 @@ test('battle exit, death and restored ended battle discard statuses and pending 
  for(const finish of [g=>g.reward('victory'),g=>g.phase('DOWNED',1000),g=>g.beginBattle()]){const g=make();put(g,'hero','quick');g.command(cmd(g,'heal'));finish(g);assert.equal(g.state.battle?.pendingSkill,undefined);assert.equal(g.state.battle?.statuses?.hero.length||0,0);}
  const g=make();put(g,'hero','quick');g.character.hp=0;const restored=new Game(g.config,structuredClone(g.state));assert.deepEqual(ids(restored,'hero'),[]);
 });
-test('treasure grants every unlearned skill exactly once to current character, no sale or implicit equip; all learned falls back to gold',()=>{
- const g=make();g.phase('HOME',1000);const other=g.create({name:'다른 모험가',appearanceId:'warrior'});g.selectCharacter(g.state.characters[0].id);const slots=structuredClone(g.character.skillSlots);
- for(let i=0;i<17;i++){g.reward('treasure');assert.ok(g.state.lastReward.skillId);assert.equal(g.state.lastReward.goldOnly,false);}
- assert.equal(g.character.skills.length,18);assert.equal(new Set(g.character.skills.map(i=>i.templateId)).size,18);assert.deepEqual(g.character.skillSlots,slots);assert.equal(other.skills.length,1);
- const gold=g.state.gold;g.reward('treasure');assert.equal(g.state.lastReward.goldOnly,true);assert.equal(g.character.skills.length,18);assert.ok(g.state.gold>gold);const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skills.length,18);
+test('skill-category treasure grants every unlearned skill exactly once to current character, no sale or implicit equip; all learned falls back to gold',()=>{
+ const g=make();g.config.probabilities={dropPercent:100,weaponWeight:0,armorWeight:0,charmWeight:0,skillWeight:1};g.phase('HOME',1000);const other=g.create({name:'다른 모험가',appearanceId:'warrior'});g.selectCharacter(g.state.characters[0].id);const slots=structuredClone(g.character.skillSlots);
+ for(let i=0;i<29;i++){g.reward('treasure');assert.ok(g.state.lastReward.skillId);assert.equal(g.state.lastReward.goldOnly,false);}
+ assert.equal(g.character.skills.length,30);assert.equal(new Set(g.character.skills.map(i=>i.templateId)).size,30);assert.deepEqual(g.character.skillSlots,slots);assert.equal(other.skills.length,1);
+ const gold=g.state.gold;g.reward('treasure');assert.equal(g.state.lastReward.goldOnly,true);assert.equal(g.character.skills.length,30);assert.ok(g.state.gold>gold);const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skills.length,30);
 });
 test('new monsters receive a limited skill, use it on third action, then return to basic attacks; saved old enemies are not granted abilities',()=>{
  const g=make();g.state.enemy.skills=['weakening-strike'];g.state.enemy.ACC=100;g.rng=n=>n-1;for(let i=0;i<4;i++)g.battleAction('enemy');const hits=g.events.filter(e=>e.type==='hit');assert.deepEqual(hits.map(e=>e.hit.skillId),[undefined,undefined,'weakening-strike',undefined]);assert.equal(g.state.battle.enemySkillUseCounts['weakening-strike'],1);assert.ok(ids(g,'hero').includes('weakened'));
@@ -127,7 +127,7 @@ test('UI shows real icon and skill defense/duration, no cooldown, and disables c
 
 
 test('attack duration preview includes Acute and Enfeebled and matches actual snapshotted duration',()=>{
- const g=make();learn(g,'hamstring');put(g,'hero','acute');put(g,'enemy','enfeebled');g.character.attributes.INT=4;g.rng=n=>n-1;
+ const g=make();learn(g,'hamstring');put(g,'hero','acute');put(g,'enemy','enfeebled');g.character.attributes.INT=4;g.state.enemy.RES=10;put(g,'enemy','shaken');g.rng=n=>n-1;
  const preview=g.snapshot().inventory.find(i=>i.templateId==='hamstring').durationMs;
  g.command(cmd(g,'hamstring'));g.battleAction('hero');assert.equal(g.state.battle.statuses.enemy.find(s=>s.id==='hobbled').remainingMs,preview);
 });
@@ -136,4 +136,42 @@ test('attack duration preview includes Acute and Enfeebled and matches actual sn
 test('monster CON status rounds the full HP formula once and retains flat HP bonuses',()=>{
  const g=make();Object.assign(g.state.enemy,{CON:1,maxHp:52,statusHpBase:50});put(g,'enemy','fit');assert.equal(effectiveEnemy(g.state.enemy,g.state.battle,g.config).maxHp,65);
  g.state.enemy.maxHp=62;assert.equal(effectiveEnemy(g.state.enemy,g.state.battle,g.config).maxHp,75);clearStatuses(g.state.battle,'enemy','buff');put(g,'enemy','sickened');assert.equal(effectiveEnemy(g.state.enemy,g.state.battle,g.config).maxHp,50);
+});
+
+test('Resolve scales all 18 afflictions, allows negatives and caps reduction at 75%, without shortening inspirations or mirror',()=>{
+ for(const RES of [-5,0,5,25,100])for(const def of STATUS_CATALOG.statuses){
+  const b={};applyStatus(b,'hero',def.id,10000,{INT:4},'enemy',{},'test',{RES});
+  const expected=12000*(def.polarity==='debuff'?Math.max(.25,1-.03*RES):1);
+  assert.ok(Math.abs(b.statuses.hero[0].remainingMs-expected)<1e-8,`${def.id} RES ${RES}`);
+ }
+ const b={};applyMirror(b,'hero',10000,{INT:4,RES:100});assert.equal(b.statuses.hero[0].remainingMs,12000);
+ applyStatus(b,'enemy','enfeebled',10000,{INT:0},'hero');applyStatus(b,'hero','acute',10000,{INT:0});
+ applyStatus(b,'enemy','hobbled',10000,{INT:4},'hero',{},'hamstring',{RES:5});
+ assert.equal(b.statuses.enemy.find(s=>s.id==='hobbled').remainingMs,19125);
+});
+test('hero and monster attacks use recipient effective Resolve including gear and existing debuffs',()=>{
+ for(const actor of ['hero','enemy']){
+  const g=make();g.rng=n=>n-1;g.character.attributes.RES=8;g.character.attributes.INT=4;
+  g.state.inventory.find(i=>i.id===g.character.equipment.armor).stats.RES=2;
+  Object.assign(g.state.enemy,{RES:10,INT:4,ACC:100,skills:['hamstring']});
+  const target=actor==='hero'?'enemy':'hero';put(g,target,'shaken');
+  if(actor==='hero'){learn(g,'hamstring');g.command(cmd(g,'hamstring'));}else g.state.battle.combatants.enemy.actionSeq=2;
+  g.battleAction(actor);
+  const status=g.state.battle.statuses[target].find(s=>s.id==='hobbled');assert.ok(status,actor);assert.equal(status.remainingMs,15300,actor);
+ }
+});
+test('Resolve is sampled on execution before the new Resolve debuff and does not rescale existing or restored timers',()=>{
+ const g=make();g.rng=n=>n-1;g.character.attributes.INT=0;g.state.enemy.RES=0;learn(g,'dread-whisper');g.command(cmd(g,'dread-whisper'));
+ g.state.enemy.RES=10;g.battleAction('hero');const entry=g.state.battle.statuses.enemy.find(s=>s.id==='frightened');assert.ok(entry);
+ assert.equal(entry.remainingMs,skillDefinition('dread-whisper').effect.durationMs*.7);
+ g.state.enemy.RES=100;g.refreshBattleTiming();assert.equal(entry.remainingMs,10500);
+ const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)),()=>0);assert.equal(restored.state.battle.statuses.enemy.find(s=>s.id==='frightened').remainingMs,10500);
+ const online=new Game(g.config,structuredClone(g.state),()=>0),offline=new Game(g.config,structuredClone(g.state),()=>0);
+ online.tick(200,1);offline.tick(100,2);assert.deepEqual(online.state.battle.statuses,offline.state.battle.statuses);assert.equal(online.state.battle.statuses.enemy.find(s=>s.id==='frightened').remainingMs,10300);
+});
+test('Resolve-adjusted reapplication keeps the longest time and preserves resistance and cancellation',()=>{
+ const b={};const apply=(RES,base=10000)=>applyStatus(b,'hero','hobbled',base,{INT:0},'enemy',{},'hamstring',{RES});
+ apply(0);apply(20);assert.equal(b.statuses.hero[0].remainingMs,10000);apply(-5);assert.equal(b.statuses.hero[0].remainingMs,11500);assert.equal(b.statuses.hero[0].durationMs,11500);
+ applyStatus(b,'hero','quick',10000,{INT:0},'hero',{},'dexterity-inspiration',{RES:100});assert.equal(b.statuses.hero.length,0);
+ assert.equal(applyStatus(b,'hero','hobbled',10000,{INT:0},'enemy',{resistance:{DEX:1}},'hamstring',{RES:-5}).reason,'immune');assert.equal(b.statuses.hero.length,0);
 });
