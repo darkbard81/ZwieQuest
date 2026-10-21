@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>ZwieQuest home screen icon</title>
+  <defs><radialGradient id="background" cx=".3" cy=".18" r=".95"><stop stop-color="#29473d"/><stop offset=".65" stop-color="#142729"/><stop offset="1" stop-color="#0b171b"/></radialGradient></defs>
+  <path fill="url(#background)" d="M0 0H512V512H0Z"/>
+  <g transform="translate(80 80) scale(5.5)">
+    <defs>
+    <linearGradient id="gold" x1="15" y1="12" x2="46" y2="53" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff0bd"/><stop offset=".28" stop-color="#e5c27b"/>
+      <stop offset=".5" stop-color="#c38c39"/><stop offset=".68" stop-color="#ffe3a0"/><stop offset="1" stop-color="#b47d30"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="9" y1="5" x2="51" y2="59" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fae7b1"/><stop offset=".5" stop-color="#b99350"/><stop offset="1" stop-color="#efd59a"/>
+    </linearGradient>
+    <linearGradient id="enamel" x1="15" y1="5" x2="49" y2="59" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#28433b"/><stop offset="1" stop-color="#0b181a"/>
+    </linearGradient>
+  </defs>
+    <path d="M14 4H59L50 60H5Z" fill="url(#enamel)" stroke="url(#edge)" stroke-width="2"/>
+  <path d="M22 16H49L48.3 20L25 45H40.5L44 37H47L44.8 49H15L15.7 45L39 20H25L22 27H19Z" fill="url(#gold)"/>
+  </g>
+</svg>

@@ -74,7 +74,7 @@ function tick() {
   if (persist) lastPersist = now; if (emit) lastBroadcast = now;
 }
 const timer = setInterval(tick, 200);
-const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
 function json(res, status, body) { res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body)); }
 function endSession(u) { for (const [res, c] of clients) if (c.sessionHash === u.sessionHash) { res.end(); clients.delete(res); } for (const [key, p] of presence) if (p.sessionHash === u.sessionHash) presence.delete(key); }
 const server = http.createServer(async (req, res) => {
