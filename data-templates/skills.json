@@ -431,15 +431,16 @@
     },
     {
       "id": "light-weapon-mastery",
-      "name": "경량 검 숙련",
+      "name": "단검·숏소드·레이피어 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/light-weapon-mastery-v1.webp",
-      "description": "경량 검 착용 중 ON일 때 명중 +2, 행동속도 +10%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 단검, 숏소드, 레이피어. 해당 장비 착용 중 ON일 때 명중 +2, 행동속도 +10%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -456,15 +457,16 @@
     },
     {
       "id": "sword-mastery",
-      "name": "한손 검 숙련",
+      "name": "롱소드 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/sword-mastery-v1.webp",
-      "description": "한손 검 착용 중 ON일 때 명중 +2, 행동속도 -5%, 피해 +10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 롱소드. 해당 장비 착용 중 ON일 때 명중 +2, 행동속도 -5%, 피해 +10%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -481,15 +483,16 @@
     },
     {
       "id": "axe-mastery",
-      "name": "한손 도끼 숙련",
+      "name": "손도끼 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/axe-mastery-v1.webp",
-      "description": "한손 도끼 착용 중 ON일 때 명중 -2, 행동속도 +0%, 피해 +25%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 손도끼. 해당 장비 착용 중 ON일 때 명중 -2, 행동속도 +0%, 피해 +25%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -506,15 +509,16 @@
     },
     {
       "id": "mace-mastery",
-      "name": "한손 둔기 숙련",
+      "name": "메이스 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/mace-mastery-v1.webp",
-      "description": "한손 둔기 착용 중 ON일 때 명중 +3, 행동속도 -10%, 피해 +0%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 메이스. 해당 장비 착용 중 ON일 때 명중 +3, 행동속도 -10%, 피해 +0%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -534,12 +538,13 @@
       "name": "창 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/spear-mastery-v1.webp",
-      "description": "창 착용 중 ON일 때 명중 +3, 행동속도 +0%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 창. 해당 장비 착용 중 ON일 때 명중 +3, 행동속도 +0%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -556,15 +561,16 @@
     },
     {
       "id": "polearm-mastery",
-      "name": "장병기 숙련",
+      "name": "할버드 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/polearm-mastery-v1.webp",
-      "description": "장병기 착용 중 ON일 때 명중 +0, 행동속도 -10%, 피해 +20%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 할버드. 해당 장비 착용 중 ON일 때 명중 +0, 행동속도 -10%, 피해 +20%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -581,15 +587,16 @@
     },
     {
       "id": "heavy-weapon-mastery",
-      "name": "중량 무기 숙련",
+      "name": "대검·전투도끼·전투망치 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/heavy-weapon-mastery-v1.webp",
-      "description": "중량 무기 착용 중 ON일 때 명중 +0, 행동속도 -15%, 피해 +30%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 대검, 전투도끼, 전투망치. 해당 장비 착용 중 ON일 때 명중 +0, 행동속도 -15%, 피해 +30%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -606,15 +613,16 @@
     },
     {
       "id": "staff-mastery",
-      "name": "지팡이 숙련",
+      "name": "원소 지팡이 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/staff-mastery-v1.webp",
-      "description": "지팡이 착용 중 ON일 때 명중 -1, 행동속도 +0%, 피해 +20%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 화염 지팡이, 냉기 지팡이, 번개 지팡이, 부식 지팡이. 해당 장비 착용 중 ON일 때 명중 -1, 행동속도 +0%, 피해 +20%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -634,12 +642,13 @@
       "name": "천옷 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/cloth-armor-mastery-v1.webp",
-      "description": "천옷 착용 중 ON일 때 명중 -1, 행동속도 +0%, 피해 +15%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 로브. 해당 장비 착용 중 ON일 때 명중 -1, 행동속도 +0%, 피해 +15%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -659,12 +668,13 @@
       "name": "경량 갑옷 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/light-armor-mastery-v1.webp",
-      "description": "경량 갑옷 착용 중 ON일 때 명중 +0, 행동속도 +15%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 가죽 갑옷, 덧댄 갑옷, 생가죽 갑옷. 해당 장비 착용 중 ON일 때 명중 +0, 행동속도 +15%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -681,15 +691,16 @@
     },
     {
       "id": "medium-armor-mastery",
-      "name": "중간 갑옷 숙련",
+      "name": "중형 갑옷 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/medium-armor-mastery-v1.webp",
-      "description": "중간 갑옷 착용 중 ON일 때 명중 +2, 행동속도 -5%, 피해 +0%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 사슬 갑옷, 비늘 갑옷, 흉갑. 해당 장비 착용 중 ON일 때 명중 +2, 행동속도 -5%, 피해 +0%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,
@@ -706,15 +717,16 @@
     },
     {
       "id": "heavy-armor-mastery",
-      "name": "중갑옷 숙련",
+      "name": "중장 갑옷 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/heavy-armor-mastery-v1.webp",
-      "description": "중갑옷 착용 중 ON일 때 명중 +0, 행동속도 +20%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 브리건딘, 판금 갑옷. 해당 장비 착용 중 ON일 때 명중 +0, 행동속도 +20%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
       "useContexts": [
-        "combat"
+        "combat",
+        "nonCombat"
       ],
       "activationMode": "toggle",
       "perBattleLimit": null,

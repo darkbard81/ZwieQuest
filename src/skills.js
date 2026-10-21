@@ -28,7 +28,7 @@ export function validateSkillCatalog(catalog) {
       const e=s.effect, categories=e.equipmentSlot==='weapon'?EQUIPMENT_CATALOG.weaponCategories:e.equipmentSlot==='armor'?EQUIPMENT_CATALOG.armorCategories:null;
       if (!categories?.[e.category] || e.category==='natural') fail(`${s.id}: invalid mastery category`);
       if (!Number.isInteger(e.accuracyBonus) || Math.abs(e.accuracyBonus)>20 || ['actionSpeedRate','damageRate'].some(k=>!Number.isFinite(e[k]) || e[k]<-.5 || e[k]>1)) fail(`${s.id}: invalid mastery bonus`);
-      if (s.useContexts.length!==1 || s.useContexts[0]!=='combat' || s.perBattleLimit!==null || s.toggleConsumesCycle!==false) fail(`${s.id}: invalid mastery activation`);
+      if (s.useContexts.length!==2 || !s.useContexts.includes('combat') || !s.useContexts.includes('nonCombat') || s.perBattleLimit!==null || s.toggleConsumesCycle!==false) fail(`${s.id}: invalid mastery activation`);
     } else if (s.activationMode === 'direct' && ['attack','status','mirror','cleanse','dispel'].includes(s.effect?.type)) {
       if (['attack','status','mirror'].includes(s.effect.type) && !(Number.isFinite(s.effect.durationMs) && s.effect.durationMs > 0)) fail(`${s.id}: invalid duration`);
       if (['attack','status'].includes(s.effect.type) && !statusDefinition(s.effect.statusId)) fail(`${s.id}: unknown status`);
@@ -59,6 +59,8 @@ export function initializeBattleSkills(battle, events) {
 // initialized only at battle creation or one-time legacy migration, not per turn.
 const owner = state => state.characters ? activeCharacter(state) : state;
 const learned = state => state.characters ? owner(state)?.skills || [] : state.inventory;
+// Equipment mastery preferences belong to the character, including outside battle.
+const toggleOwner = (state, def) => def?.effect.type === 'equipmentMastery' ? owner(state) : state.phase === 'BATTLE' ? state.battle : null;
 export function initializeSkills(state, catalog = SKILL_CATALOG) {
   if (!owner(state)) return;
   owner(state).skillSlots ||= Array(catalog.maxEquipped).fill(null);
@@ -67,12 +69,24 @@ export function initializeSkills(state, catalog = SKILL_CATALOG) {
   owner(state).skillGrants ||= [];
   if (!skillDefinition('dagger-mastery',catalog)?.enabled && catalog.skills.some(d=>d.id==='light-weapon-mastery' && d.enabled)) {
     const old=learned(state).find(i=>i.templateId==='dagger-mastery'), current=learned(state).find(i=>i.templateId==='light-weapon-mastery');
-    if(old){if(current){owner(state).skillSlots=owner(state).skillSlots.map(id=>id===old.id?(owner(state).skillSlots.includes(current.id)?null:current.id):id);const list=learned(state);list.splice(list.indexOf(old),1);}else{old.templateId='light-weapon-mastery';old.name='경량 검 숙련';}
+    if(old){if(current){owner(state).skillSlots=owner(state).skillSlots.map(id=>id===old.id?(owner(state).skillSlots.includes(current.id)?null:current.id):id);const list=learned(state);list.splice(list.indexOf(old),1);}else{old.templateId='light-weapon-mastery';old.name=skillDefinition('light-weapon-mastery',catalog).name;}
       if(state.battle?.skillToggles?.['dagger-mastery'])state.battle.skillToggles['light-weapon-mastery']=true;
       if(state.battle?.skillToggles)delete state.battle.skillToggles['dagger-mastery'];
     }
   }
   initializeBattleSkills(state.battle);
+  owner(state).skillToggles ||= {};
+  for (const def of catalog.skills.filter(s => s.effect.type === 'equipmentMastery')) {
+    // Preserve explicit OFF and consume legacy battle entries so they cannot revive later.
+    if (!Object.hasOwn(owner(state).skillToggles, def.id) && typeof state.battle?.skillToggles?.[def.id] === 'boolean') {
+      owner(state).skillToggles[def.id] = state.battle.skillToggles[def.id];
+    }
+    if (state.battle?.skillToggles) delete state.battle.skillToggles[def.id];
+  }
+  for (const item of learned(state)) {
+    const def = skillDefinition(item.templateId, catalog);
+    if (def) item.name = def.name;
+  }
   for (const def of catalog.skills.filter(s => s.enabled && s.grantOnCreate)) {
     if (owner(state).skillGrants.includes(def.id)) continue;
     let item = learned(state).find(i => i.slot === 'skill' && i.templateId === def.id);
@@ -105,7 +119,7 @@ export function skillItemView(item, state, hero, catalog = SKILL_CATALOG) {
     useContexts: def?.useContexts || [], activationMode: def?.activationMode, effectType: def?.effect.type, perBattleLimit: def?.perBattleLimit ?? null,
     usesThisBattle: used, remainingUses: inCombat && def?.perBattleLimit != null ? Math.max(0, def.perBattleLimit - used) : null,
     masteryMatches: def?.effect.type === 'equipmentMastery' ? masteryMatches(state, def.effect) : true,
-    toggleOn: inCombat && !!state.battle?.skillToggles?.[item.templateId], toggleConsumesCycle: def?.toggleConsumesCycle ?? null,
+    toggleOn: !!toggleOwner(state, def)?.skillToggles?.[item.templateId], toggleConsumesCycle: def?.toggleConsumesCycle ?? null,
     ...values, ...(def?.effect.type === 'heal' ? { heal: Math.floor(skillValues(def, hero).heal * modifiers(state.battle, 'hero').healingReceived) } : {}) };
 }
 export function equipSkill(state, item, unequip = false, slotIndex, catalog = SKILL_CATALOG) {
@@ -220,12 +234,13 @@ export function toggleSkill(state, item, hero, command, now = Date.now(), catalo
   if (def.toggleConsumesCycle === null) throw Error('ON/OFF 전환의 행동 주기 사용 정책이 아직 정해지지 않았습니다.');
   if (typeof command.enabled !== 'boolean') throw Error('ON/OFF 상태를 지정하세요.');
   const { b } = validateUse(state, item, command, catalog, def.toggleConsumesCycle);
-  if (!!b.skillToggles?.[def.id] === command.enabled) return null;
+  const target = toggleOwner(state, def);
+  if (!!target.skillToggles?.[def.id] === command.enabled) return null;
   const values = skillValues(def, hero);
   if (command.enabled) { checkActivation(state, def, b, now); recordActivation(state, def, b, values, now, def.toggleConsumesCycle); }
-  else if (def.toggleConsumesCycle) b.skillUsed = true;
-  b.skillToggles ||= {}; b.skillToggles[def.id] = command.enabled;
-  return { skillId: def.id, name: def.name, enabled: command.enabled, heroActionSeq: b.combatants.hero.actionSeq, battleId: b.id };
+  else if (b && def.toggleConsumesCycle) b.skillUsed = true;
+  target.skillToggles ||= {}; target.skillToggles[def.id] = command.enabled;
+  return { skillId: def.id, name: def.name, enabled: command.enabled, heroActionSeq: b?.combatants.hero.actionSeq ?? null, battleId: b?.id ?? null };
 }
 function masteryMatches(state, effect) {
   const item=state.inventory.find(i=>i.slot===effect.equipmentSlot && i.id===owner(state)?.equipment[effect.equipmentSlot]);
@@ -235,13 +250,13 @@ function masteryMatches(state, effect) {
 // a bonus on a previously boosted snapshot. Duplicate copies count only once.
 export function maintainedSkillBonuses(state, catalog = SKILL_CATALOG) {
   const bonus = { ACC: 0 };
-  if (!owner(state) || state.phase !== 'BATTLE' || !state.battle || owner(state).hp <= 0 || state.enemy?.hp <= 0) return bonus;
+  if (!owner(state)?.equipment || owner(state).hp <= 0 || (state.phase === 'BATTLE' && (!state.battle || state.enemy?.hp <= 0))) return bonus;
   const weapon = state.inventory.find(i => i.slot === 'weapon' && i.id === owner(state).equipment.weapon);
   const applied = new Set();
   for (const id of owner(state).skillSlots || []) {
     const item = learned(state).find(i => i.slot === 'skill' && i.id === id);
     const def = skillDefinition(item?.templateId, catalog);
-    if (!def?.enabled || def.activationMode !== 'toggle' || !def.useContexts.includes('combat') || !state.battle.skillToggles?.[def.id] || applied.has(def.id)) continue;
+    if (!def?.enabled || def.activationMode !== 'toggle' || !def.useContexts.includes(state.phase === 'BATTLE' ? 'combat' : 'nonCombat') || !toggleOwner(state, def)?.skillToggles?.[def.id] || applied.has(def.id)) continue;
     applied.add(def.id);
     if (def.effect.type==='equipmentMastery' && masteryMatches(state,def.effect)) { bonus.ACC+=def.effect.accuracyBonus; bonus.actionSpeedRate=(bonus.actionSpeedRate||0)+def.effect.actionSpeedRate; bonus.damageRate=(bonus.damageRate||0)+def.effect.damageRate; }
     if (def.effect.type === 'accuracyBonus' && def.effect.weaponCategories.includes(weapon?.templateId)) bonus.ACC += def.effect.amount;

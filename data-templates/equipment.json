@@ -463,11 +463,11 @@
       "actionSpeedPenaltyRate": 0.1
     },
     "medium": {
-      "name": "중간 갑옷",
+      "name": "중형 갑옷",
       "actionSpeedPenaltyRate": 0.3
     },
     "heavy": {
-      "name": "중갑옷",
+      "name": "중장 갑옷",
       "actionSpeedPenaltyRate": 0.5
     },
     "natural": {
@@ -478,19 +478,19 @@
   "weaponBalanceRulesVersion": 1,
   "weaponCategories": {
     "light": {
-      "name": "경량 검",
+      "name": "단검·숏소드·레이피어",
       "actionSpeedPenaltyRate": 0
     },
     "sword": {
-      "name": "한손 검",
+      "name": "롱소드",
       "actionSpeedPenaltyRate": 0.05
     },
     "axe": {
-      "name": "한손 도끼",
+      "name": "손도끼",
       "actionSpeedPenaltyRate": 0.1
     },
     "mace": {
-      "name": "한손 둔기",
+      "name": "메이스",
       "actionSpeedPenaltyRate": 0.1
     },
     "spear": {
@@ -498,15 +498,15 @@
       "actionSpeedPenaltyRate": 0.05
     },
     "polearm": {
-      "name": "장병기",
+      "name": "할버드",
       "actionSpeedPenaltyRate": 0.15
     },
     "heavy": {
-      "name": "중량 무기",
+      "name": "대검·전투도끼·전투망치",
       "actionSpeedPenaltyRate": 0.2
     },
     "staff": {
-      "name": "지팡이",
+      "name": "원소 지팡이",
       "actionSpeedPenaltyRate": 0
     },
     "natural": {

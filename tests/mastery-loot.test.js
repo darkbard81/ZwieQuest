@@ -7,13 +7,13 @@ import {stats,attack} from '../src/combat.js';
 import {generateEquipment,EQUIPMENT_CATALOG} from '../src/equipment.js';
 import {SKILL_CATALOG,maintainedSkillBonuses,validateSkillCatalog} from '../src/skills.js';
 import {DEFAULT_PROBABILITIES,DROP_WEIGHTS,ProbabilitySettings,validateProbabilities,rollDropSlot} from '../src/probabilities.js';
-import {skillDescription} from '../public/skills-view.js';
+import {skillDescription,skillAvailability} from '../public/skills-view.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
 const masteries=SKILL_CATALOG.skills.filter(d=>d.effect.type==='equipmentMastery');
 function make(){const g=new Game(structuredClone(config),null,()=>0);g.create({name:'숙련 검수',appearanceId:'warrior'});g.beginBattle();g.state.enemy.hp=g.state.enemy.maxHp=1e8;g.state.enemy.skills=[];g.state.enemy.DEX=-100;return g;}
 function equip(g,slot,category){const def=(slot==='weapon'?EQUIPMENT_CATALOG.weapons:EQUIPMENT_CATALOG.armors).find(d=>d[slot+'Category']===category),item=generateEquipment({slot,templateId:def.id,gradeId:'normal',specials:false,rng:()=>0});g.state.inventory.push(item);g.character.equipment[slot]=item.id;return item;}
 function learn(g,d,index=1){const item={id:d.id,templateId:d.id,slot:'skill',name:d.name,stats:{}};g.character.skills.push(item);g.character.skillSlots[index]=item.id;return item;}
-function toggle(g,item,enabled=true){g.command({type:'TOGGLE_SKILL',characterId:g.character.id,itemId:item.id,battleId:g.state.battle.id,heroActionSeq:g.state.battle.combatants.hero.actionSeq,enabled});}
+function toggle(g,item,enabled=true){g.command({type:'TOGGLE_SKILL',characterId:g.character.id,itemId:item.id,battleId:g.state.phase==='BATTLE'?g.state.battle.id:null,heroActionSeq:g.state.phase==='BATTLE'?g.state.battle.combatants.hero.actionSeq:null,enabled});}
 const close=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} ~= ${b}`);
 test('all 12 mastery categories apply exact bonuses, match equipment, preserve progress, and restore without stacking',()=>{
  assert.equal(masteries.length,12);assert.equal(new Set(masteries.map(d=>d.effect.equipmentSlot+':'+d.effect.category)).size,12);
@@ -42,7 +42,7 @@ test('masteries do not change buffs or heal; reserve skill and toggle coexist, o
 });
 test('legacy disabled dagger mastery migrates once preserving item slot and active toggle',()=>{
  const g=make(),old={id:'legacy-dagger',templateId:'dagger-mastery',name:'단검숙련',slot:'skill',stats:{}};g.character.skills.push(old);g.character.skillSlots[2]=old.id;g.state.battle.skillToggles['dagger-mastery']=true;
- const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skills.find(i=>i.id===old.id).templateId,'light-weapon-mastery');assert.equal(restored.character.skillSlots[2],old.id);assert.equal(restored.state.battle.skillToggles['light-weapon-mastery'],true);assert.equal(restored.state.battle.skillToggles['dagger-mastery'],undefined);
+ const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skills.find(i=>i.id===old.id).templateId,'light-weapon-mastery');assert.equal(restored.character.skillSlots[2],old.id);assert.equal(restored.character.skillToggles['light-weapon-mastery'],true);assert.equal(restored.state.battle.skillToggles['light-weapon-mastery'],undefined);assert.equal(restored.state.battle.skillToggles['dagger-mastery'],undefined);
  assert.deepEqual(new Game(g.config,JSON.parse(JSON.stringify(restored.state))).character.skills,restored.character.skills);
 });
 test('drop category weights cover exact boundaries and exclude zero-weight categories',()=>{
@@ -58,4 +58,47 @@ test('legacy probability settings keep configured encounter/drop rates and gain 
 });
 test('an exhausted skill pool never rerolls another category or grants duplicates',()=>{
  for(const kind of ['victory','boss','treasure']){const g=make();g.character.skills=SKILL_CATALOG.skills.filter(d=>d.enabled).map(d=>({id:d.id,templateId:d.id,slot:'skill',name:d.name,stats:{}}));g.config.probabilities={...DEFAULT_PROBABILITIES,dropPercent:100,weaponWeight:0,armorWeight:0,charmWeight:0,skillWeight:1};const inventory=g.state.inventory.length,calls=[];g.rng=n=>{calls.push(n);return 0;};g.reward(kind);assert.equal(g.character.skills.length,30);assert.equal(g.state.inventory.length,inventory);assert.equal(g.state.lastReward.skillId,null);assert.equal(g.state.lastReward.itemId,null);assert.equal(g.state.lastReward.dropSlot,'skill');assert.deepEqual(calls,[10000,1]);}
+});
+
+test('mastery names and descriptions enumerate actual equipment; all twelve toggle outside combat and persist',()=>{
+ const names=['단검·숏소드·레이피어 숙련','롱소드 숙련','손도끼 숙련','메이스 숙련','창 숙련','할버드 숙련','대검·전투도끼·전투망치 숙련','원소 지팡이 숙련','천옷 숙련','경량 갑옷 숙련','중형 갑옷 숙련','중장 갑옷 숙련'];
+ assert.deepEqual(masteries.map(d=>d.name),names);
+ for(const d of masteries){
+  const g=make(),e=d.effect;g.phase('HOME',10000);g.state.battle=null;g.state.enemy=null;
+  const gear=equip(g,e.equipmentSlot,e.category),item=learn(g,d),before=g.snapshot();
+  const targets=(e.equipmentSlot==='weapon'?EQUIPMENT_CATALOG.weapons:EQUIPMENT_CATALOG.armors).filter(x=>x[e.equipmentSlot+'Category']===e.category).map(x=>x.name);
+  assert.ok(d.description.startsWith('적용 장비: '+targets.join(', ')+'.'));
+  assert.deepEqual(d.useContexts,['combat','nonCombat']);
+  assert.equal(skillAvailability(before,before.inventory.find(i=>i.id===item.id),0).ready,true);
+  toggle(g,item);toggle(g,item);assert.equal(g.character.skillToggles[d.id],true);
+  assert.equal(g.snapshot().combatStats.ACC,before.combatStats.ACC+e.accuracyBonus);
+  close(g.snapshot().stats.actionSpeed,before.stats.actionSpeed*(1+e.actionSpeedRate));
+  assert.equal(g.state.battle,null);assert.equal(g.snapshot().inventory.find(i=>i.id===item.id).toggleOn,true);
+  const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)),()=>0);
+  assert.equal(restored.snapshot().inventory.find(i=>i.id===item.id).toggleOn,true);
+  restored.phase('TRAVEL',10000);toggle(restored,item,false);assert.equal(restored.character.skillToggles[d.id],false);toggle(restored,item);
+  restored.beginBattle();assert.equal(restored.character.skillToggles[d.id],true);assert.deepEqual(restored.state.battle.skillUseCounts,{});
+  assert.equal(maintainedSkillBonuses(restored.state).ACC,e.accuracyBonus);
+  restored.command({type:'UNEQUIP',characterId:restored.character.id,itemId:item.id});assert.deepEqual(maintainedSkillBonuses(restored.state),{ACC:0});assert.equal(restored.character.skillToggles[d.id],true);
+  restored.command({type:'EQUIP',characterId:restored.character.id,itemId:item.id});assert.equal(maintainedSkillBonuses(restored.state).ACC,e.accuracyBonus);
+  restored.character.hp=0;assert.deepEqual(maintainedSkillBonuses(restored.state),{ACC:0});restored.character.hp=1;
+  restored.phase('HOME',10000);restored.state.battle=null;restored.state.enemy=null;assert.equal(restored.character.skillToggles[d.id],true);
+  delete restored.character.equipment[e.equipmentSlot];assert.deepEqual(maintainedSkillBonuses(restored.state),{ACC:0});restored.character.equipment[e.equipmentSlot]=gear.id;
+  toggle(restored,item,false);const off=new Game(g.config,JSON.parse(JSON.stringify(restored.state)));assert.equal(off.character.skillToggles[d.id],false);assert.deepEqual(maintainedSkillBonuses(off.state),{ACC:0});
+ }
+});
+test('persistent OFF wins over legacy battle ON, old names refresh and character preferences stay isolated',()=>{
+ const g=make(),d=masteries[0],item=learn(g,d);item.name='경량 검 숙련';g.character.skillToggles[d.id]=false;g.state.battle.skillToggles[d.id]=true;
+ const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skillToggles[d.id],false);assert.equal(restored.character.skills.find(i=>i.id===item.id).name,d.name);assert.equal(restored.state.battle.skillToggles[d.id],undefined);
+ g.phase('HOME',10000);g.state.battle=null;g.state.enemy=null;const first=g.character;toggle(g,item);g.create({name:'다른 모험가',appearanceId:'warrior'});const second=g.state.characters.find(c=>c.id!==first.id);g.selectCharacter(second.id);
+ assert.deepEqual(g.character.skillToggles,{});assert.equal(first.skillToggles[d.id],true);g.selectCharacter(first.id);assert.equal(g.snapshot().inventory.find(i=>i.id===item.id).toggleOn,true);
+});
+test('noncombat toggles keep stale battle, foreign character and death guards',()=>{
+ const g=make(),item=learn(g,masteries[0]),battle=g.state.battle;
+ const command={type:'TOGGLE_SKILL',characterId:g.character.id,itemId:item.id,enabled:true,battleId:null,heroActionSeq:null};
+ assert.throws(()=>g.command(command),/행동 주기/);
+ g.phase('HOME',10000);g.state.battle=null;g.state.enemy=null;
+ assert.throws(()=>g.command({...command,battleId:battle.id,heroActionSeq:0}),/행동 주기/);
+ assert.throws(()=>g.command({...command,characterId:'someone-else'}),/캐릭터/);
+ g.character.hp=0;assert.throws(()=>g.command(command),/지금은/);assert.deepEqual(g.character.skillToggles,{});
 });
