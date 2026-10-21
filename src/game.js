@@ -1,3 +1,4 @@
+import { buyTreasure, treasureOffers } from './treasures.js';
 import { initializeStatuses, modifiers, effectiveEnemy, applyStatus, consumeMirror, convertHit, nextStatusEvent, advanceStatuses, resolveStatusEvents, statusViews } from './status-effects.js';
 import { randomInt, randomUUID } from 'node:crypto';
 import { CHARACTER_VERSION, MAX_CHARACTERS, activeCharacter, newCharacter, migrateCharacters, equipmentUsers, remainingPoints, allocatePoint } from './characters.js';
@@ -67,7 +68,7 @@ export class Game {
   log(type, text, detail = {}) { const e = { seq: ++this.state.eventSeq, at: Date.now(), type, text, ...detail }; this.events.push(e); this.state.lastEvent = e; }
   phase(phase, ms) { if (phase !== 'BATTLE' && this.state.battle) { delete this.state.battle.pendingSkill; this.state.battle.statuses = { hero: [], enemy: [] }; } Object.assign(this.state, { phase, remaining: ms, duration: ms, phaseStartedAt: Date.now() }); if (phase !== 'BATTLE' && this.character) this.character.hp = Math.min(this.character.hp, stats(this.state, this.config).maxHp); }
   normalSaleItems() {
-    return this.state.inventory.filter(item => item.slot !== 'skill' && item.gradeId === 'normal' && !equipmentUsers(this.state, item.id).length);
+    return this.state.inventory.filter(item => ['weapon', 'armor', 'charm'].includes(item.slot) && item.gradeId === 'normal' && !equipmentUsers(this.state, item.id).length);
   }
   item(kind, tier) {
     return generateEquipment({ slot: kind, rng: this.rng, gradeId: tier == null ? undefined : EQUIPMENT_CATALOG.grades[tier]?.id });
@@ -394,6 +395,10 @@ export class Game {
       if (s.phase === 'CHOICE_WAIT') this.followAutoRoute();
     }
     else if (cmd.type === 'CANCEL_ROUTE') { s.autoRoute = null; }
+    else if (cmd.type === 'BUY_TREASURE') {
+      const result = buyTreasure(s, cmd.treasureId);
+      if (result) this.log('treasure-purchase', `${result.item.name} 구입 · 금화 -${result.price}`, { itemId: result.item.id, treasureId: result.item.templateId, price: result.price });
+    }
     else if (cmd.type === 'SELL_NORMAL') {
       const items = this.normalSaleItems(), ids = new Set(items.map(item => item.id));
       if (!items.length) return;
@@ -419,6 +424,7 @@ export class Game {
     }
     else if (['EQUIP', 'UNEQUIP', 'SELL'].includes(cmd.type)) {
       const item = [...s.inventory, ...(this.character?.skills || [])].find(i => i.id === cmd.itemId); if (!item) throw Error('이미 판매했거나 없는 아이템입니다.');
+      if (item.slot === 'treasure') throw Error('보물은 계정 공용 소장품입니다. 장착하거나 판매할 수 없습니다.');
       if (item.slot === 'skill') {
         if (cmd.type === 'SELL') throw Error('습득한 스킬은 판매할 수 없습니다.');
         equipSkill(s, item, cmd.type === 'UNEQUIP', cmd.slotIndex);
@@ -453,6 +459,7 @@ export class Game {
       ...(c ? structuredClone(c) : { name: '', appearanceId: null, level: 0, xp: 0, hp: 0, attributes: {}, equipment: {}, skillSlots: Array(6).fill(null), skillCooldowns: {} }),
       attributePoints: remainingPoints(c),
       characters: characters.map(c => ({ ...structuredClone(c), attributePoints: remainingPoints(c), maxHp: statDetails(this.state, this.config, c).values.maxHp })),
+      treasureOffers: treasureOffers(this.state),
       normalSale: this.normalSaleItems().reduce((total, item) => ({ count: total.count + 1, gold: total.gold + item.value }), { count: 0, gold: 0 }),
       equipmentUsers: Object.fromEntries(state.inventory.map(i => [i.id, equipmentUsers(this.state, i.id)])),
       inventory: [...structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : i), ...(c?.skills || []).map(i => skillItemView(i, this.state, hero))],

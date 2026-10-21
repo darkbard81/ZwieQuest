@@ -1,3 +1,4 @@
+import { initTreasureViewer, treasureCardHTML } from './treasure-view.js';
 import { mapSVG } from './map-view.js';
 import { REGIONS } from './regions.js';
 import { mapViewState, nodeLabels } from './map-navigation.js';
@@ -29,6 +30,7 @@ let hideOtherEquipment = false;
 try { hideOtherEquipment = localStorage.getItem(hideOthersKey) === 'true'; } catch {}
 $('#hide-other-equipment').checked = hideOtherEquipment;
 const equipmentViews = new Map();
+const treasureViewer = initTreasureViewer();
 let statsHTML = '';
 const defenseDetails = initDefenseDetails($('#stats'), $('#defense-details'));
 const bestiary = createBestiarySync(initBestiary($('#bestiary-panel')), () => api('/api/state'));
@@ -142,22 +144,33 @@ function renderEquipment(s) {
   }
 }
 function renderInventory(s) {
-  const key = JSON.stringify([s.inventory.map(({cooldown, ...item}) => item), s.equipment, s.skillSlots, s.equipmentUsers, s.characters.map(c=>[c.id,c.name]), s.activeCharacterId, filter, hideOtherEquipment]); if (key === inventoryKey) return; inventoryKey = key;
+  const key = JSON.stringify([s.inventory.map(({cooldown, ...item}) => item), s.equipment, s.skillSlots, s.equipmentUsers, s.characters.map(c=>[c.id,c.name]), s.activeCharacterId, s.treasureOffers, filter, hideOtherEquipment]); if (key === inventoryKey) return; inventoryKey = key;
   const items = sortInventory(s, filter, hideOtherEquipment);
+  const offers = filter === 'treasure' ? s.treasureOffers || [] : [];
+  $('#sell-normal').closest('.inventory-tools').hidden = filter === 'treasure';
+  $('#drop-probability-summary').hidden = filter === 'treasure';
+  $('.inventory-footer > span:last-child').textContent = filter === 'treasure' ? '소장한 보물상자 아이콘을 눌러 감상하세요.' : '모든 캐릭터에서 장착 해제 후 판매 가능';
   $('#item-count').textContent = hideOtherEquipment ? `${items.length} / ${s.inventory.length}개` : `${s.inventory.length}개`;
   const sale = s.normalSale || { count: 0, gold: 0 };
   $('#sell-normal').textContent = `일반 일괄 판매 (${sale.count}개 · ${sale.gold} G)`;
   $('#sell-normal').disabled = !sale.count;
-  $('#inventory-list').innerHTML = items.length ? items.map(item => {
+  const ownedHTML = items.length ? items.map(item => {
+    if (item.slot === 'treasure') return treasureCardHTML(item);
     const skill = item.slot === 'skill';
     const equipped = skill ? s.skillSlots.includes(item.id) : Object.values(s.equipment).includes(item.id);
     if (skill) return `<article class="item skill-item"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3>${esc(item.name)}${equipped ? '<span class="equipped">장착</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${esc(item.id)}" ${!equipped && (!item.enabled || s.skillSlots.every(Boolean)) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button></div></div><p>${esc(item.description)}<br>${esc(skillDescription(item))}<br>이 캐릭터의 스킬 · 최대 6개 장착 · 판매 불가</p></div></article>`;
     const users = s.equipmentUsers?.[item.id] || (equipped ? [s.activeCharacterId] : []);
     const names = users.map(id => s.characters.find(c=>c.id === id)?.name || id).join('·');
     return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3><span class="rarity">${esc(item.rarity)}</span> ${esc(item.name)}${users.length ? `<span class="equipped">${esc(names)} 장착</span>` : ''}${item.special ? ' <span class="item-special">특수</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}" ${!s.activeCharacterId || (!equipped && users.length) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${users.length ? `disabled title="${esc(names)} 캐릭터에서 장착을 해제해 주세요"` : ''}>판매 ${item.value} G</button></div></div><p>${itemDetailsHTML(item)}</p></div></article>`;
-  }).join('') : `<p class="muted">${s.inventory.length ? '현재 필터에 표시할 아이템이 없습니다.' : '아직 발견한 장비가 없어요. 여행을 조금 더 지켜보세요.'}</p>`;
+  }).join('') : offers.length ? '' : `<p class="muted">${s.inventory.length ? '현재 필터에 표시할 아이템이 없습니다.' : '아직 발견한 장비가 없어요. 여행을 조금 더 지켜보세요.'}</p>`;
+  $('#inventory-list').innerHTML = offers.map(item => treasureCardHTML(item, false)).join('') + ownedHTML;
 }
-$('#inventory-list').addEventListener('click', e => { const b = e.target.closest('[data-action]'); if (b) command(b.dataset.action, { itemId: b.dataset.item }, b); });
+$('#inventory-list').addEventListener('click', e => {
+  const open = e.target.closest('[data-open-treasure]');
+  if (open) { const item = data?.state?.inventory.find(item => item.slot === 'treasure' && item.id === open.dataset.openTreasure); if (item) treasureViewer.open(item); return; }
+  const b = e.target.closest('[data-action]');
+  if (b) command(b.dataset.action, b.dataset.action === 'BUY_TREASURE' ? { treasureId: b.dataset.treasureId } : { itemId: b.dataset.item }, b);
+});
 $('#sell-normal').onclick = e => command('SELL_NORMAL', {}, e.currentTarget);
 $('#hide-other-equipment').onchange = event => {
   hideOtherEquipment = event.target.checked;
@@ -204,7 +217,7 @@ const passwordInput = initPasswordInput($('#password'), $('#password-input-error
 authDialog.addEventListener('cancel', e => e.preventDefault());
 const logout = document.createElement('button'); logout.className = 'quiet'; logout.id = 'logout'; logout.textContent = '로그아웃'; logout.hidden = true; $('nav').insertBefore(logout, $('#help-button'));
 const adminSettings = initAdminSettings({ api, getUser: () => user, getState: () => data?.state, onReset: result => { if (result.state) receive(result); } });
-function showAuth() { bestiary.update(null); adminSettings.setUser(null); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
+function showAuth() { treasureViewer.close(); bestiary.update(null); adminSettings.setUser(null); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
 function setAuthMode(mode) { passwordInput.clear(); authMode = mode; $('#tab-login').classList.toggle('active', mode === 'login'); $('#tab-register').classList.toggle('active', mode === 'register'); $('#auth-title').textContent = mode === 'login' ? '이어서 떠나는 여행' : '첫 여행을 시작해 볼까요?'; $('#auth-submit').textContent = mode === 'login' ? '로그인하고 여행 계속하기' : '계정 만들고 모험 시작하기'; $('#password').autocomplete = mode === 'login' ? 'current-password' : 'new-password'; $('#auth-error').textContent = ''; }
 $('#tab-login').onclick = () => setAuthMode('login'); $('#tab-register').onclick = () => setAuthMode('register');
 $('#auth-form').onsubmit = async e => {
