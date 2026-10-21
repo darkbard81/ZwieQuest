@@ -234,7 +234,7 @@ export class Game {
     const recipient=targetActor==='hero'?this.character:s.enemy;recipient.hp=Math.max(0,recipient.hp-result.damage);
     if(targetActor!==actor && result.tier>=2)consumeMirror(b,targetActor);
     if(skill && result.tier>=2 && recipient.hp>0) {
-      result.statusResult=applyStatus(b,targetActor,skill.effect.statusId,skill.effect.durationMs,attacker,actor,recipient.statusResistance||{});
+      result.statusResult=applyStatus(b,targetActor,skill.effect.statusId,skill.effect.durationMs,attacker,actor,recipient.statusResistance||{},skill.skillId);
     }
     if(targetActor!==actor && result.tier===3 && am.interruptOnCrit && !modifiers(b,targetActor).interruptImmune && recipient.hp>0) {
       b.combatants[targetActor].readiness=0;
@@ -440,7 +440,7 @@ export class Game {
       const readiness = state.battle.combatants[actor].readiness;
       return [actor, { actionSpeed: values.actionSpeed, actionSpeedPenaltyRate: values.actionSpeedPenaltyRate, armorSpeedPenaltyRate: values.armorSpeedPenaltyRate, weaponSpeedPenaltyRate: values.weaponSpeedPenaltyRate, readiness, nextActionMs: state.battle.transition ? state.battle.transition.remainingMs + (state.battle.transition.actor === actor ? 0 : values.actionIntervalMs) : Math.max(0, 1 - readiness) * values.actionIntervalMs }];
     })) : null;
-    return { ...structuredClone(state), battleTiming, enemy: structuredClone(effectiveEnemy(state.enemy, state.battle, this.config)), statusEffects: { hero: statusViews(state.battle, 'hero'), enemy: statusViews(state.battle, 'enemy') }, actionLocked: state.phase === 'BATTLE' && !!modifiers(state.battle, 'hero').actionLocked,
+    return { ...structuredClone(state), battleTiming, enemy: structuredClone(effectiveEnemy(state.enemy, state.battle, this.config)), statusEffects: { hero: statusViews(state.battle, 'hero', skillDefinition), enemy: statusViews(state.battle, 'enemy', skillDefinition) }, actionLocked: state.phase === 'BATTLE' && !!modifiers(state.battle, 'hero').actionLocked,
       ...(c ? structuredClone(c) : { name: '', appearanceId: null, level: 0, xp: 0, hp: 0, attributes: {}, equipment: {}, skillSlots: Array(6).fill(null), skillCooldowns: {} }),
       attributePoints: remainingPoints(c),
       characters: characters.map(c => ({ ...structuredClone(c), attributePoints: remainingPoints(c), maxHp: statDetails(this.state, this.config, c).values.maxHp })),

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { enemyActionSpeed } from './action-speed.js';
 export const STATUS_CATALOG = JSON.parse(readFileSync(new URL('../data-templates/status-effects.json', import.meta.url), 'utf8'));
 export const statusDefinition = id => STATUS_CATALOG.statuses.find(s => s.id === id);
-export function initializeStatuses(b) { if (b) { b.statuses ||= { hero: [], enemy: [] }; b.statuses.hero ||= []; b.statuses.enemy ||= []; b.enemySkillUseCounts ||= {}; } }
+export function initializeStatuses(b) { if (b) { b.statuses ||= { hero: [], enemy: [] }; b.statuses.hero ||= []; b.statuses.enemy ||= []; b.enemySkillUseCounts ||= {}; for (const actor of ['hero','enemy']) for (const effect of b.statuses[actor]) effect.durationMs ||= effect.remainingMs; } }
 export function modifiers(b, actor) {
   const out = { healingReceived: 1, hostileDurationMultiplier: 1, debuffDurationMultiplier: 1, buffDecayRate: 1, actionTimeMultiplier: 1 };
   for (const s of b?.statuses?.[actor] || []) {
@@ -18,7 +18,7 @@ export function modifiers(b, actor) {
   return out;
 }
 export const durationMs = (base, intellect) => Math.round(base * Math.max(STATUS_CATALOG.duration.minimumMultiplier, 1 + (intellect || 0) * STATUS_CATALOG.duration.intelligenceRate));
-export function applyStatus(b, actor, id, baseMs, source, sourceActor = actor, resistance = {}) {
+export function applyStatus(b, actor, id, baseMs, source, sourceActor = actor, resistance = {}, sourceSkillId = null) {
   initializeStatuses(b);
   let def = statusDefinition(id);
   if (!def) throw Error(`Unknown status: ${id}`);
@@ -35,15 +35,15 @@ export function applyStatus(b, actor, id, baseMs, source, sourceActor = actor, r
   if (oldDef && oldDef.polarity !== def.polarity) { list.splice(index, 1); return { applied:false, cancelled:true, id:def.id }; }
   if (oldDef?.tier > def.tier) return { applied:false, reason:'stronger' };
   const remainingMs = durationMs(baseMs, source.INT) * (def.polarity === 'debuff' ? caster.debuffDurationMultiplier * target.hostileDurationMultiplier : 1);
-  if (oldDef?.tier === def.tier) { old.remainingMs = Math.max(old.remainingMs, remainingMs); return { applied:true, id:def.id }; }
-  const entry = { id:def.id, remainingMs, ...(def.modifiers.periodMs ? { tickRemainingMs:def.modifiers.periodMs } : {}) };
+  if (oldDef?.tier === def.tier) { if (remainingMs > old.remainingMs) { old.remainingMs = remainingMs; old.durationMs = remainingMs; old.sourceSkillId = sourceSkillId; } return { applied:true, id:def.id }; }
+  const entry = { id:def.id, remainingMs, durationMs:remainingMs, sourceSkillId, ...(def.modifiers.periodMs ? { tickRemainingMs:def.modifiers.periodMs } : {}) };
   if (index >= 0) list[index] = entry; else list.push(entry);
   return { applied:true, id:def.id };
 }
 export function applyMirror(b, actor, baseMs, source) {
   initializeStatuses(b); const list=b.statuses[actor], old=list.find(s=>s.id==='mirrored-image');
   const time=durationMs(baseMs,source.INT);
-  if(old){old.remainingMs=Math.max(old.remainingMs,time);old.bonus=30;} else list.push({id:'mirrored-image',remainingMs:time,bonus:30});
+  if(old){if(time>old.remainingMs){old.remainingMs=time;old.durationMs=time;}old.sourceSkillId='mirrored-image';old.bonus=30;} else list.push({id:'mirrored-image',remainingMs:time,durationMs:time,sourceSkillId:'mirrored-image',bonus:30});
 }
 export const polarityOf = s => s.id === 'mirrored-image' ? 'buff' : statusDefinition(s.id)?.polarity;
 export function clearStatuses(b,actor,polarity) { initializeStatuses(b); const old=b.statuses[actor]; b.statuses[actor]=old.filter(s=>polarityOf(s)!==polarity); return old.length-b.statuses[actor].length; }
@@ -90,4 +90,16 @@ export function effectiveEnemy(enemy,b,config) {
   Object.assign(out,enemyActionSpeed(out,config));out.actionIntervalMs*=m.actionTimeMultiplier;out.actionSpeed/=m.actionTimeMultiplier;
   return out;
 }
-export function statusViews(b,actor) { return (b?.statuses?.[actor]||[]).map(s=>{const d=statusDefinition(s.id);return {...s,name:d?.name||'반사된 형상',englishName:d?.englishName||'Mirrored Image',description:d?.description||'회피 +30, 피격 명중·치명타마다 보너스 −10',attribute:d?.attribute,polarity:polarityOf(s),tier:d?.tier||1};}); }
+export function statusViews(b, actor, resolveSkill = () => null) {
+  const decayRate = modifiers(b, actor).buffDecayRate;
+  return (b?.statuses?.[actor] || []).map(s => {
+    const d = statusDefinition(s.id), source = resolveSkill(s.sourceSkillId);
+    const fallback = d?.polarity === 'buff'
+      ? {STR:'might-inspiration',CON:'constitution-inspiration',DEX:'dexterity-inspiration',PER:'perception-inspiration',INT:'intellect-inspiration',RES:'resolve-inspiration'}[d.attribute]
+      : {STR:'staggering-blow',CON:'weakening-strike',DEX:s.id==='hobbled'?'hamstring':'binding-strike',PER:'eye-gouge',INT:'mind-fog',RES:'dread-whisper'}[d?.attribute];
+    return { ...s, durationMs:s.durationMs || s.remainingMs, decayRate:polarityOf(s)==='buff'?decayRate:1,
+      sourceSkillName:source?.name || null, iconPath:source?.iconPath || `/assets/skills/${fallback || 'mirrored-image'}-v1.webp`,
+      name:d?.name || '반사된 형상', englishName:d?.englishName || 'Mirrored Image',
+      description:d?.description || '회피 +30, 피격 명중·치명타마다 보너스 −10', attribute:d?.attribute, polarity:polarityOf(s), tier:d?.tier || 1 };
+  });
+}

@@ -8,6 +8,7 @@ import { initBestiary } from './bestiary-view.js';
 import { createBestiarySync } from './bestiary-sync.js';
 import { initInn } from './inn-view.js';
 import { appearanceFor } from './appearances.js';
+import { initStatusEffects } from './status-effects-view.js';
 import { initSkills, skillDescription } from './skills-view.js';
 import { itemIconHTML, itemDetailsHTML } from './equipment-view.js';
 import { createWorld } from './render.js';
@@ -37,7 +38,8 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) refr
 const clientId = crypto.randomUUID(); let lastHeartbeat = 0;
 let world, choicePending = false;
 const combatFeed = createCombatFeed();
-const skills = initSkills({ bar: $('#skill-bar'), slots: $('#skill-slots'), summary: $('#skill-summary'), status: $('#battle-status'), onUse: (itemId, battleId, heroActionSeq, button, mode, enabled) => command(mode === 'toggle' ? 'TOGGLE_SKILL' : 'USE_SKILL', { itemId, battleId, heroActionSeq, ...(mode === 'toggle' ? { enabled } : {}) }, button) });
+const skills = initSkills({ bar: $('#skill-bar'), slots: $('#skill-slots'), onUse: (itemId, battleId, heroActionSeq, button, mode, enabled) => command(mode === 'toggle' ? 'TOGGLE_SKILL' : 'USE_SKILL', { itemId, battleId, heroActionSeq, ...(mode === 'toggle' ? { enabled } : {}) }, button) });
+const statusEffects = initStatusEffects({ world: $('#world'), columns: { hero: $('#hero-status-effects'), enemy: $('#enemy-status-effects') }, tooltip: $('#world-status-tooltip') });
 const inn = initInn({ panel: $('#inn-selection'), portrait: $('#portrait'), countdown: $('#rest-countdown'), onCommand: (type, fields) => command(type, fields) });
 function updateInn() { inn.update(data?.state, receivedAt, data?.rate || 1, connected && !!user); }
 createWorld($('#world')).then(w => { world = w; if (data?.state) w.update(data.state); inn.setWorldReady(); }).catch(e => { $('#render-error').hidden = false; $('#render-error').textContent = '게임 화면을 불러오지 못했습니다. 새로고침해 주세요. ' + e.message; console.error(e); });
@@ -71,6 +73,7 @@ function receive(next) {
   $('#server-status').textContent = 'SERVER LIVE · SAVED';
   updateInn();
   skills.update(next.state, next.serverTime, receivedAt, connected);
+  statusEffects.update(next.state, receivedAt, connected, next.rate || 1);
   const s = next.state; $('#world').dataset.phase = s?.phase || 'HOME'; updateChoices();
   const probabilities = next.config?.probabilities;
   if (probabilities) {
@@ -184,10 +187,10 @@ $('#class-switch').onclick = () => { const w = $('#world-window'); if (w.classLi
 $('#stats').addEventListener('click', e => { const button = e.target.closest('button[data-stat]'); if (button && !button.disabled) command('ALLOCATE_STAT', { stat: button.dataset.stat }, button); });
 $('#help-button').onclick = () => $('#help').showModal(); $$('#help .dialog-close').forEach(b => b.onclick = () => $('#help').close());
 async function presence(active = true) { if (!user) return; if (active) lastHeartbeat = Date.now(); try { await api('/api/presence', { clientId, active }); } catch (e) { if (active) $('#connection').classList.add('lost'); } }
-function disconnect() { source?.close(); source = null; connected = false; skills.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
+function disconnect() { source?.close(); source = null; connected = false; skills.disconnect(); statusEffects.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
 async function connect() {
   disconnect();
-  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; skills.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
+  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; skills.disconnect(); statusEffects.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
 }
 setInterval(() => { if (user) presence(); }, 4000);
 addEventListener('pagehide', () => { if (user) fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, active: false }), keepalive: true }); });
@@ -209,7 +212,7 @@ $('#auth-form').onsubmit = async e => {
   catch (error) { $('#auth-error').textContent = error.message; }
   finally { button.disabled = false; }
 };
-logout.onclick = async () => { try { await api('/api/auth/logout', {}); user = null; data = null; world?.update(null); disconnect(); showAuth(); } catch (e) { toast(e.message); } };
+logout.onclick = async () => { try { await api('/api/auth/logout', {}); user = null; data = null; statusEffects.update(null); world?.update(null); disconnect(); showAuth(); } catch (e) { toast(e.message); } };
 api('/api/auth/me').then(r => { user = r.user; adminSettings.setUser(user); if (user) { logout.hidden = false; connect(); } else showAuth(); }).catch(e => { toast(e.message); showAuth(); });
 // Read-only diagnostics for local QA; contains no credentials or authoritative setters.
 window.zwiequestDiagnostics = () => ({ render: world?.diagnostics(), phase: data?.state?.phase, eventSeq: data?.state?.eventSeq, connected });

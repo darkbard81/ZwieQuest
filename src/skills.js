@@ -146,7 +146,7 @@ function prepareDirectSkill(state, item, hero, command, now, catalog) {
 }
 export function applySkillEffect(state, actor, def, source) {
   const b=state.battle, e=def.effect;
-  if(e.type==='status')return applyStatus(b,actor,e.statusId,e.durationMs,source,actor,(actor==='hero'?owner(state):state.enemy).statusResistance || {});
+  if(e.type==='status')return applyStatus(b,actor,e.statusId,e.durationMs,source,actor,(actor==='hero'?owner(state):state.enemy).statusResistance || {},def.id);
   if(e.type==='mirror') { applyMirror(b,actor,e.durationMs,source); return {}; }
   if(e.type==='cleanse' || e.type==='dispel')return { removed:clearStatuses(b,e.type==='cleanse'?actor:(actor==='hero'?'enemy':'hero'),e.type==='cleanse'?'debuff':'buff') };
   return {};

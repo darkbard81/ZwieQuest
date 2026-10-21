@@ -27,7 +27,7 @@ export function skillAvailability(state, item, now, connected = true) {
   else reason = toggle ? (turningOff ? 'OFF로 전환' : 'ON으로 전환') : inCombat ? '다음 행동에 예약 가능' : '사용 가능';
   return { kind, reason, remaining, ready: kind === 'ready', progress: 1 };
 }
-export function initSkills({ bar, slots, summary, status, onUse }) {
+export function initSkills({ bar, slots, onUse }) {
   let state = null, serverTime = 0, receivedAt = 0, connected = false, pending = false;
   const views = Array.from({ length: 6 }, (_, index) => {
     const button = document.createElement('button');
@@ -53,29 +53,19 @@ export function initSkills({ bar, slots, summary, status, onUse }) {
       const description = item ? `${item.name} · ${skillDescription(item)}` : `스킬 슬롯 ${index + 1} · 비어 있음`;
       button.disabled = pending || !availability.ready;
       button.dataset.state = availability.kind;
-      button.querySelector('.skill-symbol').innerHTML = skillIconHTML(item || {icon:'＋'});
+      const iconHTML = skillIconHTML(item || {icon:'＋'});
+      const symbol = button.querySelector('.skill-symbol'), slotSymbol = slot.querySelector('span');
+      if (symbol.dataset.icon !== iconHTML) { symbol.innerHTML = iconHTML; symbol.dataset.icon = iconHTML; }
+      if (slotSymbol.dataset.icon !== iconHTML) { slotSymbol.innerHTML = iconHTML; slotSymbol.dataset.icon = iconHTML; }
       button.querySelector('.skill-timer').textContent = availability.kind === 'queued' ? '예약' : availability.kind === 'exhausted' ? '소진' : availability.remaining ? Math.ceil(availability.remaining / 1000) : item?.activationMode === 'toggle' ? (item.toggleOn ? 'ON' : 'OFF') : '';
       button.querySelector('.skill-uses').textContent = item?.remainingUses != null ? `${item.remainingUses}/${item.perBattleLimit}` : '';
       if (item?.activationMode === 'toggle') button.setAttribute('aria-pressed', String(item.toggleOn)); else button.removeAttribute('aria-pressed');
       const label = `${description} · ${availability.reason}${availability.remaining ? ` · ${Math.ceil(availability.remaining / 1000)}초 남음` : ''}`;
       if (button.title !== label) { button.title = label; button.setAttribute('aria-label', label); }
-      slot.querySelector('span').innerHTML = skillIconHTML(item || {icon:'＋'}); slot.querySelector('small').textContent = item?.name || `${index + 1}`;
+      slot.querySelector('small').textContent = item?.name || `${index + 1}`;
       slot.classList.toggle('empty', !item); slot.title = description;
     }
-    if (!state) return;
-    const effects = document.getElementById('combat-status-effects');
-    if (effects) effects.innerHTML = ['hero','enemy'].map(actor=>`<div class="status-actor"><strong>${actor==='hero'?'모험가':'몬스터'}</strong>${(state.statusEffects?.[actor] || []).map(s=>`<span class="status-effect ${s.polarity}" title="${esc(s.englishName)} · ${esc(s.description || '')} · ${s.attribute || 'DEF'} ${s.tier}단계">${esc(s.name)}${s.id==='mirrored-image'?` +${s.bonus}`:''} <small>${(s.remainingMs/1000).toFixed(1)}초</small></span>`).join('') || '<small>상태 효과 없음</small>'}</div>`).join('');
-    const equipped = views.map((_, index) => getItem(index)).filter(Boolean);
-    summary.textContent = equipped.length ? equipped.map(item => `${item.name}: ${skillDescription(item)}`).join(' · ') : '가방의 스킬 탭에서 장착해 주세요.';
-    const b = state.battle;
-    status.textContent = state.phase === 'BATTLE' && b
-      ? `개인 행동 주기 ${b.combatants.hero.actionSeq} · ${b.pendingSkill ? '스킬 예약됨 · 다음 일반 공격 대체' : b.skillUsed ? '이번 주기 스킬 사용 완료' : '다음 행동에 스킬 1개 예약 가능'} · ` + ['hero','enemy'].map(actor => {
-        const t = state.battleTiming?.[actor];
-        return t ? `${actor === 'hero' ? '모험가' : '몬스터'}: 속도 ${Number(t.actionSpeed.toFixed(2))}, 갑옷 -${Math.round((t.armorSpeedPenaltyRate ?? t.actionSpeedPenaltyRate) * 100)}%, 무기 -${Math.round((t.weaponSpeedPenaltyRate || 0) * 100)}%, 준비 ${Math.min(100, Math.floor(t.readiness * 100))}% (${(t.nextActionMs / 1000).toFixed(2)} 게임초)` : '';
-      }).join(' / ')
-      : '전투 중 스킬을 예약하면 다음 행동에 일반 공격 대신 발동';
   }
-  setInterval(() => { if (!document.hidden) refresh(); }, 100);
   return { update(next, time, at, online) { state = next; serverTime = time; receivedAt = at; connected = online; refresh(); }, disconnect() { connected = false; refresh(); } };
 }
 export const skillIconHTML = item => `<span class="skill-item-icon" aria-hidden="true">${/^\/assets\/skills\/[a-z0-9-]+\.webp$/.test(item.iconPath || '') ? `<img src="${esc(item.iconPath)}" alt="" loading="lazy">` : esc(item.icon || '✦')}</span>`;
