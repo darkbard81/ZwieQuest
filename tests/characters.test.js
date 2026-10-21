@@ -64,7 +64,7 @@ test('legacy migration preserves active battle and common state, removes duplica
  const old=structuredClone(g.state);delete old.characterVersion;delete old.characters;delete old.activeCharacterId;
  Object.assign(old,{classId:'wizard',appearanceId:'wizard',level:a.level,xp:a.xp,hp:a.hp,equipment:a.equipment,skillSlots:a.skillSlots,skillGrants:a.skillGrants,skillCooldowns:a.skillCooldowns,inactiveClasses:{warrior:{level:4,xp:7,equipment:{...a.equipment}}}});old.inventory.push(...structuredClone(a.skills));
  const before=structuredClone(old),migrated=new Game(config,old),c=migrated.character;
- assert.equal(c.level,8);assert.equal(c.xp,19);assert.equal(c.hp,3);assert.deepEqual(c.equipment,before.equipment);assert.deepEqual(c.skillSlots,before.skillSlots);assert.deepEqual(c.skillCooldowns,before.skillCooldowns);assert.equal(remainingPoints(c),14);
+ assert.equal(c.level,8);assert.equal(c.xp,19);assert.equal(c.hp,3);assert.deepEqual(c.equipment,before.equipment);assert.deepEqual(c.skillSlots,before.skillSlots);assert.deepEqual(c.skillCooldowns,{});assert.equal(remainingPoints(c),14);
  assert.equal(migrated.state.characters.length,2);assert.equal(migrated.state.characters[1].level,4);assert.deepEqual(migrated.state.characters[1].equipment,{});assert.notEqual(c.skills[0].id,migrated.state.characters[1].skills[0].id);
  for(const key of ['maps','path','gold','remaining','enemy','checkpointHistory','autoRoute','currentNodeId'])assert.deepEqual(migrated.state[key],before[key],key);
  assert.equal(migrated.state.battle.ap,undefined);assert.equal(migrated.state.battle.attacks,undefined);assert.deepEqual(migrated.state.battle.skillUseCounts,{heal:2});assert.equal(migrated.state.classId,undefined);

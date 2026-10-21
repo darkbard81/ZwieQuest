@@ -1,0 +1,485 @@
+{
+  "schemaVersion": 1,
+  "duration": {
+    "intelligenceRate": 0.05,
+    "minimumMultiplier": 0.25
+  },
+  "statuses": [
+    {
+      "id": "strong",
+      "name": "강력",
+      "englishName": "Strong",
+      "attribute": "STR",
+      "polarity": "buff",
+      "tier": 1,
+      "modifiers": {
+        "STR": 5
+      },
+      "description": "완력 +5"
+    },
+    {
+      "id": "tenacious",
+      "name": "강인",
+      "englishName": "Tenacious",
+      "attribute": "STR",
+      "polarity": "buff",
+      "tier": 2,
+      "modifiers": {
+        "STR": 5,
+        "PEN": 2
+      },
+      "description": "완력 +5, 관통력 +2"
+    },
+    {
+      "id": "energized",
+      "name": "활력",
+      "englishName": "Energized",
+      "attribute": "STR",
+      "polarity": "buff",
+      "tier": 3,
+      "modifiers": {
+        "STR": 5,
+        "PEN": 2,
+        "interruptOnCrit": true
+      },
+      "description": "완력 +5, 관통력 +2, 치명타로 적 행동 준비도 초기화"
+    },
+    {
+      "id": "staggered",
+      "name": "비틀거림",
+      "englishName": "Staggered",
+      "attribute": "STR",
+      "polarity": "debuff",
+      "tier": 1,
+      "modifiers": {
+        "STR": -5
+      },
+      "description": "완력 −5"
+    },
+    {
+      "id": "dazed",
+      "name": "멍해짐",
+      "englishName": "Dazed",
+      "attribute": "STR",
+      "polarity": "debuff",
+      "tier": 2,
+      "modifiers": {
+        "STR": -5,
+        "PEN": -4
+      },
+      "description": "완력 −5, 관통력 −4"
+    },
+    {
+      "id": "stunned",
+      "name": "기절",
+      "englishName": "Stunned",
+      "attribute": "STR",
+      "polarity": "debuff",
+      "tier": 3,
+      "modifiers": {
+        "STR": -5,
+        "PEN": -4,
+        "DEF": -10
+      },
+      "description": "완력 −5, 관통력 −4, 회피 −10"
+    },
+    {
+      "id": "fit",
+      "name": "건강",
+      "englishName": "Fit",
+      "attribute": "CON",
+      "polarity": "buff",
+      "tier": 1,
+      "modifiers": {
+        "CON": 5
+      },
+      "description": "체질 +5"
+    },
+    {
+      "id": "hardy",
+      "name": "튼튼함",
+      "englishName": "Hardy",
+      "attribute": "CON",
+      "polarity": "buff",
+      "tier": 2,
+      "modifiers": {
+        "CON": 5,
+        "AR": 2
+      },
+      "description": "체질 +5, 방어도 +2"
+    },
+    {
+      "id": "robust",
+      "name": "강건",
+      "englishName": "Robust",
+      "attribute": "CON",
+      "polarity": "buff",
+      "tier": 3,
+      "modifiers": {
+        "CON": 5,
+        "AR": 2,
+        "periodMs": 3000,
+        "periodType": "heal",
+        "periodAmount": 10
+      },
+      "description": "체질 +5, 방어도 +2, 3초마다 HP 10 회복"
+    },
+    {
+      "id": "sickened",
+      "name": "병듦",
+      "englishName": "Sickened",
+      "attribute": "CON",
+      "polarity": "debuff",
+      "tier": 1,
+      "modifiers": {
+        "CON": -5,
+        "healingReceived": 0.75
+      },
+      "description": "체질 −5, 받는 회복량 −25%"
+    },
+    {
+      "id": "weakened",
+      "name": "쇠약",
+      "englishName": "Weakened",
+      "attribute": "CON",
+      "polarity": "debuff",
+      "tier": 2,
+      "modifiers": {
+        "CON": -5,
+        "healingReceived": 0.5
+      },
+      "description": "체질 −5, 받는 회복량 −50%"
+    },
+    {
+      "id": "enfeebled",
+      "name": "극심한 쇠약",
+      "englishName": "Enfeebled",
+      "attribute": "CON",
+      "polarity": "debuff",
+      "tier": 3,
+      "modifiers": {
+        "CON": -5,
+        "healingReceived": 0,
+        "hostileDurationMultiplier": 1.5
+      },
+      "description": "체질 −5, 회복 차단, 받는 약화 지속시간 +50%"
+    },
+    {
+      "id": "quick",
+      "name": "신속",
+      "englishName": "Quick",
+      "attribute": "DEX",
+      "polarity": "buff",
+      "tier": 1,
+      "modifiers": {
+        "DEX": 5
+      },
+      "description": "민첩 +5"
+    },
+    {
+      "id": "nimble",
+      "name": "날렵",
+      "englishName": "Nimble",
+      "attribute": "DEX",
+      "polarity": "buff",
+      "tier": 2,
+      "modifiers": {
+        "DEX": 5,
+        "incomingHitToGraze": 0.25
+      },
+      "description": "민첩 +5, 피격 명중의 25%를 스침으로 전환"
+    },
+    {
+      "id": "swift",
+      "name": "쾌속",
+      "englishName": "Swift",
+      "attribute": "DEX",
+      "polarity": "buff",
+      "tier": 3,
+      "modifiers": {
+        "DEX": 5,
+        "incomingHitToGraze": 0.25,
+        "interruptImmune": true
+      },
+      "description": "민첩 +5, 피격 명중의 25%를 스침으로 전환, 방해 면역"
+    },
+    {
+      "id": "hobbled",
+      "name": "절뚝거림",
+      "englishName": "Hobbled",
+      "attribute": "DEX",
+      "polarity": "debuff",
+      "tier": 1,
+      "modifiers": {
+        "DEX": -5
+      },
+      "description": "민첩 −5"
+    },
+    {
+      "id": "immobilized",
+      "name": "이동불가",
+      "englishName": "Immobilized",
+      "attribute": "DEX",
+      "polarity": "debuff",
+      "tier": 2,
+      "modifiers": {
+        "DEX": -5,
+        "incomingGrazeToHit": 0.5
+      },
+      "description": "민첩 −5, 피격 스침의 50%를 명중으로 전환"
+    },
+    {
+      "id": "paralyzed",
+      "name": "마비",
+      "englishName": "Paralyzed",
+      "attribute": "DEX",
+      "polarity": "debuff",
+      "tier": 3,
+      "modifiers": {
+        "DEX": -5,
+        "incomingGrazeToHit": 0.5,
+        "incomingHitToCrit": 0.25
+      },
+      "description": "민첩 −5, 피격 스침의 50%를 명중으로, 피격 명중의 25%를 치명타로 전환"
+    },
+    {
+      "id": "insightful",
+      "name": "통찰",
+      "englishName": "Insightful",
+      "attribute": "PER",
+      "polarity": "buff",
+      "tier": 1,
+      "modifiers": {
+        "PER": 5
+      },
+      "description": "지각 +5"
+    },
+    {
+      "id": "aware",
+      "name": "경계",
+      "englishName": "Aware",
+      "attribute": "PER",
+      "polarity": "buff",
+      "tier": 2,
+      "modifiers": {
+        "PER": 5,
+        "outgoingGrazeToHit": 0.5
+      },
+      "description": "지각 +5, 공격 스침의 50%를 명중으로 전환"
+    },
+    {
+      "id": "intuitive",
+      "name": "직관",
+      "englishName": "Intuitive",
+      "attribute": "PER",
+      "polarity": "buff",
+      "tier": 3,
+      "modifiers": {
+        "PER": 5,
+        "outgoingGrazeToHit": 0.5,
+        "outgoingHitToCrit": 0.25
+      },
+      "description": "지각 +5, 공격 스침의 50%를 명중으로, 공격 명중의 25%를 치명타로 전환"
+    },
+    {
+      "id": "distracted",
+      "name": "주의산만",
+      "englishName": "Distracted",
+      "attribute": "PER",
+      "polarity": "debuff",
+      "tier": 1,
+      "modifiers": {
+        "PER": -5,
+        "DEF": -10
+      },
+      "description": "지각 −5, 회피 −10"
+    },
+    {
+      "id": "disoriented",
+      "name": "혼란",
+      "englishName": "Disoriented",
+      "attribute": "PER",
+      "polarity": "debuff",
+      "tier": 2,
+      "modifiers": {
+        "PER": -5,
+        "DEF": -10,
+        "actionTimeMultiplier": 1.5
+      },
+      "description": "지각 −5, 회피 −10, 행동시간 +50%"
+    },
+    {
+      "id": "blinded",
+      "name": "실명",
+      "englishName": "Blinded",
+      "attribute": "PER",
+      "polarity": "debuff",
+      "tier": 3,
+      "modifiers": {
+        "PER": -5,
+        "DEF": -10,
+        "actionTimeMultiplier": 1.5,
+        "ACC": -10
+      },
+      "description": "지각 −5, 회피 −10, 행동시간 +50%, 명중 −10"
+    },
+    {
+      "id": "smart",
+      "name": "총명",
+      "englishName": "Smart",
+      "attribute": "INT",
+      "polarity": "buff",
+      "tier": 1,
+      "modifiers": {
+        "INT": 5
+      },
+      "description": "지능 +5"
+    },
+    {
+      "id": "acute",
+      "name": "예리",
+      "englishName": "Acute",
+      "attribute": "INT",
+      "polarity": "buff",
+      "tier": 2,
+      "modifiers": {
+        "INT": 5,
+        "debuffDurationMultiplier": 1.25
+      },
+      "description": "지능 +5, 부여하는 약화 지속시간 +25%"
+    },
+    {
+      "id": "brilliant",
+      "name": "영특",
+      "englishName": "Brilliant",
+      "attribute": "INT",
+      "polarity": "buff",
+      "tier": 3,
+      "modifiers": {
+        "INT": 5,
+        "debuffDurationMultiplier": 1.25,
+        "periodMs": 6000,
+        "periodType": "restore",
+        "periodAmount": 1
+      },
+      "description": "지능 +5, 부여하는 약화 지속시간 +25%, 6초마다 소모된 장착 스킬 사용 횟수 1회 복구"
+    },
+    {
+      "id": "confused",
+      "name": "혼란",
+      "englishName": "Confused",
+      "attribute": "INT",
+      "polarity": "debuff",
+      "tier": 1,
+      "modifiers": {
+        "INT": -5
+      },
+      "description": "지능 −5"
+    },
+    {
+      "id": "charmed",
+      "name": "매혹",
+      "englishName": "Charmed",
+      "attribute": "INT",
+      "polarity": "debuff",
+      "tier": 2,
+      "modifiers": {
+        "INT": -5,
+        "actionLocked": true
+      },
+      "description": "지능 −5, 조작 불가, 일반 공격만 가능"
+    },
+    {
+      "id": "dominated",
+      "name": "지배",
+      "englishName": "Dominated",
+      "attribute": "INT",
+      "polarity": "debuff",
+      "tier": 3,
+      "modifiers": {
+        "INT": -5,
+        "actionLocked": true,
+        "selfAttack": true
+      },
+      "description": "지능 −5, 조작 불가, 자기 자신에게 일반 공격"
+    },
+    {
+      "id": "steadfast",
+      "name": "굳건",
+      "englishName": "Steadfast",
+      "attribute": "RES",
+      "polarity": "buff",
+      "tier": 1,
+      "modifiers": {
+        "RES": 5
+      },
+      "description": "결의 +5"
+    },
+    {
+      "id": "resolute",
+      "name": "의연",
+      "englishName": "Resolute",
+      "attribute": "RES",
+      "polarity": "buff",
+      "tier": 2,
+      "modifiers": {
+        "RES": 5,
+        "buffDecayRate": 0.5
+      },
+      "description": "결의 +5, 자신의 강화 시간 소모 ×0.5"
+    },
+    {
+      "id": "courageous",
+      "name": "용맹",
+      "englishName": "Courageous",
+      "attribute": "RES",
+      "polarity": "buff",
+      "tier": 3,
+      "modifiers": {
+        "RES": 5,
+        "buffDecayRate": 0.5,
+        "inspirationBonus": 1
+      },
+      "description": "결의 +5, 자신의 강화 시간 소모 ×0.5, 다른 능력치 강화 적용 단계 +1"
+    },
+    {
+      "id": "shaken",
+      "name": "동요",
+      "englishName": "Shaken",
+      "attribute": "RES",
+      "polarity": "debuff",
+      "tier": 1,
+      "modifiers": {
+        "RES": -5
+      },
+      "description": "결의 −5"
+    },
+    {
+      "id": "frightened",
+      "name": "공포",
+      "englishName": "Frightened",
+      "attribute": "RES",
+      "polarity": "debuff",
+      "tier": 2,
+      "modifiers": {
+        "RES": -5,
+        "buffDecayRate": 2
+      },
+      "description": "결의 −5, 자신의 강화 시간 소모 ×2"
+    },
+    {
+      "id": "terrified",
+      "name": "극도의 공포",
+      "englishName": "Terrified",
+      "attribute": "RES",
+      "polarity": "debuff",
+      "tier": 3,
+      "modifiers": {
+        "RES": -5,
+        "buffDecayRate": 2,
+        "afflictionBonus": 1
+      },
+      "description": "결의 −5, 자신의 강화 시간 소모 ×2, 다른 능력치 약화 적용 단계 +1"
+    }
+  ]
+}

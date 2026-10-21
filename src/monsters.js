@@ -81,7 +81,8 @@ function buildMonster({ monster, variation }, level, grade, rng, mapId, config) 
     description: monster.description, img_path: variation.img_path, icon_path: variation.icon_path,
     level, gradeId: grade.id, gradeName: grade.name, attributes, allocatedAttributes,
     hp: values.maxHp, weapon, armor, damageTypes: [...weapon.damageTypes], hitDefense: weapon.hitDefense,
-    skills: structuredClone(variation.skills), ...(variation.attackName ? { attackName: variation.attackName } : {}), mapId };
+    statusHpBase: monster.hp + monster.hpGrowth * (level - 1),
+    skills: variation.skills.length ? structuredClone(variation.skills) : ({ slime: ['weakening-strike'], golem: ['constitution-inspiration'], harpy: ['binding-strike'], ghost: ['mind-fog'] }[monster.id] || []), ...(variation.attackName ? { attackName: variation.attackName } : {}), mapId };
 }
 export function monsterRewards(enemy, characterLevel, xpPerLevel, rules = ENCOUNTER_CONFIG) {
   const r = rules.rewards, difference = enemy.level - characterLevel, eligible = difference >= 0;

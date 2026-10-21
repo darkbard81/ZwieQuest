@@ -154,7 +154,7 @@ export async function createWorld(container) {
       if (!['hero', 'enemy'].includes(hit.actor) || !['빗나감', '스침', '명중', '치명타'].includes(hit.label)) return;
       feedback.text = hit.label;
       feedback.style.fill = ['#e7eef5', '#c6dfed', '#fff7dc', '#ffd36a'][hit.tier] || '#ffffff';
-      feedbackTarget = hit.actor === 'hero' ? 'enemy' : 'hero';
+      feedbackTarget = hit.targetActor || (hit.actor === 'hero' ? 'enemy' : 'hero');
       feedbackAt = performance.now(); feedback.alpha = 1; feedback.visible = true; feedbackCount++;
     },
     diagnostics() { return { engine: 'PixiJS', version: VERSION, mode: renderer instanceof CanvasRenderer ? 'pixi-canvas' : 'pixi-webgl',

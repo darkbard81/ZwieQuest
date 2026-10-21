@@ -76,9 +76,9 @@ function receive(next) {
   if (probabilities) {
     const { battlePercent, treasurePercent, passPercent, dropPercent } = probabilities;
     $('#drop-probability-summary').textContent = `전투 승리 시 장비 ${dropPercent}%`;
-    $('#drop-probability-summary').title = `일반 몬스터와 보스는 레벨 차이와 관계없이 처치 시 ${dropPercent}% 확률로 장비를 얻습니다. 하위 레벨 몬스터는 경험치 1과 금화를 지급합니다. 보물상자는 금화만 지급합니다.`;
+    $('#drop-probability-summary').title = `일반 몬스터와 보스는 레벨 차이와 관계없이 처치 시 ${dropPercent}% 확률로 장비를 얻습니다. 하위 레벨 몬스터는 경험치 1과 금화를 지급합니다. 보물상자는 금화와 미습득 스킬 1개를 지급합니다. 모든 스킬 습득 후에는 금화만 지급합니다.`;
     $('#help-encounter-probabilities').textContent = `일반 경로 도착 시 전투 ${battlePercent}%, 보물 ${treasurePercent}%, 통과 ${passPercent}%로 새로 판정합니다.`;
-    $('#help-drop-probabilities').textContent = `보스 또는 일반 몬스터와의 전투에서 레벨 차이와 관계없이 승리하면 ${dropPercent}% 확률로 무기·방어구·부적 중 1개를 동일한 확률로 얻습니다. 보물 상자는 금화만 지급합니다.`;
+    $('#help-drop-probabilities').textContent = `보스 또는 일반 몬스터와의 전투에서 레벨 차이와 관계없이 승리하면 ${dropPercent}% 확률로 무기·방어구·부적 중 1개를 동일한 확률로 얻습니다. 보물 상자는 금화와 미습득 스킬 1개를 지급합니다. 모든 스킬 습득 후에는 금화만 지급합니다.`;
   }
   $('#hero-world-hp').hidden = s?.phase !== 'BATTLE' || !s?.activeCharacterId;
   if (!s) { world?.update(null); return; }
@@ -108,7 +108,7 @@ function receive(next) {
   $('#enemy-hud').hidden = !s.enemy || s.phase !== 'BATTLE';
   $('#enemy-hud').classList.toggle('template-monster', Boolean(s.enemy?.img_path));
   if (s.enemy) $('#enemy-hud').innerHTML = `${esc(s.enemy.name)}${s.enemy.level ? ` Lv.${s.enemy.level}` : ''} · ${s.enemy.hp}/${s.enemy.maxHp}<div class="meter"><div style="width:${100 * s.enemy.hp / s.enemy.maxHp}%"></div></div>`;
-  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.kind === 'treasure' ? `보물상자에서 금화 ${s.lastReward.gold}개를 얻었어요.` : s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : `경험치 ${s.lastReward?.xp ?? 0}, 금화 ${s.lastReward?.gold ?? 0}개를 얻었어요.`) : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
+  $('#scene-notice').textContent = s.phase === 'TREASURE' ? (s.lastReward?.kind === 'treasure' ? `보물상자 · 금화 ${s.lastReward.gold}개${s.lastReward.skillName ? ` · ${s.lastReward.skillName} 스킬 습득! 가방에서 장착하세요.` : ' · 모든 스킬 습득 완료'}` : s.lastReward?.itemName ? `${s.lastReward.itemName} 획득!` : `경험치 ${s.lastReward?.xp ?? 0}, 금화 ${s.lastReward?.gold ?? 0}개를 얻었어요.`) : s.phase === 'DOWNED' ? '괜찮아요. 여관에서 다시 시작하면 돼요.' : '';
   $('#return-overlay').hidden = s.phase !== 'RETURN_HOME';
   if (s.phase === 'RETURN_HOME') $('#return-overlay').innerHTML = `<small>JOURNEY COMPLETE</small><h2>${s.lastSummary?.downed ? '무사히 돌아왔어요' : s.lastSummary?.reason === 'boss' ? '수호자를 넘어섰어요' : '길 끝에서, 다시 출발'}</h2><p>${s.run}번째 여행 · ${theme.name}</p><strong>+ ${s.lastSummary.gold} G</strong><p>성장과 전리품을 안전하게 저장했습니다.<br>마을의 집(HOME)으로 돌아갑니다.</p>`;
   if ($('#map-dialog')?.open) renderMap();

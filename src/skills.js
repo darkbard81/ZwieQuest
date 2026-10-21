@@ -1,3 +1,4 @@
+import { statusDefinition, modifiers, durationMs, applyStatus, applyMirror, clearStatuses, polarityOf } from './status-effects.js';
 import { activeCharacter } from './characters.js';
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -5,7 +6,7 @@ import { EQUIPMENT_CATALOG } from './equipment.js';
 
 export function validateSkillCatalog(catalog) {
   const fail = message => { throw Error(`skills.json: ${message}`); };
-  if (catalog.schemaVersion !== 2 || catalog.maxEquipped !== 6 || !Array.isArray(catalog.skills)) fail('schemaVersion=2, maxEquipped=6 and skills array required');
+  if (catalog.schemaVersion !== 3 || catalog.maxEquipped !== 6 || !Array.isArray(catalog.skills)) fail('schemaVersion=3, maxEquipped=6 and skills array required');
   const ids = new Set();
   for (const s of catalog.skills) {
     if (!/^[a-z][a-z0-9-]*$/.test(s.id) || ids.has(s.id)) fail('unique skill id required');
@@ -15,10 +16,6 @@ export function validateSkillCatalog(catalog) {
     if (!Array.isArray(s.useContexts) || !s.useContexts.length || new Set(s.useContexts).size !== s.useContexts.length || s.useContexts.some(c => !['combat', 'nonCombat'].includes(c))) fail(`${s.id}: invalid useContexts`);
     if (!['direct', 'toggle'].includes(s.activationMode)) fail(`${s.id}: invalid activationMode`);
     if (s.perBattleLimit !== null && (!Number.isSafeInteger(s.perBattleLimit) || s.perBattleLimit < 1)) fail(`${s.id}: perBattleLimit must be positive or null`);
-    for (const [key, value] of Object.entries({ baseMs: s.cooldown?.baseMs, dexterityReductionRate: s.cooldown?.dexterityReductionRate, minimumMs: s.cooldown?.minimumMs })) {
-      if (!Number.isFinite(value) || value < 0) fail(`${s.id}.${key} must be nonnegative and finite`);
-    }
-    if (s.cooldown.minimumMs > s.cooldown.baseMs) fail(`${s.id}: invalid minimum cooldown`);
     if (s.effect?.type === 'heal' && s.activationMode === 'direct') {
       for (const key of ['maxHpRate', 'intelligenceRate']) if (!Number.isFinite(s.effect[key]) || s.effect[key] < 0) fail(`${s.id}: invalid ${key}`);
       if (s.effect.maxHpRate > 1) fail(`${s.id}: invalid healing rate`);
@@ -27,7 +24,15 @@ export function validateSkillCatalog(catalog) {
       if (!Array.isArray(s.effect.weaponCategories) || !s.effect.weaponCategories.length || s.effect.weaponCategories.some(id => !EQUIPMENT_CATALOG.weapons.some(w => w.id === id))) fail(`${s.id}: invalid weapon category`);
       if (s.useContexts.length !== 1 || s.useContexts[0] !== 'combat') fail(`${s.id}: accuracy toggle currently supports combat only`);
       if (s.toggleConsumesCycle !== null && typeof s.toggleConsumesCycle !== 'boolean') fail(`${s.id}: toggleConsumesCycle must be boolean or null (unresolved)`);
+    } else if (s.activationMode === 'direct' && ['attack','status','mirror','cleanse','dispel'].includes(s.effect?.type)) {
+      if (['attack','status','mirror'].includes(s.effect.type) && !(Number.isFinite(s.effect.durationMs) && s.effect.durationMs > 0)) fail(`${s.id}: invalid duration`);
+      if (['attack','status'].includes(s.effect.type) && !statusDefinition(s.effect.statusId)) fail(`${s.id}: unknown status`);
+      if (s.effect.type === 'attack') {
+        if (!['DEF','REF','FOR','WIL'].includes(s.effect.defense)) fail(`${s.id}: invalid defense`);
+        for (const k of ['damageMultiplier','accuracyBonus','penetrationBonus']) if (!Number.isFinite(s.effect[k]) || s.effect[k] < 0) fail(`${s.id}: invalid ${k}`);
+      }
     } else fail(`${s.id}: unsupported effect/mode; add a server handler first`);
+    if (s.enabled && !/^\/assets\/skills\/[a-z0-9-]+\.webp$/.test(s.iconPath || '')) fail(`${s.id}: invalid iconPath`);
   }
   return catalog;
 }
@@ -52,7 +57,7 @@ const learned = state => state.characters ? owner(state)?.skills || [] : state.i
 export function initializeSkills(state, catalog = SKILL_CATALOG) {
   if (!owner(state)) return;
   owner(state).skillSlots ||= Array(catalog.maxEquipped).fill(null);
-  owner(state).skillCooldowns ||= {};
+  owner(state).skillCooldowns = {}; // Retired wall-clock cooldowns never survive migration.
   owner(state).skillGrants ||= [];
   initializeBattleSkills(state.battle);
   for (const def of catalog.skills.filter(s => s.enabled && s.grantOnCreate)) {
@@ -68,19 +73,26 @@ export function initializeSkills(state, catalog = SKILL_CATALOG) {
   }
 }
 export function skillValues(def, hero) {
-  return {
-    ...(def.effect.type === 'heal' ? { heal: Math.max(0, Math.floor(hero.maxHp * (def.effect.maxHpRate + hero.INT * def.effect.intelligenceRate))) } : { accuracyBonus: def.effect.amount }),
-    cooldownMs: Math.max(def.cooldown.minimumMs, Math.round(def.cooldown.baseMs * (1 - hero.DEX * def.cooldown.dexterityReductionRate)))
-  };
+  return { ...(def.effect.type === 'heal' ? { heal: Math.max(0, Math.floor(hero.maxHp * (def.effect.maxHpRate + hero.INT * def.effect.intelligenceRate))) } : def.effect.type === 'accuracyBonus' ? { accuracyBonus: def.effect.amount } : {}),
+    ...(def.effect.durationMs ? { durationMs: durationMs(def.effect.durationMs, hero.INT) } : {}) };
+}
+export function grantTreasureSkill(state, rng, catalog = SKILL_CATALOG) {
+  const known = new Set(learned(state).map(i=>i.templateId));
+  const candidates = catalog.skills.filter(d=>d.enabled && d.treasureDrop && !known.has(d.id));
+  if (!candidates.length) return null;
+  const def=candidates[((rng(candidates.length) % candidates.length) + candidates.length) % candidates.length], item={id:randomUUID(),templateId:def.id,slot:'skill',name:def.name,stats:{}};
+  learned(state).push(item); return item;
 }
 export function skillItemView(item, state, hero, catalog = SKILL_CATALOG) {
   const def = skillDefinition(item.templateId, catalog), inCombat = state.phase === 'BATTLE';
   const used = inCombat ? state.battle?.skillUseCounts?.[item.templateId] || 0 : 0;
-  return { ...item, name: def?.name || item.name, icon: def?.icon || '?', description: def?.description || '등록되지 않은 스킬입니다.', enabled: !!def?.enabled,
+  const values = def ? skillValues(def, hero) : {};
+  if (def?.effect.type === 'attack' && inCombat) values.durationMs *= modifiers(state.battle, 'hero').debuffDurationMultiplier * modifiers(state.battle, 'enemy').hostileDurationMultiplier;
+  return { ...item, name: def?.name || item.name, icon: def?.icon || '?', iconPath: def?.iconPath, effect: def?.effect, statusName: statusDefinition(def?.effect.statusId)?.name, statusDescription: statusDefinition(def?.effect.statusId)?.description, description: [def?.description || '등록되지 않은 스킬입니다.', statusDefinition(def?.effect.statusId)?.description].filter(Boolean).join(' '), enabled: !!def?.enabled,
     useContexts: def?.useContexts || [], activationMode: def?.activationMode, effectType: def?.effect.type, perBattleLimit: def?.perBattleLimit ?? null,
     usesThisBattle: used, remainingUses: inCombat && def?.perBattleLimit != null ? Math.max(0, def.perBattleLimit - used) : null,
     toggleOn: inCombat && !!state.battle?.skillToggles?.[item.templateId], toggleConsumesCycle: def?.toggleConsumesCycle ?? null,
-    ...(def ? skillValues(def, hero) : {}), cooldown: owner(state).skillCooldowns[item.templateId] || null };
+    ...values, ...(def?.effect.type === 'heal' ? { heal: Math.floor(skillValues(def, hero).heal * modifiers(state.battle, 'hero').healingReceived) } : {}) };
 }
 export function equipSkill(state, item, unequip = false, slotIndex, catalog = SKILL_CATALOG) {
   if (!owner(state) || !learned(state).some(i => i.id === item.id)) throw Error('이 캐릭터가 습득한 스킬이 아닙니다.');
@@ -104,14 +116,15 @@ function validateUse(state, item, command, catalog, consumesCycle) {
   const b = state.phase === 'BATTLE' ? state.battle : null;
   if (!def.useContexts.includes(b ? 'combat' : 'nonCombat')) throw Error(b ? '전투 외에 사용하는 스킬입니다.' : '스킬은 전투 중에만 사용할 수 있습니다.');
   if (owner(state).hp <= 0 || (b && state.enemy?.hp <= 0)) throw Error('지금은 스킬을 사용할 수 없습니다.');
+  if (b && modifiers(b, 'hero').actionLocked) throw Error('매혹·지배 중에는 스킬을 조작할 수 없습니다.');
   // Prevent a stale non-combat request from executing after a battle starts, or vice versa.
   if ((b?.id ?? null) !== (command.battleId ?? null) || (b && command.heroActionSeq !== b.combatants.hero.actionSeq)) throw Error('스킬을 선택한 행동 주기가 지났습니다.');
-  if (b && consumesCycle && b.skillUsed) throw Error('이번 행동 주기에는 이미 스킬을 사용했습니다.');
+  if (b && consumesCycle && (b.skillUsed || b.pendingSkill)) throw Error('이번 행동 주기에는 이미 스킬을 사용했거나 예약했습니다.');
   return { def, b };
 }
 function checkActivation(state, def, b, now) {
   if (b && def.perBattleLimit !== null && (b.skillUseCounts?.[def.id] || 0) >= def.perBattleLimit) throw Error(`전투당 ${def.perBattleLimit}회 사용을 모두 소진했습니다.`);
-  if ((owner(state).skillCooldowns[def.id]?.readyAt || 0) > now) throw Error('스킬 재사용 대기 중입니다.');
+
 }
 function recordActivation(state, def, b, values, now, consumesCycle) {
   if (b) {
@@ -119,18 +132,56 @@ function recordActivation(state, def, b, values, now, consumesCycle) {
     b.skillUseCounts[def.id] = (b.skillUseCounts[def.id] || 0) + 1;
     if (consumesCycle) b.skillUsed = true;
   }
-  owner(state).skillCooldowns[def.id] = { startedAt: now, readyAt: now + values.cooldownMs, durationMs: values.cooldownMs };
+
 }
-export function useSkill(state, item, hero, command, now = Date.now(), catalog = SKILL_CATALOG) {
+function prepareDirectSkill(state, item, hero, command, now, catalog) {
   const { def, b } = validateUse(state, item, command, catalog, true);
   if (def.activationMode !== 'direct') throw Error('유지형 스킬은 ON/OFF로 조작하세요.');
   checkActivation(state, def, b, now);
   const values = skillValues(def, hero);
-  const healed = Math.min(values.heal, Math.max(0, hero.maxHp - owner(state).hp));
-  if (!healed) throw Error('회복할 체력이 없습니다.');
+  const healed = def.effect.type === 'heal' ? Math.min(Math.floor(values.heal * modifiers(b, 'hero').healingReceived), Math.max(0, hero.maxHp - owner(state).hp)) : 0;
+  if (def.effect.type === 'heal' && !healed) throw Error('회복할 체력이 없거나 회복이 차단되었습니다.');
+  if (['cleanse','dispel'].includes(def.effect.type) && !(b?.statuses?.[def.effect.type === 'cleanse' ? 'hero' : 'enemy'] || []).some(s=>polarityOf(s)===(def.effect.type === 'cleanse' ? 'debuff' : 'buff'))) throw Error('제거할 상태 효과가 없습니다.');
+  return { def, b, values, healed, hero };
+}
+export function applySkillEffect(state, actor, def, source) {
+  const b=state.battle, e=def.effect;
+  if(e.type==='status')return applyStatus(b,actor,e.statusId,e.durationMs,source,actor,(actor==='hero'?owner(state):state.enemy).statusResistance || {});
+  if(e.type==='mirror') { applyMirror(b,actor,e.durationMs,source); return {}; }
+  if(e.type==='cleanse' || e.type==='dispel')return { removed:clearStatuses(b,e.type==='cleanse'?actor:(actor==='hero'?'enemy':'hero'),e.type==='cleanse'?'debuff':'buff') };
+  return {};
+}
+function activateDirectSkill(state, { def, b, values, healed, hero }, now) {
   owner(state).hp += healed;
+  const effectResult=applySkillEffect(state,'hero',def,hero);
   recordActivation(state, def, b, values, now, true);
-  return { skillId: def.id, name: def.name, healed, ...values, heroActionSeq: b?.combatants.hero.actionSeq ?? null, battleId: b?.id ?? null };
+  return { skillId: def.id, name: def.name, effect: def.effect, ...effectResult, healed, ...values, heroActionSeq: b?.combatants.hero.actionSeq ?? null, battleId: b?.id ?? null };
+}
+// A combat request reserves one upcoming hero action. Costs and effects belong
+// to execution, so equipment/stat changes are checked again at that boundary.
+export function useSkill(state, item, hero, command, now = Date.now(), catalog = SKILL_CATALOG) {
+  const prepared = prepareDirectSkill(state, item, hero, command, now, catalog);
+  const { def, b } = prepared;
+  if (!b) return activateDirectSkill(state, prepared, now);
+  b.pendingSkill = { itemId: item.id, skillId: def.id, characterId: owner(state).id,
+    battleId: b.id, heroActionSeq: b.combatants.hero.actionSeq };
+  return { ...b.pendingSkill, name: def.name, queued: true };
+}
+export function resolvePendingSkill(state, hero, now = Date.now(), catalog = SKILL_CATALOG) {
+  const b = state.battle, pending = b?.pendingSkill;
+  if (!pending) return null;
+  // Clear before attempting execution: a cancelled reservation cannot retry or
+  // carry over to another action. A valid reservation never also attacks.
+  delete b.pendingSkill;
+  let prepared;
+  try {
+    if (state.phase !== 'BATTLE' || pending.characterId !== owner(state)?.id || pending.battleId !== b.id) throw Error('예약한 전투 또는 캐릭터가 변경되었습니다.');
+    const item = learned(state).find(i => i.id === pending.itemId && i.templateId === pending.skillId);
+    prepared = prepareDirectSkill(state, item, hero, pending, now, catalog);
+  } catch (error) {
+    return { ...pending, cancelled: true, reason: error.message };
+  }
+  return activateDirectSkill(state, prepared, now);
 }
 export function toggleSkill(state, item, hero, command, now = Date.now(), catalog = SKILL_CATALOG) {
   const def = skillDefinition(item?.templateId, catalog);

@@ -56,7 +56,7 @@ test('old saved weapon balance migrates once without rerolling gear or resetting
  const item=restored.state.inventory.find(i=>i.id===special.id);
  assert.deepEqual(item,{...before,weaponCategory:'heavy',actionSpeedPenaltyRate:.2,weaponBalanceRulesVersion:1,damageMin:21,damageMax:29});
  assert.equal(restored.character.equipment.weapon,item.id);assert.equal(restored.character.hp,old.characters[0].hp);
- assert.deepEqual(restored.state.battle,{...old.battle,rulesVersion:COMBAT_RULES_VERSION});assert.deepEqual(restored.character.skillCooldowns,old.characters[0].skillCooldowns);
+ assert.deepEqual(restored.state.battle,{...old.battle,rulesVersion:COMBAT_RULES_VERSION});assert.deepEqual(restored.character.skillCooldowns,{});
  assert.deepEqual(restored.state.enemy,old.enemy);
  const again=new Game(config,structuredClone(restored.state),()=>{throw Error('must not reroll');});assert.deepEqual(again.state,restored.state);
 });

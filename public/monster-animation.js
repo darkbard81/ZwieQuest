@@ -27,9 +27,9 @@ export function createMonsterAnimator() {
       if (!['BATTLE', 'DOWNED'].includes(state.phase)) return;
       const hits = events.filter(e => e.type === 'hit' && e.hit).map(e => e.hit);
       // Damage takes priority over attack; repeated hits replace, never accumulate.
-      if (state.phase === 'BATTLE' && hits.some(hit => hit.actor === 'hero' && hit.damage > 0)) {
+      if (state.phase === 'BATTLE' && hits.some(hit => (hit.targetActor || (hit.actor==='hero'?'enemy':'hero')) === 'enemy' && hit.damage > 0)) {
         action = 'hit'; startedAt = now;
-      } else if (hits.some(hit => hit.actor === 'enemy') && !(action === 'hit' && now - startedAt < MONSTER_MOTION.hitMs)) {
+      } else if ((hits.some(hit => hit.actor === 'enemy') || events.some(e=>e.type==='skill' && e.actor==='enemy')) && !(action === 'hit' && now - startedAt < MONSTER_MOTION.hitMs)) {
         action = 'attack'; startedAt = now;
       }
     },

@@ -1,5 +1,6 @@
 import { activeCharacter } from './characters.js';
 import { actionSpeed } from './action-speed.js';
+import { modifiers } from './status-effects.js';
 import { BASE_STATS } from './equipment.js';
 const DEFENSE_RULES = {
   DEF: { attributes: { RES: 1 } },
@@ -26,15 +27,15 @@ export function effectiveArmor(ar, damageTypes = ['blunt'], typeModifiers = {}) 
   const damageType = damageTypes.reduce((best, type) => (typeModifiers[type] || 0) < (typeModifiers[best] || 0) ? type : best);
   return { damageType, effectiveAR: ar + (typeModifiers[damageType] || 0) };
 }
-export function attack({ roll, acc, defense, str, base, pen, ar, damageTypes = ['blunt'], typeModifiers = {}, damageRate = 0, tacticDamageRate = 0, fixedDamage }) {
-  const hit = hitResult(roll, acc, defense);
+export function attack({ roll, acc, defense, str, base, pen, ar, damageTypes = ['blunt'], typeModifiers = {}, damageRate = 0, tacticDamageRate = 0, fixedDamage, transformHit, skillDamageMultiplier = 1 }) {
+  const initial = hitResult(roll, acc, defense), hit = transformHit ? transformHit(initial) : initial;
   const armor = effectiveArmor(ar, damageTypes, typeModifiers);
   const raw = armor.damageType === 'raw';
   if (raw && (!Number.isInteger(fixedDamage) || fixedDamage < 0)) throw Error('Raw requires nonnegative fixed damage');
-  const factors = raw ? null : { grade: 1 + damageRate, tactic: 1 + tacticDamageRate, strength: 1 + .05 * str, hit: hit.multiplier, armor: penetration(pen, armor.effectiveAR) };
-  const damage = raw ? (hit.tier === 0 ? 0 : fixedDamage) : Math.floor(base * factors.grade * factors.tactic * factors.strength * factors.hit * factors.armor);
+  const factors = raw ? null : { grade: 1 + damageRate, tactic: 1 + tacticDamageRate, strength: Math.max(0, 1 + .05 * str), hit: hit.multiplier, armor: penetration(pen, armor.effectiveAR) };
+  const damage = raw ? (hit.tier === 0 ? 0 : fixedDamage) : Math.floor(base * skillDamageMultiplier * factors.grade * factors.tactic * factors.strength * factors.hit * factors.armor);
   return { ...hit, ...armor, damage, base, damageRate, tacticDamageRate, pen: raw ? null : pen, ar,
-    calculation: { acc, defense, factors, fixedDamage: raw ? fixedDamage : null } };
+    calculation: { acc, defense, factors, ...(skillDamageMultiplier !== 1 ? { skillDamageMultiplier } : {}), fixedDamage: raw ? fixedDamage : null } };
 }
 // Shared character and monster HP; multiply before dividing to avoid rounding
 // exact integer percentages down (e.g. 100 * 115 / 100 must be 115).
@@ -51,21 +52,23 @@ export function statDetails(state, config, character = activeCharacter(state)) {
   if (!character) return { values: { ...Object.fromEntries([...BASE_STATS, 'ACC', 'DEF', 'REF', 'FOR', 'WIL', 'PEN', 'AR', 'power'].map(k => [k, 0])), maxHp: 0, ...actionSpeed(0, 0, config), typeModifiers: {} }, defenses: {} };
   const gear = Object.values(character.equipment).map(id => state.inventory.find(i => i.id === id)).filter(Boolean);
   const e = key => gear.reduce((sum, i) => sum + (key === 'DEX' && i.slot === 'armor' ? 0 : i.stats[key] || 0), 0);
-  const b = Object.fromEntries(BASE_STATS.map(key => [key, character.attributes[key] + e(key)]));
+  const m = state.phase === 'BATTLE' && character.id === state.activeCharacterId ? modifiers(state.battle, 'hero') : {};
+  const b = Object.fromEntries(BASE_STATS.map(key => [key, character.attributes[key] + e(key) + (m[key] || 0)]));
   const defenses = Object.fromEntries(Object.entries(DEFENSE_RULES).map(([key, rule]) => {
-    const attributes = Object.entries(rule.attributes).map(([key, multiplier]) => ({ key, base: character.attributes[key], equipment: e(key), value: b[key], multiplier, contribution: b[key] * multiplier }));
-    const detail = { base: cls.B[key], attributes, level: character.level, equipment: e(key), mastery: null };
-    detail.total = detail.base + attributes.reduce((sum, a) => sum + a.contribution, 0) + detail.equipment;
+    const attributes = Object.entries(rule.attributes).map(([key, multiplier]) => ({ key, base: character.attributes[key], equipment: e(key), status: m[key] || 0, value: b[key], multiplier, contribution: b[key] * multiplier }));
+    const detail = { base: cls.B[key], attributes, level: character.level, equipment: e(key), status: m[key] || 0, mastery: null };
+    detail.total = detail.base + attributes.reduce((sum, a) => sum + a.contribution, 0) + detail.equipment + detail.status;
     return [key, detail];
   }));
   const values = {
     ...b,
-    ACC: cls.B.ACC + b.PER + e('ACC'),
+    ACC: cls.B.ACC + b.PER + e('ACC') + (m.ACC || 0),
     ...Object.fromEntries(Object.entries(defenses).map(([key, detail]) => [key, detail.total])),
-    maxHp: maximumHp(character.level, b.CON, cls, e('HP')),
-    PEN: e('PEN'), AR: e('AR'), power: e('power'),
+    maxHp: Math.max(1, maximumHp(character.level, b.CON, cls, e('HP'))),
+    PEN: e('PEN') + (m.PEN || 0), AR: e('AR') + (m.AR || 0), power: e('power'),
     ...actionSpeed(b.DEX, gear.find(i => i.slot === 'armor')?.actionSpeedPenaltyRate || 0, config, gear.find(i => i.slot === 'weapon')?.actionSpeedPenaltyRate || 0),
     typeModifiers: { ...(gear.find(i => i.slot === 'armor')?.typeModifiers || {}) }
   };
+  values.actionIntervalMs *= m.actionTimeMultiplier || 1; values.actionSpeed /= m.actionTimeMultiplier || 1;
   return { values, defenses };
 }

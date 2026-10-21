@@ -31,8 +31,9 @@ export function createHeroAnimator() {
       const victory = events.some(e => e.type === 'victory' || e.type === 'boss');
       const down = state.phase === 'DOWNED';
       const actions = [];
+      if (!hit && events.some(e=>e.type==='skill' && (e.actor || 'hero')==='hero') && state.phase==='BATTLE') actions.push('Side_Attack');
       if (hit?.actor === 'hero' && ['BATTLE', 'TREASURE'].includes(state.phase)) actions.push('Side_Attack');
-      if (hit?.actor === 'enemy' && hit.damage > 0 && ['BATTLE', 'DOWNED'].includes(state.phase)) actions.push('Side_Hit');
+      if (hit && (hit.targetActor || (hit.actor==='enemy'?'hero':'enemy')) === 'hero' && hit.damage > 0 && ['BATTLE', 'DOWNED'].includes(state.phase)) actions.push('Side_Hit');
       if (down && actions.length) actions.push('Side_Down');
       else if (victory && state.phase === 'TREASURE') actions.push('Front_Victory');
       if (!actions.length) return;

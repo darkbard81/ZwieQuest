@@ -217,7 +217,6 @@ main{padding-top:12px}
 .skill-bar,.skill-slots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;min-width:0}
 .skill-button{position:relative;isolation:isolate;overflow:hidden;height:40px;min-width:0;padding:0;border-radius:7px;background:#294637;border:1px solid #91bd8c;display:grid;place-items:center}
 .skill-symbol{font-size:23px;line-height:1}.skill-button:disabled{opacity:1;cursor:default}.skill-button[data-state=unavailable],.skill-button[data-state=used],.skill-button[data-state=empty]{background:#1a2b27;border-color:#43574b}.skill-button[data-state=unavailable] .skill-symbol,.skill-button[data-state=used] .skill-symbol{filter:grayscale(.8);opacity:.42}.skill-button[data-state=empty] .skill-symbol{opacity:.2}
-.skill-shade{position:absolute;inset:0;pointer-events:none;background:conic-gradient(from 0deg,transparent 0deg var(--cooldown-angle,360deg),#08170fbd var(--cooldown-angle,360deg) 360deg)}
 .skill-timer{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:white;font-weight:700;text-shadow:0 1px 3px #000;pointer-events:none}
 .skill-button[data-state=ready]:hover{background:#3d694a;border-color:#d3e8a7}.skill-button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.skill-button.busy{filter:brightness(.7)}
 .skill-summary{grid-column:1/-1;font-size:10px;color:#b5cdbb;line-height:1.5;max-height:3em;overflow:auto}
@@ -356,3 +355,24 @@ main{padding-top:12px}
 #admin-panel-probabilities fieldset:disabled{opacity:.55}
 
 @media(max-height:500px){.admin-dialog-header{padding-top:8px}.admin-dialog-header>.eyebrow{display:none}.admin-tabs{margin-top:8px;padding-bottom:8px}.admin-dialog-footer{padding-top:8px;padding-bottom:8px}}
+
+.skill-button[data-state=queued]{background:#40583a;border-color:#eed28b;box-shadow:inset 0 0 0 1px #eed28b}.skill-button[data-state=queued] .skill-timer{font-size:10px;color:#fff0bb}
+
+/* Opaque generated skill artwork and compact, wrapping battle statuses. */
+.skill-item-icon img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.skill-symbol .skill-item-icon{display:block;width:100%;height:100%}
+.skill-symbol{width:100%;height:100%;display:block}
+.skill-button[data-state="queued"]{outline:2px solid #f3cb68;outline-offset:2px}
+.skill-button .skill-timer,.skill-button .skill-uses{z-index:2;background:#111c;color:#fff;border-radius:3px;padding:1px 3px;text-shadow:0 1px 2px #000}
+.equipped-skill>span{width:36px;height:36px;display:block;margin:auto}
+.equipped-skill .skill-item-icon{width:100%;height:100%;display:block}
+.combat-status-effects{display:grid;gap:5px;margin:8px 0;font-size:11px}
+.status-actor{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.status-actor>strong{min-width:40px}.status-actor>small{opacity:.6}
+.status-effect{border:1px solid #698e7e;border-radius:5px;padding:3px 5px;background:#203b31;color:#e3ffef}
+.status-effect.debuff{border-color:#b77982;background:#4b2833;color:#ffe6eb}
+.status-effect small{opacity:.8;white-space:nowrap}
+
+.combat-status-effects{grid-column:1/-1;min-width:0}
+.skill-button{max-width:40px;width:100%;justify-self:end}
+.skill-timer:empty,.skill-uses:empty{display:none}

@@ -11,7 +11,7 @@ function make(dex = 0, enemyDEX = 0, budget = 500) {
   const c = structuredClone(config); c.actionSpeed.maxEventsPerTick = budget;
   const g = new Game(c, null, () => 19); g.create({ name: '속도 검증', appearanceId: 'warrior' });
   g.character.attributes.DEX = dex; g.character.attributes.CON = 100000; g.character.equipment = {};
-  g.character.hp = stats(g.state, c).maxHp; g.state.risk = 0; g.beginBattle();
+  g.character.hp = stats(g.state, c).maxHp; g.state.risk = 0; g.beginBattle(); g.state.enemy.skills=[];
   Object.assign(g.state.enemy, { DEX: enemyDEX, ...actionSpeed(enemyDEX, 0, c), hp: 1e9, maxHp: 1e9 });
   g.state.enemy.weapon.damageMin = g.state.enemy.weapon.damageMax = 0;
   g.events = []; g.refreshBattleTiming(); return g;
@@ -83,16 +83,16 @@ test('legacy reservation is preserved once, frozen through gear changes, and fol
  g=new Game(config,old,()=>19);assert.equal(g.state.battle.rulesVersion,COMBAT_RULES_VERSION);assert.equal(g.events.length,0);assert.equal(g.state.battle.transition.remainingMs,350);
  g.tick(100);g.command({type:'ALLOCATE_STAT',characterId:g.character.id,stat:'DEX'});assert.equal(g.state.remaining,250);assert.equal(g.state.battle.combatants.hero.readiness,0);
  g=new Game(config,structuredClone(g.state),()=>19);g.tick(350);assert.equal(hits(g).length,1);assert.equal(hits(g)[0].actor,'enemy');assert.equal(g.state.battle.transition,undefined);
- assert.equal(g.state.battle.combatants.hero.actionSeq,0);assert.equal(g.state.battle.skillUsed,true);assert.equal(g.state.battle.skillUseCounts.heal,1);assert.equal(g.character.skillCooldowns.heal.readyAt,12345);
+ assert.equal(g.state.battle.combatants.hero.actionSeq,0);assert.equal(g.state.battle.skillUsed,true);assert.equal(g.state.battle.skillUseCounts.heal,1);assert.deepEqual(g.character.skillCooldowns,{});
  assert.ok(Math.abs(g.state.battle.combatants.hero.readiness-100/stats(g.state,config).actionIntervalMs)<1e-9);
  const restored=new Game(config,structuredClone(g.state),()=>19);assert.equal(restored.state.battle.transition,undefined);assert.deepEqual(restored.state.battle,g.state.battle);
  for(const phase of ['DOWNED','TREASURE','RETURN_HOME']){const s=structuredClone(old);s.phase=phase;s.battle.rulesVersion=4;delete s.battle.transition;const r=new Game(config,s);assert.equal(r.state.battle.transition,undefined);}
 });
 test('zero cooldown permits use on each side of hero cycle boundary, enemy actions cannot refresh or expire a request',()=>{
  const g=make(20,40);g.character.hp=1;const cmd=()=>({type:'USE_SKILL',characterId:g.character.id,itemId:g.character.skillSlots[0],battleId:g.state.battle.id,heroActionSeq:g.state.battle.combatants.hero.actionSeq});
- const initial=cmd();g.tick(800);assert.equal(g.state.battle.combatants.enemy.actionSeq,1);g.command(initial);assert.equal(g.state.battle.skillUseCounts.heal,1);
+ const initial=cmd();g.tick(800);assert.equal(g.state.battle.combatants.enemy.actionSeq,1);g.command(initial);assert.equal(g.state.battle.skillUseCounts.heal,undefined);assert.ok(g.state.battle.pendingSkill);
  assert.throws(()=>g.command(initial),/이미/);g.tick(300);assert.equal(g.state.battle.combatants.hero.actionSeq,1);assert.throws(()=>g.command(initial),/지났/);
- g.command(cmd());assert.equal(g.state.battle.skillUseCounts.heal,2);g.tick(1100);assert.throws(()=>g.command(cmd()),/소진/);
+ g.command(cmd());assert.equal(g.state.battle.skillUseCounts.heal,1);g.tick(1100);assert.equal(g.state.battle.skillUseCounts.heal,2);assert.throws(()=>g.command(cmd()),/소진/);
  assert.throws(()=>g.command({...cmd(),characterId:'other'}),/캐릭터/);assert.throws(()=>g.command({...cmd(),battleId:'old'}),/지났/);
 });
 test('combat feed suppresses previous battle events when multiple phases fit in one tick',()=>{

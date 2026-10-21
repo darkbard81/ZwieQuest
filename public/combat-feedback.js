@@ -13,7 +13,7 @@ export function createCombatFeed() {
         const battleId = e.hit?.battleId ?? e.battleId;
         const current = snapshot.state?.battle?.id ?? snapshot.state?.lastBattleId;
         if (battleId && battleId !== current) return false;
-        return ['hit', 'victory', 'boss'].includes(e.type) && e.seq > previous && e.seq <= seq && age >= 0 && age <= 2500;
+        return ['hit', 'skill', 'victory', 'boss'].includes(e.type) && e.seq > previous && e.seq <= seq && age >= 0 && age <= 2500;
       }).sort((a, b) => a.seq - b.seq);
     }
   };

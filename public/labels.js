@@ -7,6 +7,7 @@ const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp
 export function defenseTooltip(key, detail) {
   if (!detail || !defenses.has(key)) return '';
   const terms = [`기본값(${detail.base})`, ...detail.attributes.map(a => `${statNames[a.key]}(${a.value})${(a.multiplier ?? 1) === 1 ? '' : ` × ${a.multiplier}`}`), `장비 보정(${detail.equipment})`];
+  if (detail.status) terms.push(`상태 보정(${detail.status})`);
   if (detail.mastery) terms.push(`직업 숙련(${detail.mastery.value})`);
   return `${terms.join(' + ')} = ${detail.total}`;
 }

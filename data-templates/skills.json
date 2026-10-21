@@ -1,30 +1,411 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "maxEquipped": 6,
   "skills": [
     {
       "id": "heal",
       "name": "회복",
-      "icon": "💚",
-      "description": "최대 체력의 (10% + 유효 지능 × 5%)를 회복합니다. 최대 체력을 넘지 않습니다. 전투당 최대 2회 사용합니다.",
+      "icon": "✦",
+      "iconPath": "/assets/skills/heal-v1.webp",
+      "description": "최대 HP의 (10% + INT × 5%)를 회복합니다. 전투당 2회.",
       "enabled": true,
       "grantOnCreate": true,
       "equipByDefault": true,
-      "effect": {
-        "type": "heal",
-        "maxHpRate": 0.1,
-        "intelligenceRate": 0.05
-      },
-      "cooldown": {
-        "baseMs": 20000,
-        "dexterityReductionRate": 0.05,
-        "minimumMs": 0
-      },
       "useContexts": [
         "combat"
       ],
       "activationMode": "direct",
-      "perBattleLimit": 2
+      "perBattleLimit": 2,
+      "treasureDrop": false,
+      "effect": {
+        "type": "heal",
+        "maxHpRate": 0.1,
+        "intelligenceRate": 0.05
+      }
+    },
+    {
+      "id": "hamstring",
+      "name": "무력화",
+      "icon": "✦",
+      "iconPath": "/assets/skills/hamstring-v1.webp",
+      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "attack",
+        "defense": "FOR",
+        "statusId": "hobbled",
+        "durationMs": 15000,
+        "damageMultiplier": 1.25,
+        "accuracyBonus": 0,
+        "penetrationBonus": 2
+      }
+    },
+    {
+      "id": "eye-gouge",
+      "name": "눈찌르기",
+      "icon": "✦",
+      "iconPath": "/assets/skills/eye-gouge-v1.webp",
+      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "attack",
+        "defense": "REF",
+        "statusId": "blinded",
+        "durationMs": 15000,
+        "damageMultiplier": 1.25,
+        "accuracyBonus": 10,
+        "penetrationBonus": 0
+      }
+    },
+    {
+      "id": "staggering-blow",
+      "name": "충격의 일격",
+      "icon": "✦",
+      "iconPath": "/assets/skills/staggering-blow-v1.webp",
+      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "attack",
+        "defense": "DEF",
+        "statusId": "dazed",
+        "durationMs": 15000,
+        "damageMultiplier": 1.25,
+        "accuracyBonus": 0,
+        "penetrationBonus": 0
+      }
+    },
+    {
+      "id": "intimidating-strike",
+      "name": "위압의 일격",
+      "icon": "✦",
+      "iconPath": "/assets/skills/intimidating-strike-v1.webp",
+      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "attack",
+        "defense": "DEF",
+        "statusId": "terrified",
+        "durationMs": 15000,
+        "damageMultiplier": 1,
+        "accuracyBonus": 0,
+        "penetrationBonus": 0
+      }
+    },
+    {
+      "id": "binding-strike",
+      "name": "발목 묶기",
+      "icon": "✦",
+      "iconPath": "/assets/skills/binding-strike-v1.webp",
+      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "attack",
+        "defense": "REF",
+        "statusId": "immobilized",
+        "durationMs": 15000,
+        "damageMultiplier": 1.25,
+        "accuracyBonus": 0,
+        "penetrationBonus": 0
+      }
+    },
+    {
+      "id": "weakening-strike",
+      "name": "쇠약의 일격",
+      "icon": "✦",
+      "iconPath": "/assets/skills/weakening-strike-v1.webp",
+      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "attack",
+        "defense": "FOR",
+        "statusId": "weakened",
+        "durationMs": 15000,
+        "damageMultiplier": 1.25,
+        "accuracyBonus": 0,
+        "penetrationBonus": 0
+      }
+    },
+    {
+      "id": "mind-fog",
+      "name": "정신 교란",
+      "icon": "✦",
+      "iconPath": "/assets/skills/mind-fog-v1.webp",
+      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "attack",
+        "defense": "WIL",
+        "statusId": "charmed",
+        "durationMs": 15000,
+        "damageMultiplier": 1,
+        "accuracyBonus": 0,
+        "penetrationBonus": 0
+      }
+    },
+    {
+      "id": "dread-whisper",
+      "name": "공포의 속삭임",
+      "icon": "✦",
+      "iconPath": "/assets/skills/dread-whisper-v1.webp",
+      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "attack",
+        "defense": "WIL",
+        "statusId": "frightened",
+        "durationMs": 15000,
+        "damageMultiplier": 1.25,
+        "accuracyBonus": 0,
+        "penetrationBonus": 0
+      }
+    },
+    {
+      "id": "might-inspiration",
+      "name": "완력 고양",
+      "icon": "✦",
+      "iconPath": "/assets/skills/might-inspiration-v1.webp",
+      "description": "자신에게 능력치 강화를 적용합니다. 같은 능력치의 약화와 상쇄합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "status",
+        "statusId": "tenacious",
+        "durationMs": 30000
+      }
+    },
+    {
+      "id": "constitution-inspiration",
+      "name": "체질 고양",
+      "icon": "✦",
+      "iconPath": "/assets/skills/constitution-inspiration-v1.webp",
+      "description": "자신에게 능력치 강화를 적용합니다. 같은 능력치의 약화와 상쇄합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "status",
+        "statusId": "hardy",
+        "durationMs": 30000
+      }
+    },
+    {
+      "id": "dexterity-inspiration",
+      "name": "민첩 고양",
+      "icon": "✦",
+      "iconPath": "/assets/skills/dexterity-inspiration-v1.webp",
+      "description": "자신에게 능력치 강화를 적용합니다. 같은 능력치의 약화와 상쇄합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "status",
+        "statusId": "nimble",
+        "durationMs": 30000
+      }
+    },
+    {
+      "id": "perception-inspiration",
+      "name": "지각 고양",
+      "icon": "✦",
+      "iconPath": "/assets/skills/perception-inspiration-v1.webp",
+      "description": "자신에게 능력치 강화를 적용합니다. 같은 능력치의 약화와 상쇄합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "status",
+        "statusId": "aware",
+        "durationMs": 30000
+      }
+    },
+    {
+      "id": "intellect-inspiration",
+      "name": "지능 고양",
+      "icon": "✦",
+      "iconPath": "/assets/skills/intellect-inspiration-v1.webp",
+      "description": "자신에게 능력치 강화를 적용합니다. 같은 능력치의 약화와 상쇄합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "status",
+        "statusId": "acute",
+        "durationMs": 30000
+      }
+    },
+    {
+      "id": "resolve-inspiration",
+      "name": "용맹한 결의",
+      "icon": "✦",
+      "iconPath": "/assets/skills/resolve-inspiration-v1.webp",
+      "description": "자신에게 능력치 강화를 적용합니다. 같은 능력치의 약화와 상쇄합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "status",
+        "statusId": "courageous",
+        "durationMs": 30000
+      }
+    },
+    {
+      "id": "mirrored-image",
+      "name": "반사된 형상",
+      "icon": "✦",
+      "iconPath": "/assets/skills/mirrored-image-v1.webp",
+      "description": "자신의 DEF +30. 적의 명중·치명타를 받을 때마다 보너스가 10 감소합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "mirror",
+        "durationMs": 60000
+      }
+    },
+    {
+      "id": "purify",
+      "name": "정화",
+      "icon": "✦",
+      "iconPath": "/assets/skills/purify-v1.webp",
+      "description": "자신의 모든 약화를 제거합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "cleanse"
+      }
+    },
+    {
+      "id": "dispel",
+      "name": "해제",
+      "icon": "✦",
+      "iconPath": "/assets/skills/dispel-v1.webp",
+      "description": "적의 모든 강화를 제거합니다.",
+      "enabled": true,
+      "grantOnCreate": false,
+      "equipByDefault": false,
+      "useContexts": [
+        "combat"
+      ],
+      "activationMode": "direct",
+      "perBattleLimit": 1,
+      "treasureDrop": true,
+      "effect": {
+        "type": "dispel"
+      }
     },
     {
       "id": "dagger-mastery",
@@ -46,11 +427,6 @@
         "weaponCategories": [
           "dagger"
         ]
-      },
-      "cooldown": {
-        "baseMs": 0,
-        "dexterityReductionRate": 0,
-        "minimumMs": 0
       }
     }
   ]
