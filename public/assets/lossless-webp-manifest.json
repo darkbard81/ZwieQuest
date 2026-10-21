@@ -4,7 +4,7 @@
     {
       "source": "public/assets/barbarian/sheets/Front_Idle.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Front_Idle.png",
-      "output": "public/assets/barbarian/sheets/Front_Idle.webp",
+      "output": "public/assets/character/barbarian/sheets/Front_Idle.webp",
       "sourceBytes": 5453065,
       "webpBytes": 3714126,
       "sourceSha256": "51303b8d6e18a6062b6037cc061b50cf0f2c522313d5b4c7395ba5c6c6f189cb",
@@ -19,7 +19,7 @@
     {
       "source": "public/assets/barbarian/sheets/Front_Victory.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Front_Victory.png",
-      "output": "public/assets/barbarian/sheets/Front_Victory.webp",
+      "output": "public/assets/character/barbarian/sheets/Front_Victory.webp",
       "sourceBytes": 5438493,
       "webpBytes": 3757570,
       "sourceSha256": "c82f2310e1b194637bfec8ab2ec068dcd56fe9e96114522e0059630ce7937f72",
@@ -34,7 +34,7 @@
     {
       "source": "public/assets/barbarian/sheets/Side_Attack.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Side_Attack.png",
-      "output": "public/assets/barbarian/sheets/Side_Attack.webp",
+      "output": "public/assets/character/barbarian/sheets/Side_Attack.webp",
       "sourceBytes": 5469596,
       "webpBytes": 3885928,
       "sourceSha256": "8486efdb066e431468a7028d566ab37e2e4ddb1d048388aa29d41cfa83b7c388",
@@ -49,7 +49,7 @@
     {
       "source": "public/assets/barbarian/sheets/Side_Down.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Side_Down.png",
-      "output": "public/assets/barbarian/sheets/Side_Down.webp",
+      "output": "public/assets/character/barbarian/sheets/Side_Down.webp",
       "sourceBytes": 5051113,
       "webpBytes": 3595426,
       "sourceSha256": "30be3db9d942f13c95a96bfa5169276dc078652847d0863adc46946b1361cc0a",
@@ -64,7 +64,7 @@
     {
       "source": "public/assets/barbarian/sheets/Side_Hit.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Side_Hit.png",
-      "output": "public/assets/barbarian/sheets/Side_Hit.webp",
+      "output": "public/assets/character/barbarian/sheets/Side_Hit.webp",
       "sourceBytes": 5157212,
       "webpBytes": 3631088,
       "sourceSha256": "cb6786248445816aab802b4d3b40075c848163adeb1df7cc83a440f66f3c9c3e",
@@ -79,7 +79,7 @@
     {
       "source": "public/assets/barbarian/sheets/Side_Walk.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets/Side_Walk.png",
-      "output": "public/assets/barbarian/sheets/Side_Walk.webp",
+      "output": "public/assets/character/barbarian/sheets/Side_Walk.webp",
       "sourceBytes": 5319085,
       "webpBytes": 3713258,
       "sourceSha256": "ceb35e00e9e9f1b5533e443b0c8484ac7db5dcb3d246b291376db013df17228b",
@@ -109,7 +109,7 @@
     {
       "source": "public/assets/cat/sheets/Front_Idle.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Front_Idle.png",
-      "output": "public/assets/cat/sheets/Front_Idle.webp",
+      "output": "public/assets/character/cat/sheets/Front_Idle.webp",
       "sourceBytes": 3970755,
       "webpBytes": 2782266,
       "sourceSha256": "42965dcf6ceff6dbfa597cf307d9e51ece0af01e9fe8b6649f283696d4d42012",
@@ -124,7 +124,7 @@
     {
       "source": "public/assets/cat/sheets/Front_Victory.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Front_Victory.png",
-      "output": "public/assets/cat/sheets/Front_Victory.webp",
+      "output": "public/assets/character/cat/sheets/Front_Victory.webp",
       "sourceBytes": 5440695,
       "webpBytes": 3562800,
       "sourceSha256": "bacbbdb8d727298c798b92560501c5ceb1778df4ac053459424cfd6405f6a568",
@@ -139,7 +139,7 @@
     {
       "source": "public/assets/cat/sheets/Side_Attack.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Side_Attack.png",
-      "output": "public/assets/cat/sheets/Side_Attack.webp",
+      "output": "public/assets/character/cat/sheets/Side_Attack.webp",
       "sourceBytes": 4034625,
       "webpBytes": 2648808,
       "sourceSha256": "3629f400558f18ea156824bbe404f1d652780a26a370c1cec092e6325a053716",
@@ -154,7 +154,7 @@
     {
       "source": "public/assets/cat/sheets/Side_Down.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Side_Down.png",
-      "output": "public/assets/cat/sheets/Side_Down.webp",
+      "output": "public/assets/character/cat/sheets/Side_Down.webp",
       "sourceBytes": 4034302,
       "webpBytes": 2642532,
       "sourceSha256": "954a6d32673c2a21652b3620ff2f3b8e8e4bb341d892b027d969faa4520e28eb",
@@ -169,7 +169,7 @@
     {
       "source": "public/assets/cat/sheets/Side_Hit.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Side_Hit.png",
-      "output": "public/assets/cat/sheets/Side_Hit.webp",
+      "output": "public/assets/character/cat/sheets/Side_Hit.webp",
       "sourceBytes": 3907034,
       "webpBytes": 2577924,
       "sourceSha256": "dd968ec4e8f9fe9dda0cc77afea8ca98a1bfac7cbceec07f54022d28ab596cc7",
@@ -184,7 +184,7 @@
     {
       "source": "public/assets/cat/sheets/Side_Walk.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets/Side_Walk.png",
-      "output": "public/assets/cat/sheets/Side_Walk.webp",
+      "output": "public/assets/character/cat/sheets/Side_Walk.webp",
       "sourceBytes": 4370140,
       "webpBytes": 2887916,
       "sourceSha256": "94ea21efdcdbf5933bb0cfc0038bcf214355bbac27da0b879ca1eb05b9a2593d",
@@ -214,7 +214,7 @@
     {
       "source": "public/assets/lamia/sheets/Front_Idle.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Front_Idle.png",
-      "output": "public/assets/lamia/sheets/Front_Idle.webp",
+      "output": "public/assets/character/lamia/sheets/Front_Idle.webp",
       "sourceBytes": 5960909,
       "webpBytes": 4010902,
       "sourceSha256": "5c5aeba83ab39e94cdd394ccbc987fa9e9bc7954c00dc1a9b2baeba00a4e57c5",
@@ -229,7 +229,7 @@
     {
       "source": "public/assets/lamia/sheets/Front_Victory.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Front_Victory.png",
-      "output": "public/assets/lamia/sheets/Front_Victory.webp",
+      "output": "public/assets/character/lamia/sheets/Front_Victory.webp",
       "sourceBytes": 6516186,
       "webpBytes": 4387054,
       "sourceSha256": "5f64f649e83efaaea8303808346b9f0a5ac03c2e04fe7b5766798124081559f5",
@@ -244,7 +244,7 @@
     {
       "source": "public/assets/lamia/sheets/Side_Attack.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Side_Attack.png",
-      "output": "public/assets/lamia/sheets/Side_Attack.webp",
+      "output": "public/assets/character/lamia/sheets/Side_Attack.webp",
       "sourceBytes": 6263041,
       "webpBytes": 4264932,
       "sourceSha256": "916aa5a69e19dca3d4f8b0e8dd734712c8c632b4bb5a98f05413291c149b0472",
@@ -259,7 +259,7 @@
     {
       "source": "public/assets/lamia/sheets/Side_Down.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Side_Down.png",
-      "output": "public/assets/lamia/sheets/Side_Down.webp",
+      "output": "public/assets/character/lamia/sheets/Side_Down.webp",
       "sourceBytes": 5254744,
       "webpBytes": 3492192,
       "sourceSha256": "1bfcb10078a71940b53c4fbfa0e6be3f815982133e6d35fa8cdd91b080d7a1d8",
@@ -274,7 +274,7 @@
     {
       "source": "public/assets/lamia/sheets/Side_Hit.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Side_Hit.png",
-      "output": "public/assets/lamia/sheets/Side_Hit.webp",
+      "output": "public/assets/character/lamia/sheets/Side_Hit.webp",
       "sourceBytes": 5931272,
       "webpBytes": 3957942,
       "sourceSha256": "662df4264749795d265b862d1c1b18f19ce962a082cbf61ea0483fc04421bdf2",
@@ -289,7 +289,7 @@
     {
       "source": "public/assets/lamia/sheets/Side_Walk.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets/Side_Walk.png",
-      "output": "public/assets/lamia/sheets/Side_Walk.webp",
+      "output": "public/assets/character/lamia/sheets/Side_Walk.webp",
       "sourceBytes": 5657814,
       "webpBytes": 3734898,
       "sourceSha256": "d8c78033bc83a1f2512399f247fc268c8f56b5d5c35b6afe1869d5728ce44bb7",
@@ -319,7 +319,7 @@
     {
       "source": "public/assets/ranger/sheets/Front_Idle.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Front_Idle.png",
-      "output": "public/assets/ranger/sheets/Front_Idle.webp",
+      "output": "public/assets/character/ranger/sheets/Front_Idle.webp",
       "sourceBytes": 3591761,
       "webpBytes": 2556722,
       "sourceSha256": "6bbcb2617ad412b9d9d65c347834665b6800c2e744dc6012ce07bf2a73e4410e",
@@ -334,7 +334,7 @@
     {
       "source": "public/assets/ranger/sheets/Front_Victory.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Front_Victory.png",
-      "output": "public/assets/ranger/sheets/Front_Victory.webp",
+      "output": "public/assets/character/ranger/sheets/Front_Victory.webp",
       "sourceBytes": 3756948,
       "webpBytes": 2652294,
       "sourceSha256": "50db1b7834349a90825e4323a73ab7bae52024ddaf334df8775ede479f9ea5b2",
@@ -349,7 +349,7 @@
     {
       "source": "public/assets/ranger/sheets/Side_Attack.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Side_Attack.png",
-      "output": "public/assets/ranger/sheets/Side_Attack.webp",
+      "output": "public/assets/character/ranger/sheets/Side_Attack.webp",
       "sourceBytes": 3726375,
       "webpBytes": 2657028,
       "sourceSha256": "4ba6e0d029c72a2c987b2cc9c3fd293453fc3455911002646ebfe57555f9aae1",
@@ -364,7 +364,7 @@
     {
       "source": "public/assets/ranger/sheets/Side_Down.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Side_Down.png",
-      "output": "public/assets/ranger/sheets/Side_Down.webp",
+      "output": "public/assets/character/ranger/sheets/Side_Down.webp",
       "sourceBytes": 3298091,
       "webpBytes": 2344702,
       "sourceSha256": "471c4d4ea909bb8d76b87814bbd17680b034cd44a35481a49a27b71a5712bb2d",
@@ -379,7 +379,7 @@
     {
       "source": "public/assets/ranger/sheets/Side_Hit.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Side_Hit.png",
-      "output": "public/assets/ranger/sheets/Side_Hit.webp",
+      "output": "public/assets/character/ranger/sheets/Side_Hit.webp",
       "sourceBytes": 3522420,
       "webpBytes": 2509668,
       "sourceSha256": "06f8e2166437cfaecfe6c4ff041bdfc9d6528fc445aef6c6a3f8cd42e39579d2",
@@ -394,7 +394,7 @@
     {
       "source": "public/assets/ranger/sheets/Side_Walk.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets/Side_Walk.png",
-      "output": "public/assets/ranger/sheets/Side_Walk.webp",
+      "output": "public/assets/character/ranger/sheets/Side_Walk.webp",
       "sourceBytes": 3663408,
       "webpBytes": 2625184,
       "sourceSha256": "f2fa08770c81fa5e09dbedc18d51bb3829489480eb4f9fbd099a87f21754bb8b",
@@ -454,7 +454,7 @@
     {
       "source": "public/assets/warrior/sheets/Front_Idle.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Front_Idle.png",
-      "output": "public/assets/warrior/sheets/Front_Idle.webp",
+      "output": "public/assets/character/warrior/sheets/Front_Idle.webp",
       "sourceBytes": 3311811,
       "webpBytes": 2264936,
       "sourceSha256": "1492060d0eb72b2a0a2d2c517288810d9c4f549e671bf3bf6774a57010171c75",
@@ -469,7 +469,7 @@
     {
       "source": "public/assets/warrior/sheets/Front_Victory.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Front_Victory.png",
-      "output": "public/assets/warrior/sheets/Front_Victory.webp",
+      "output": "public/assets/character/warrior/sheets/Front_Victory.webp",
       "sourceBytes": 4540069,
       "webpBytes": 3240980,
       "sourceSha256": "8f5f5c62a55b00fc8896bd7b97d64ed1f4cc4ba1c903c104f014e8bfdd9e354e",
@@ -484,7 +484,7 @@
     {
       "source": "public/assets/warrior/sheets/Side_Attack.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Side_Attack.png",
-      "output": "public/assets/warrior/sheets/Side_Attack.webp",
+      "output": "public/assets/character/warrior/sheets/Side_Attack.webp",
       "sourceBytes": 3062811,
       "webpBytes": 2196510,
       "sourceSha256": "b485b61f81432f1867125c6c7a8c3c557a3329f483ed6f2655aed5fc87efeec7",
@@ -499,7 +499,7 @@
     {
       "source": "public/assets/warrior/sheets/Side_Down.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Side_Down.png",
-      "output": "public/assets/warrior/sheets/Side_Down.webp",
+      "output": "public/assets/character/warrior/sheets/Side_Down.webp",
       "sourceBytes": 2754473,
       "webpBytes": 1935526,
       "sourceSha256": "c11593987d562a5ebcc8cef0692dfd83b32eec47c9c7d93e1dcdae63e7e5e516",
@@ -514,7 +514,7 @@
     {
       "source": "public/assets/warrior/sheets/Side_Hit.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Side_Hit.png",
-      "output": "public/assets/warrior/sheets/Side_Hit.webp",
+      "output": "public/assets/character/warrior/sheets/Side_Hit.webp",
       "sourceBytes": 2856163,
       "webpBytes": 2034660,
       "sourceSha256": "7256b2618a1634fc7ebb46de5a1df6e53b03ce981862cc61933de1094e6f119e",
@@ -529,7 +529,7 @@
     {
       "source": "public/assets/warrior/sheets/Side_Walk.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets/Side_Walk.png",
-      "output": "public/assets/warrior/sheets/Side_Walk.webp",
+      "output": "public/assets/character/warrior/sheets/Side_Walk.webp",
       "sourceBytes": 2966890,
       "webpBytes": 2089600,
       "sourceSha256": "2cf9bb068fbc69028b9e14e5c86e35e67ed1af46d465bcd77f38f2457071027d",
@@ -544,7 +544,7 @@
     {
       "source": "public/assets/wizard/sheets/Front_Idle.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Front_Idle.png",
-      "output": "public/assets/wizard/sheets/Front_Idle.webp",
+      "output": "public/assets/character/wizard/sheets/Front_Idle.webp",
       "sourceBytes": 3991142,
       "webpBytes": 2825872,
       "sourceSha256": "799a3ddba4c5fbe6eddbee1a1f6aecb0cbeea7bf966a380ddfc53b486cc30d35",
@@ -559,7 +559,7 @@
     {
       "source": "public/assets/wizard/sheets/Front_Victory.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Front_Victory.png",
-      "output": "public/assets/wizard/sheets/Front_Victory.webp",
+      "output": "public/assets/character/wizard/sheets/Front_Victory.webp",
       "sourceBytes": 4140869,
       "webpBytes": 2943734,
       "sourceSha256": "86ced26b65ff7cd6e1321d50ad0e1bb41e7364dc87898eb8020bc11a014ebd03",
@@ -574,7 +574,7 @@
     {
       "source": "public/assets/wizard/sheets/Side_Attack.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Side_Attack.png",
-      "output": "public/assets/wizard/sheets/Side_Attack.webp",
+      "output": "public/assets/character/wizard/sheets/Side_Attack.webp",
       "sourceBytes": 4855681,
       "webpBytes": 3622538,
       "sourceSha256": "7a0daff2e762689ad7a71e860299b7f3e58688ab92862836e4294ddab7dbe481",
@@ -589,7 +589,7 @@
     {
       "source": "public/assets/wizard/sheets/Side_Down.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Side_Down.png",
-      "output": "public/assets/wizard/sheets/Side_Down.webp",
+      "output": "public/assets/character/wizard/sheets/Side_Down.webp",
       "sourceBytes": 3466116,
       "webpBytes": 2504126,
       "sourceSha256": "e53ea577dde36cea161575bf8b5aeeab4d50264e9566b26a1c35c73cfe60743b",
@@ -604,7 +604,7 @@
     {
       "source": "public/assets/wizard/sheets/Side_Hit.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Side_Hit.png",
-      "output": "public/assets/wizard/sheets/Side_Hit.webp",
+      "output": "public/assets/character/wizard/sheets/Side_Hit.webp",
       "sourceBytes": 3814608,
       "webpBytes": 2797836,
       "sourceSha256": "b50a326df59632e4758d8f50f6d49f7db82ada33f0738efff50844cd59b7c32f",
@@ -619,7 +619,7 @@
     {
       "source": "public/assets/wizard/sheets/Side_Walk.png",
       "archive": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets/Side_Walk.png",
-      "output": "public/assets/wizard/sheets/Side_Walk.webp",
+      "output": "public/assets/character/wizard/sheets/Side_Walk.webp",
       "sourceBytes": 3656630,
       "webpBytes": 2659046,
       "sourceSha256": "d4128647e33ac68cd81cdb75dd51a0916c1bf14384bc3663a8133f6870b9e2ca",

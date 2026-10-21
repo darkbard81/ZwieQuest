@@ -37,6 +37,6 @@
 - 운영 HTTPS의 변환 자산·메타데이터·화면 코드·출처 목록 55개 파일의 해시 일치 확인.
 - 정적 파일 교체이므로 서버 재시작 없이 적용된다. 기존 열린 페이지는 새로고침해야 한다. 캐시 정책 자체는 변경하지 않았다.
 
-변경: `public/assets/<id>/sheets/*.webp`, 6개 `sprite.json`, `public/assets/*.webp` 배경, `render.js`, `regions.js`, `appearances.js`, `style.css`, 자산 출처/해시 목록, `tests/sprite-contract.test.js`, `tests/regions.test.js`, `tests/helpers/webp.js`, README와 로컬 제작 계약.
+변경: `public/assets/character/<id>/sheets/*.webp`, 6개 `sprite.json`, `public/assets/*.webp` 배경, `render.js`, `regions.js`, `appearances.js`, `style.css`, 자산 출처/해시 목록, `tests/sprite-contract.test.js`, `tests/regions.test.js`, `tests/helpers/webp.js`, README와 로컬 제작 계약.
 
 변환 스크립트·원본·검증은 `art-workbench/webp-lossless-20261021T062145Z/`, 브라우저 및 테스트 증거는 해당 폴더의 `review/`에 있다. 기존 미커밋 변경을 보존했으며 커밋·푸시는 수행하지 않았다.

@@ -51,7 +51,7 @@ test('runtime playback follows the authored shared timing contract', () => {
 });
 for (const appearance of APPEARANCES) {
   test(`${appearance.id}: sprite.json animation/frame times, loops and atlas layout match the common contract`, () => {
-    const dir = new URL(`../public/assets/${appearance.id}/`, import.meta.url);
+    const dir = new URL(`../public/assets/character/${appearance.id}/`, import.meta.url);
     validate(JSON.parse(readFileSync(new URL('sprite.json',dir))),appearance.id);
     for(const [action] of contract){
       const data=readFileSync(new URL(`sheets/${action}.webp`,dir));
@@ -61,7 +61,7 @@ for (const appearance of APPEARANCES) {
   });
 }
 test('contract rejects the former per-character timing and frame-count regressions',()=>{
-  const base=JSON.parse(readFileSync(new URL('../public/assets/warrior/sprite.json',import.meta.url)));
+  const base=JSON.parse(readFileSync(new URL('../public/assets/character/warrior/sprite.json',import.meta.url)));
   for(const [action,duration] of [['Front_Idle',6000],['Front_Victory',3500],['Side_Attack',1000],['Side_Hit',600],['Side_Walk',2400],['Side_Down',1800]]){
     const meta=structuredClone(base);meta.animations[action].durationMs=duration;
     assert.throws(()=>validate(meta,'regression'),new RegExp(`${action} durationMs`));

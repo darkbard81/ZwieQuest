@@ -225,7 +225,7 @@
   ],
   "characters": [
     {
-      "file": "warrior/sheets/Front_Idle.webp",
+      "file": "character/warrior/sheets/Front_Idle.webp",
       "sha256": "055668063a11134419dccb7fb84d0777fe32947dca27322a7b16cbce8ac4d6c8",
       "width": 4096,
       "height": 1536,
@@ -234,7 +234,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "warrior/sheets/Front_Victory.webp",
+      "file": "character/warrior/sheets/Front_Victory.webp",
       "sha256": "054ab525fe6442ac7719b0b7113a837be6eb2b93f63d30a9bd2ad085ef8cb980",
       "width": 4096,
       "height": 1536,
@@ -243,7 +243,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "warrior/sheets/Side_Walk.webp",
+      "file": "character/warrior/sheets/Side_Walk.webp",
       "sha256": "4e7315bf4e3cef5bd3dc5316aef0d0a790947bd036157dee54538ee07a136bca",
       "width": 4096,
       "height": 1536,
@@ -252,7 +252,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "warrior/sheets/Side_Attack.webp",
+      "file": "character/warrior/sheets/Side_Attack.webp",
       "sha256": "a1f935938981f91685cb7df82b21527d2ae89f8546daec2a8caf9b6a649097ca",
       "width": 4096,
       "height": 1536,
@@ -261,7 +261,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "warrior/sheets/Side_Down.webp",
+      "file": "character/warrior/sheets/Side_Down.webp",
       "sha256": "26ff2b2beedbcc1002b01f22e7eced818eca73e4b2ab18793fccd5748eb08ab1",
       "width": 4096,
       "height": 1536,
@@ -270,7 +270,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "warrior/sheets/Side_Hit.webp",
+      "file": "character/warrior/sheets/Side_Hit.webp",
       "sha256": "2e6e198c1b48f119be5f589261e766e7215d5f77f9848bacdb5a27a27ed5c2c3",
       "width": 4096,
       "height": 1536,
@@ -279,7 +279,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "warrior/sprite.json",
+      "file": "character/warrior/sprite.json",
       "sha256": "4242fa1d046fe68fe1021d6258a92761b778cefe36df54254e3608e0a96f0c40"
     },
     {
@@ -287,7 +287,7 @@
       "sha256": "9c8d7176cf27e4288a699d9b24a3e443767075a19a9456ae8d25bbf90e62b4c7"
     },
     {
-      "file": "wizard/sheets/Front_Idle.webp",
+      "file": "character/wizard/sheets/Front_Idle.webp",
       "sha256": "15e1c3261e27dc98ee95b333f3730f589116fef99a5223be11e43ee2c9da3b57",
       "width": 4096,
       "height": 1536,
@@ -296,7 +296,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "wizard/sheets/Front_Victory.webp",
+      "file": "character/wizard/sheets/Front_Victory.webp",
       "sha256": "2167c742bb91c911aed6fdb7c2b978eccd6bb2fb3cae325a4a56120107747f83",
       "width": 4096,
       "height": 1536,
@@ -305,7 +305,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "wizard/sheets/Side_Walk.webp",
+      "file": "character/wizard/sheets/Side_Walk.webp",
       "sha256": "cf8dc8d8b410000031b38b6bfb08e2630ef4b91a3d341b6bbeba21ae32b8897b",
       "width": 4096,
       "height": 1536,
@@ -314,7 +314,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "wizard/sheets/Side_Attack.webp",
+      "file": "character/wizard/sheets/Side_Attack.webp",
       "sha256": "c3e1a21ceab7e7e0ab03cfe0a631b7b9f8d1e5125bd05f2f90a0222209270d74",
       "width": 4096,
       "height": 1536,
@@ -323,7 +323,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "wizard/sheets/Side_Down.webp",
+      "file": "character/wizard/sheets/Side_Down.webp",
       "sha256": "20b88273b412d88305262a2925200e33bfb94e3cbc5251872125edee084a43db",
       "width": 4096,
       "height": 1536,
@@ -332,7 +332,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "wizard/sheets/Side_Hit.webp",
+      "file": "character/wizard/sheets/Side_Hit.webp",
       "sha256": "58bc4364095c6ef215366a791487a4490affdc0caca9761c3ade3b8a15b25ac5",
       "width": 4096,
       "height": 1536,
@@ -341,7 +341,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "wizard/sprite.json",
+      "file": "character/wizard/sprite.json",
       "sha256": "12cb0d1f73eb1ac48c78e2df9e44a8316edd6b4bf5cbb45520dada62fc703cb1"
     },
     {
@@ -349,7 +349,7 @@
       "sha256": "20ea7f0f778ead00c440ce92f4300a11978df1de7d9245006fb548081c4d7f56"
     },
     {
-      "file": "barbarian/sheets/Front_Idle.webp",
+      "file": "character/barbarian/sheets/Front_Idle.webp",
       "sha256": "d78b8f23f10de8c724f85d2edd7c5bccfd10a8577934e3db036b533c54a7cad7",
       "width": 4096,
       "height": 1536,
@@ -358,7 +358,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "barbarian/sheets/Front_Victory.webp",
+      "file": "character/barbarian/sheets/Front_Victory.webp",
       "sha256": "c4a6281ccc9143214cc33a2ed0166f18bb59b6242b7af55d3e40feb1686d6ad0",
       "width": 4096,
       "height": 1536,
@@ -367,7 +367,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "barbarian/sheets/Side_Walk.webp",
+      "file": "character/barbarian/sheets/Side_Walk.webp",
       "sha256": "adc962c88864547886c7bbd5347f21279a458d0cb7bec9afa14f2a805585fc22",
       "width": 4096,
       "height": 1536,
@@ -376,7 +376,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "barbarian/sheets/Side_Attack.webp",
+      "file": "character/barbarian/sheets/Side_Attack.webp",
       "sha256": "6ee1ed52177ff129dc0dc28952c042dab77808d8b22f69e6c0e5e0e29dee2d3e",
       "width": 4096,
       "height": 1536,
@@ -385,7 +385,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "barbarian/sheets/Side_Down.webp",
+      "file": "character/barbarian/sheets/Side_Down.webp",
       "sha256": "8db546155ff343bf7d9c6e92d5e14e77fd8ad0325697a49fb227fddbd81d574e",
       "width": 4096,
       "height": 1536,
@@ -394,7 +394,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "barbarian/sheets/Side_Hit.webp",
+      "file": "character/barbarian/sheets/Side_Hit.webp",
       "sha256": "3a1118a1b55d5fdc9b93eaf17d6b5286e292c7f8d1a3b39f30ca576fb306f834",
       "width": 4096,
       "height": 1536,
@@ -403,7 +403,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "barbarian/sprite.json",
+      "file": "character/barbarian/sprite.json",
       "sha256": "9a31d7f9ad6a036e534ee7dc174279a2eb1c85f2ea9832c230f5c625f15366db"
     },
     {
@@ -411,7 +411,7 @@
       "sha256": "19a9c305aa92c924b9e510704cce59a180443679c5588c2885153b2844f0ec6b"
     },
     {
-      "file": "ranger/sheets/Front_Idle.webp",
+      "file": "character/ranger/sheets/Front_Idle.webp",
       "sha256": "be48761c6190108420fb9686e1c1246e83ef74a3066a87ac1babc7f16e70bdaf",
       "width": 4096,
       "height": 1536,
@@ -420,7 +420,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "ranger/sheets/Front_Victory.webp",
+      "file": "character/ranger/sheets/Front_Victory.webp",
       "sha256": "a600b2ab05d050ee491ffbfdbdd6b32cdfd5e0c7434d21fab2e003442912dcbe",
       "width": 4096,
       "height": 1536,
@@ -429,7 +429,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "ranger/sheets/Side_Walk.webp",
+      "file": "character/ranger/sheets/Side_Walk.webp",
       "sha256": "e57672ef9588cbf9741c3f59c2e1a80ce02da89eb96e09d9d35fdc7c6632af58",
       "width": 4096,
       "height": 1536,
@@ -438,7 +438,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "ranger/sheets/Side_Attack.webp",
+      "file": "character/ranger/sheets/Side_Attack.webp",
       "sha256": "29d369093301afe2519c21da17c5fcf970f20449e45c376607ac2037a3c76aba",
       "width": 4096,
       "height": 1536,
@@ -447,7 +447,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "ranger/sheets/Side_Down.webp",
+      "file": "character/ranger/sheets/Side_Down.webp",
       "sha256": "f4b09cb5ff7ba235702b212864b533b5179468a056f88aa69dd651fae405c776",
       "width": 4096,
       "height": 1536,
@@ -456,7 +456,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "ranger/sheets/Side_Hit.webp",
+      "file": "character/ranger/sheets/Side_Hit.webp",
       "sha256": "30a2f56bed7c093c97cca729b87786b8d3638083f7328aa54679a7f32dcc5136",
       "width": 4096,
       "height": 1536,
@@ -465,7 +465,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "ranger/sprite.json",
+      "file": "character/ranger/sprite.json",
       "sha256": "2aa64479fd74ba7653fc793f4b1ed78f075e5f3944f15f6987dee2f94a6c2fc0"
     },
     {
@@ -473,7 +473,7 @@
       "sha256": "2a91bb3731b908bfb50182533dc49f33d7dcdfff87c1d1b01d39a0b0407b821f"
     },
     {
-      "file": "cat/sheets/Front_Idle.webp",
+      "file": "character/cat/sheets/Front_Idle.webp",
       "sha256": "0647b8f314ff4b0125b444426ea4b9523fe471b664f5d29eccce30ff5e6307fd",
       "width": 4096,
       "height": 1536,
@@ -482,7 +482,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "cat/sheets/Front_Victory.webp",
+      "file": "character/cat/sheets/Front_Victory.webp",
       "sha256": "8eb991acd80a76e6b8a281f2a62e3212490a68723b45e0a8f7cec7cc7536ffca",
       "width": 4096,
       "height": 1536,
@@ -491,7 +491,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "cat/sheets/Side_Walk.webp",
+      "file": "character/cat/sheets/Side_Walk.webp",
       "sha256": "44a8fa5fa936a2fe25e97d9eef8f737354e0dfaccfea695c18b0a4a1cd1cc407",
       "width": 4096,
       "height": 1536,
@@ -500,7 +500,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "cat/sheets/Side_Attack.webp",
+      "file": "character/cat/sheets/Side_Attack.webp",
       "sha256": "f54f39a2913cba854979ba3a2106382c178d50ae5b91d136397c17bb1c2f2857",
       "width": 4096,
       "height": 1536,
@@ -509,7 +509,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "cat/sheets/Side_Down.webp",
+      "file": "character/cat/sheets/Side_Down.webp",
       "sha256": "4b6b4803f19c018fbf70eea7c06ec8669203d7df57d2f907d3ffd9528351814c",
       "width": 4096,
       "height": 1536,
@@ -518,7 +518,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "cat/sheets/Side_Hit.webp",
+      "file": "character/cat/sheets/Side_Hit.webp",
       "sha256": "a0971776d63d97ffe23d9223706a5190ea4a87f9928bcb7343e7850b0a7c3cc8",
       "width": 4096,
       "height": 1536,
@@ -527,7 +527,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "cat/sprite.json",
+      "file": "character/cat/sprite.json",
       "sha256": "3d1a2e0b4cf987ad94d0daba83971848a7e238598da335df1794c615bc350f39"
     },
     {
@@ -535,7 +535,7 @@
       "sha256": "c6def8171f422fa59c23b60e1412725d3376465e58ce0c921fada490d8fd0daa"
     },
     {
-      "file": "lamia/sheets/Front_Idle.webp",
+      "file": "character/lamia/sheets/Front_Idle.webp",
       "sha256": "bb5c8cdf3f0ee101dce805ce1f96881143f05f1905663d7d6315daa079f7bf09",
       "width": 4096,
       "height": 1536,
@@ -544,7 +544,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "lamia/sheets/Front_Victory.webp",
+      "file": "character/lamia/sheets/Front_Victory.webp",
       "sha256": "583fec562d302eba6a91fd1675a9a076b39cdef6f61095b313e90f2f03cda83c",
       "width": 4096,
       "height": 1536,
@@ -553,7 +553,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "lamia/sheets/Side_Walk.webp",
+      "file": "character/lamia/sheets/Side_Walk.webp",
       "sha256": "d8bdaefe3d8727e263e19b06c3706ab4cbbb667169daff9739405a28e3007f22",
       "width": 4096,
       "height": 1536,
@@ -562,7 +562,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "lamia/sheets/Side_Attack.webp",
+      "file": "character/lamia/sheets/Side_Attack.webp",
       "sha256": "aafec5af965bbfc71567cbff816d893f9cf90bfe743a33afa4e37afd7276cb82",
       "width": 4096,
       "height": 1536,
@@ -571,7 +571,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "lamia/sheets/Side_Down.webp",
+      "file": "character/lamia/sheets/Side_Down.webp",
       "sha256": "8c9fa2c671a8e542fa1ac8a7df1e4fd449136505282e68bfebbf658d56ac5729",
       "width": 4096,
       "height": 1536,
@@ -580,7 +580,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "lamia/sheets/Side_Hit.webp",
+      "file": "character/lamia/sheets/Side_Hit.webp",
       "sha256": "cc90cfc88dc18f052559bffa4644c340b7e6ce92548bff012f4831197c07f167",
       "width": 4096,
       "height": 1536,
@@ -589,7 +589,7 @@
       "encoding": "lossless WebP; exact RGBA"
     },
     {
-      "file": "lamia/sprite.json",
+      "file": "character/lamia/sprite.json",
       "sha256": "51099b69b8a239c833cc6022a541f9e03324e66b4a68c9a7bd47a253a18a23c8"
     },
     {

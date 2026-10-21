@@ -15,7 +15,7 @@ test('rest countdown uses rate, selected character survives departure and cannot
 
 test('all shipped appearances provide complete six-action atlases and correct left/right orientation', () => {
   for (const appearance of APPEARANCES) {
-    const meta = JSON.parse(readFileSync(new URL(`../public/assets/${appearance.id}/sprite.json`, import.meta.url)));
+    const meta = JSON.parse(readFileSync(new URL(`../public/assets/character/${appearance.id}/sprite.json`, import.meta.url)));
     for (const action of ['Front_Idle', 'Front_Victory', 'Side_Walk', 'Side_Attack', 'Side_Hit', 'Side_Down']) {
       assert.equal(meta.animations[action].frameNames.length, 24);
       for (const name of meta.animations[action].frameNames) {

@@ -42,7 +42,8 @@
       "format": "lossless WebP",
       "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/barbarian/sheets",
       "pixelEquality": "RGB and alpha, including fully transparent pixels",
-      "report": "public/assets/lossless-webp-manifest.json"
+      "report": "public/assets/lossless-webp-manifest.json",
+      "runtimeDirectory": "public/assets/character/barbarian"
     }
   },
   "ranger": {
@@ -91,7 +92,8 @@
       "format": "lossless WebP",
       "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/ranger/sheets",
       "pixelEquality": "RGB and alpha, including fully transparent pixels",
-      "report": "public/assets/lossless-webp-manifest.json"
+      "report": "public/assets/lossless-webp-manifest.json",
+      "runtimeDirectory": "public/assets/character/ranger"
     }
   },
   "cat": {
@@ -136,7 +138,8 @@
       "format": "lossless WebP",
       "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/cat/sheets",
       "pixelEquality": "RGB and alpha, including fully transparent pixels",
-      "report": "public/assets/lossless-webp-manifest.json"
+      "report": "public/assets/lossless-webp-manifest.json",
+      "runtimeDirectory": "public/assets/character/cat"
     }
   },
   "lamia": {
@@ -181,7 +184,8 @@
       "format": "lossless WebP",
       "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/lamia/sheets",
       "pixelEquality": "RGB and alpha, including fully transparent pixels",
-      "report": "public/assets/lossless-webp-manifest.json"
+      "report": "public/assets/lossless-webp-manifest.json",
+      "runtimeDirectory": "public/assets/character/lamia"
     }
   },
   "warrior": {
@@ -218,7 +222,8 @@
       "format": "lossless WebP",
       "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/warrior/sheets",
       "pixelEquality": "RGB and alpha, including fully transparent pixels",
-      "report": "public/assets/lossless-webp-manifest.json"
+      "report": "public/assets/lossless-webp-manifest.json",
+      "runtimeDirectory": "public/assets/character/warrior"
     }
   },
   "wizard": {
@@ -255,7 +260,8 @@
       "format": "lossless WebP",
       "originalPngDirectory": "art-workbench/webp-lossless-20261021T062145Z/originals/characters/wizard/sheets",
       "pixelEquality": "RGB and alpha, including fully transparent pixels",
-      "report": "public/assets/lossless-webp-manifest.json"
+      "report": "public/assets/lossless-webp-manifest.json",
+      "runtimeDirectory": "public/assets/character/wizard"
     }
   }
 }
