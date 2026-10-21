@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="관통력">
+<title>관통력</title>
+<!-- Two armor plates split around the penetrating horizontal point. -->
+<path d="M8 3h3v5H8zM8 16h3v5H8zM14 3h3v5h-3zM14 16h3v5h-3z" fill="#7B7B7B"/>
+<path d="M2 10h15V6l6 6-6 6v-4H2z" fill="#C5C5C5"/>
+</svg>

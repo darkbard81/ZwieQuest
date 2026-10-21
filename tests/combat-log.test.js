@@ -27,7 +27,13 @@ test('combat explanation uses recorded accuracy, selected defense and exact dama
   assert.equal(enhanced.damage, Math.floor(enhanced.base * f.grade * f.tactic * f.strength * f.hit * f.armor));
   const html = combatLogHTML(entry(enhanced));
   for (const term of ['등급 130%', '전술 150%', '힘 115%', '치명타 150%', '자연 20 · 판정 ↑']) assert.ok(html.includes(term));
-  assert.match(text(html), /배율 252.28125%/);
+  assert.match(text(html), /배율 252%/);
+  assert.doesNotMatch(text(html), /배율 \d+\.\d+%/);
+  assert.equal(enhanced.damage, 60); // Display truncation must not change the recorded damage.
+  const timed = entry(enhanced); Object.assign(timed.hit, { actionSeq: 42, combatTimeMs: 12345, skillId: 'hamstring', ability: '무력화' });
+  const timedText = text(combatLogHTML(timed));
+  assert.doesNotMatch(timedText, /행동|전투 시간|12\.35초/);
+  assert.match(timedText, /무력화.*모험가 → 이끼 슬라임/);
 });
 
 test('miss, graze, natural-one downgrade and fixed damage are not described as ordinary armor damage', () => {

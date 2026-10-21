@@ -6,15 +6,15 @@ import { damageNames, damageTagHTML } from '../public/damage-tags.js';
 import { DAMAGE_NAMES } from '../src/equipment.js';
 import { logHTML } from '../public/labels.js';
 
-test('all supplied references have vector assets; absent stat references stay empty', () => {
+test('supported stats and damage types have safe vector assets; unknown references stay empty', () => {
   // Validate the shipped assets without requiring the local art workbench.
   const colors = { slash: '#DC2626', pierce: '#7C3AED', blunt: '#B45309', fire: '#EA580C', cold: '#2563EB', lightning: '#CA8A04', corrosion: '#16A34A', raw: '#6B7280' };
   const icons = [
-    ...['LB', 'ACC', 'AR', 'DEF', 'REF', 'FOR', 'WIL', 'STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(id => `stat-${id}`),
+    ...['PEN', 'actionSpeed', 'LB', 'ACC', 'AR', 'DEF', 'REF', 'FOR', 'WIL', 'STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(id => `stat-${id}`),
     ...Object.keys(colors).map(id => `damage-${id}`),
   ];
   const css = readFileSync(new URL('../public/style.css', import.meta.url), 'utf8');
-  assert.equal(icons.length, 21);
+  assert.equal(icons.length, 23);
   for (const icon of icons) {
     const [group, id] = icon.split('-');
     assert.ok(uiIconHTML(group, id).includes(icon + '.svg'));
@@ -23,7 +23,7 @@ test('all supplied references have vector assets; absent stat references stay em
     assert.doesNotMatch(svg, /<image|data:image|<script|<foreignObject/);
     if (group === 'damage') assert.ok(css.includes(`.damage-${id}{--damage-color:${colors[id]}`));
   }
-  for (const id of ['PEN', '<invalid>']) assert.equal(uiIconHTML('stat', id), '');
+  for (const id of ['missing', '<invalid>']) assert.equal(uiIconHTML('stat', id), '');
   assert.match(uiIconHTML('damage', 'slash'), /damage-slash.svg/);
 });
 

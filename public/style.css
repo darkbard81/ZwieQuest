@@ -277,16 +277,21 @@ main{padding-top:12px}
 .bestiary-card { width:66px; height:66px; padding:0; min-width:0; }
 .bestiary-card .equipment-icon { width:64px; height:64px; }
 .bestiary-card:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
-#bestiary-dialog { width:900px; max-width:95vw; max-height:90dvh; overflow:hidden; padding:0; }
+#bestiary-dialog { width:900px; max-width:95vw; height:min(720px,90dvh); max-height:90dvh; overflow:hidden; padding:0; }
 #bestiary-dialog[open] { display:flex; flex-direction:column; }
+@media(min-width:651px) {
+  #bestiary-dialog { width:calc(100vw - 24px); max-width:calc(100vw - 24px); height:calc(100dvh - 24px); max-height:calc(100dvh - 24px); }
+}
 .bestiary-dialog-header { display:flex; align-items:center; justify-content:space-between; flex:none; padding:12px 24px; border-bottom:1px solid var(--line); }
 .bestiary-dialog-header .eyebrow { margin:0; }
 #bestiary-dialog .dialog-close { position:static; width:44px; height:44px; padding:0; flex:none; }
-.bestiary-scroll { min-height:0; overflow:auto; padding:20px 24px 24px; }
+.bestiary-scroll { display:flex; flex:1; min-height:0; overflow:hidden; padding:20px 24px 24px; }
 #bestiary-title { font-size:18px; margin:4px 0; }
-#bestiary-detail { display:grid; grid-template-columns:45% 55%; min-height:450px; border:1px solid var(--line); border-radius:10px; background-color:#11251f; background-image:linear-gradient(90deg,#11251f22,#11251f44 38%,#11251ff2 57%),var(--monster-image,none); background-repeat:no-repeat; background-size:100% 100%, 52% auto; background-position:center,left center; overflow:hidden; }
-.bestiary-lore { align-self:end; padding:18px; margin:12px; background:#11251fdf; border-radius:8px; font-size:12px; line-height:1.8; }
-.bestiary-facts { padding:22px; font-size:12px; line-height:1.8; }
+#bestiary-detail { flex:1; min-width:0; display:grid; grid-template-columns:45% 55%; grid-template-rows:minmax(0,1fr); min-height:0; border:1px solid var(--line); border-radius:10px; background-color:#11251f; background-image:linear-gradient(90deg,#11251f00 50%,#11251f99 50%),var(--monster-image,none); background-repeat:no-repeat; background-size:100% 100%, 52% auto; background-position:center,left top; overflow:hidden; }
+.bestiary-details-content { display:contents; }
+.bestiary-lore { align-self:end; padding:18px; margin:12px; background:#11251f99; border-radius:8px; font-size:12px; line-height:1.8; }
+.bestiary-facts { min-height:0; min-width:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#4f655a transparent; padding:22px; font-size:12px; line-height:1.8; }
+.bestiary-facts:focus-visible, .bestiary-details-content:focus-visible { outline:1px solid var(--gold); outline-offset:-2px; }
 .bestiary-facts h3 { margin:4px 0; font-size:18px; }
 .bestiary-facts h3 span { color:var(--gold); font-size:13px; }
 .bestiary-facts h4 { margin:12px 0 4px; color:var(--gold); }
@@ -303,9 +308,10 @@ main{padding-top:12px}
   .bestiary-dialog-header { padding:8px 14px; }
   .bestiary-scroll { padding:14px; }
   .bestiary-columns { gap:10px; }
-  #bestiary-detail { grid-template-columns:1fr; background-image:linear-gradient(#11251f00 220px,#11251f 340px),var(--monster-image,none); background-size:100% 100%, 300px auto; background-position:center,center top; }
-  .bestiary-lore { margin-top:270px; }
-  .bestiary-facts { background:#11251feb; padding:16px; }
+  #bestiary-detail { grid-template-columns:1fr; grid-template-rows:minmax(0,40%) minmax(0,1fr); background-image:var(--monster-image,none); background-size:auto 40%; background-position:center top; }
+  .bestiary-details-content { display:block; grid-row:2; min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#4f655a transparent; }
+  .bestiary-lore { margin:8px 10px; padding:10px; font-size:11px; }
+  .bestiary-facts { overflow:visible; background:#11251feb; padding:16px; }
   .info-tabs [role=tab] { padding-left:8px; padding-right:8px; }
 }
 
