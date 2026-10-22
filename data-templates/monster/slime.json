@@ -1,5 +1,6 @@
 {
   "slime": {
+    "codexOrder": 10,
     "hp": 50,
     "hpGrowth": 10,
     "hpConPercent": 5,
@@ -21,6 +22,7 @@
     "description": "어디서든 흔하게 발생되는 부정형 몬스터. 귀엽다!",
     "variation": [
       {
+        "codexOrder": 10,
         "id": "slash_slime",
         "name": "슬라임(베기)",
         "img_path": "public/assets/monster/slime/05-slime-slash.webp",
@@ -53,6 +55,7 @@
         "icon_path": "public/assets/monster/slime/icons/05-slime-slash.webp"
       },
       {
+        "codexOrder": 20,
         "id": "pierce_slime",
         "name": "슬라임(관통)",
         "img_path": "public/assets/monster/slime/07-slime-pierce.webp",
@@ -85,6 +88,7 @@
         "icon_path": "public/assets/monster/slime/icons/07-slime-pierce.webp"
       },
       {
+        "codexOrder": 30,
         "id": "blunt_slime",
         "name": "슬라임(부수기)",
         "img_path": "public/assets/monster/slime/06-slime-blunt.webp",
@@ -117,6 +121,7 @@
         "icon_path": "public/assets/monster/slime/icons/06-slime-blunt.webp"
       },
       {
+        "codexOrder": 40,
         "id": "fire_slime",
         "name": "슬라임(소각)",
         "img_path": "public/assets/monster/slime/01-slime-fire.webp",
@@ -149,6 +154,7 @@
         "icon_path": "public/assets/monster/slime/icons/01-slime-fire.webp"
       },
       {
+        "codexOrder": 50,
         "id": "cold_slime",
         "name": "슬라임(동결)",
         "img_path": "public/assets/monster/slime/02-slime-cold.webp",
@@ -181,6 +187,7 @@
         "icon_path": "public/assets/monster/slime/icons/02-slime-cold.webp"
       },
       {
+        "codexOrder": 60,
         "id": "lightning_slime",
         "name": "슬라임(충격)",
         "img_path": "public/assets/monster/slime/04-slime-lightning.webp",
@@ -213,6 +220,7 @@
         "icon_path": "public/assets/monster/slime/icons/04-slime-lightning.webp"
       },
       {
+        "codexOrder": 70,
         "id": "corrosion_slime",
         "name": "슬라임(부식)",
         "img_path": "public/assets/monster/slime/03-slime-corrosion.webp",

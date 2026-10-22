@@ -1,18 +1,17 @@
 {
   "version": 1,
-  "regions": {
-    "village": { "minLevel": 1, "maxLevel": 5, "excludedDamageTypes": [] },
-    "volcano": { "minLevel": 5, "maxLevel": 20, "excludedDamageTypes": ["cold"], "bossDamageType": "fire" },
-    "snow": { "minLevel": 5, "maxLevel": 20, "excludedDamageTypes": ["fire"], "bossDamageType": "cold" },
-    "desert": { "minLevel": 5, "maxLevel": 20, "excludedDamageTypes": ["lightning"], "bossDamageType": "corrosion" },
-    "beach": { "minLevel": 5, "maxLevel": 20, "excludedDamageTypes": ["corrosion"], "bossDamageType": "lightning" }
-  },
   "rewards": {
     "equalLevelKills": 10,
     "xpBonusPerLevel": 0.25,
     "maxBonusLevels": 4,
     "goldBase": 4,
     "goldPerLevel": 2,
-    "goldMultipliers": { "normal": 1, "fine": 1.25, "excellent": 1.5, "superior": 1.75, "legendary": 2 }
+    "goldMultipliers": {
+      "normal": 1,
+      "fine": 1.25,
+      "excellent": 1.5,
+      "superior": 1.75,
+      "legendary": 2
+    }
   }
 }

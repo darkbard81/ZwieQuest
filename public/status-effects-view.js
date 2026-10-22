@@ -25,6 +25,7 @@ export function initStatusEffects({ world, columns, tooltip }) {
     if (activeView) {
       tooltip.textContent = activeView.label;
       tooltip.dataset.side = activeView.actor;
+      tooltip.dataset.polarity = activeView.effect.polarity;
       // Coordinates remain in the 512x384 world; its existing responsive transform scales the HUD too.
       const top = columns[activeView.actor].offsetTop + activeView.button.offsetTop;
       tooltip.style.top = `${Math.max(8, Math.min(top, world.clientHeight - tooltip.offsetHeight - 8))}px`;

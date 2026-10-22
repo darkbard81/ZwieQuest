@@ -45,26 +45,28 @@ export function maximumHp(level, con, profile, equipmentHp = 0) {
   const baseHp = profile.hp + profile.hpGrowth * (level - 1);
   return Math.floor(baseHp * (100 + (profile.hpConPercent ?? 5) * con) / 100) + equipmentHp;
 }
+export const levelCombatBonus = level => 3 * Math.floor(Math.max(1, Number(level) || 1) / 2);
 export function stats(state, config) {
   return statDetails(state, config).values;
 }
 // Values and their displayed breakdown share the same authoritative calculation.
 export function statDetails(state, config, character = activeCharacter(state)) {
   const cls = config.character;
-  if (!character) return { values: { ...Object.fromEntries([...BASE_STATS, 'ACC', 'DEF', 'REF', 'FOR', 'WIL', 'PEN', 'AR', 'power'].map(k => [k, 0])), maxHp: 0, ...actionSpeed(0, 0, config), typeModifiers: {} }, defenses: {} };
+  if (!character) return { values: { ...Object.fromEntries([...BASE_STATS, 'ACC', 'DEF', 'REF', 'FOR', 'WIL', 'PEN', 'AR', 'power'].map(k => [k, 0])), maxHp: 0, ...actionSpeed(0, 0, config), typeModifiers: {} }, defenses: {}, attributes: {} };
   const gear = Object.values(character.equipment).map(id => state.inventory.find(i => i.id === id)).filter(Boolean);
   const e = key => gear.reduce((sum, i) => sum + (key === 'DEX' && i.slot === 'armor' ? 0 : i.stats[key] || 0), 0);
   const m = state.phase === 'BATTLE' && character.id === state.activeCharacterId ? modifiers(state.battle, 'hero') : {};
   const b = Object.fromEntries(BASE_STATS.map(key => [key, character.attributes[key] + e(key) + (m[key] || 0)]));
+  const levelBonus = levelCombatBonus(character.level);
   const defenses = Object.fromEntries(Object.entries(DEFENSE_RULES).map(([key, rule]) => {
     const attributes = Object.entries(rule.attributes).map(([key, multiplier]) => ({ key, base: character.attributes[key], equipment: e(key), status: m[key] || 0, value: b[key], multiplier, contribution: b[key] * multiplier }));
-    const detail = { base: cls.B[key], attributes, level: character.level, equipment: e(key), status: m[key] || 0, mastery: null };
-    detail.total = detail.base + attributes.reduce((sum, a) => sum + a.contribution, 0) + detail.equipment + detail.status;
+    const detail = { base: cls.B[key], attributes, level: character.level, levelBonus, equipment: e(key), status: m[key] || 0, mastery: null };
+    detail.total = detail.base + levelBonus + attributes.reduce((sum, a) => sum + a.contribution, 0) + detail.equipment + detail.status;
     return [key, detail];
   }));
   const values = {
     ...b,
-    ACC: cls.B.ACC + b.PER + e('ACC') + (m.ACC || 0),
+    ACC: cls.B.ACC + levelBonus + b.PER + e('ACC') + (m.ACC || 0),
     ...Object.fromEntries(Object.entries(defenses).map(([key, detail]) => [key, detail.total])),
     maxHp: Math.max(1, maximumHp(character.level, b.CON, cls, e('HP'))),
     PEN: e('PEN') + (m.PEN || 0), AR: e('AR') + (m.AR || 0), power: e('power'),
@@ -75,5 +77,24 @@ export function statDetails(state, config, character = activeCharacter(state)) {
   const speedRate=Math.max(.1,1+(mastery.actionSpeedRate||0));
   values.actionSpeed*=speedRate; values.actionIntervalMs/=speedRate;
   values.actionIntervalMs *= m.actionTimeMultiplier || 1; values.actionSpeed /= m.actionTimeMultiplier || 1;
-  return { values, defenses };
+  const attributes = Object.fromEntries(BASE_STATS.map(key => [key, {
+    base: character.attributes[key], equipment: e(key), status: m[key] || 0, total: b[key]
+  }]));
+  return { values, defenses, attributes };
+}
+
+// Normal-hit damage before target armor, critical/graze, or individual skill bonuses.
+// Use the attack calculation itself so the displayed endpoints round identically.
+export function basicAttackRange(state, config, hero = stats(state, config)) {
+  const character = activeCharacter(state);
+  if (!character) return { min: 0, max: 0 };
+  const weapon = state.inventory.find(i => i.id === character.equipment.weapon);
+  const modern = Array.isArray(weapon?.damageTypes), raw = modern && weapon.damageTypes.includes('raw');
+  const legacy = weapon ? (weapon.icon === 'staff' ? config.balance.legacyStaffBasic : config.balance.legacySwordBasic) + hero.power : 1;
+  const min = modern ? (raw ? weapon.fixedDamage : weapon.damageMin) : legacy;
+  const max = modern ? (raw ? weapon.fixedDamage : weapon.damageMax) : legacy;
+  const damage = base => attack({ roll: 10, acc: 10, defense: 10, str: hero.STR, base, pen: 0, ar: 0,
+    damageTypes: modern ? weapon.damageTypes : ['blunt'], fixedDamage: raw ? weapon.fixedDamage : undefined,
+    damageRate: modern ? weapon.damageRate || 0 : 0, masteryDamageRate: maintainedSkillBonuses(state).damageRate || 0 }).damage;
+  return { min: damage(min), max: damage(max) };
 }

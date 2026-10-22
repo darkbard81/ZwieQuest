@@ -4,6 +4,7 @@ import { resolve, dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 import { Game, THEMES } from './game.js';
+import { publicRegions } from './regions.js';
 import { initializeBattleSkills } from './skills.js';
 import { ProbabilitySettings } from './probabilities.js';
 import { LocalAuth } from './auth.js';
@@ -84,6 +85,7 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, origin);
   if (![...allowedOrigins].some(o => new URL(o).host === req.headers.host)) return json(res, 403, { error: '허용되지 않은 호스트입니다.' });
   if (url.pathname === '/api/health') return json(res, 200, { ok: true });
+  if (url.pathname === '/api/regions' && req.method === 'GET') return json(res, 200, publicRegions());
   let user = auth.resolve(req);
   if (url.pathname === '/api/auth/me' && req.method === 'GET') return json(res, 200, { user: auth.publicUser(user) });
   if (url.pathname.startsWith('/api/') && !url.pathname.startsWith('/api/auth/') && !user) return json(res, 401, { error: '로그인이 필요합니다.' });
@@ -114,7 +116,13 @@ const server = http.createServer(async (req, res) => {
         const u = url.pathname.endsWith('register') ? await auth.register(cmd.username, cmd.password) : await auth.login(cmd.username, cmd.password);
         if (user) { tick(); endSession(user); auth.revoke(user, res); }
         auth.issue(u, res); return json(res, 200, { user: u });
-      } catch (e) { return json(res, 400, { error: e.message }); }
+      } catch (e) {
+        if (e.status === 429 && e.code === 'LOGIN_LOCKED') {
+          res.setHeader('Retry-After', String(e.retryAfter));
+          return json(res, 429, { error: e.message, code: e.code, retryAfter: e.retryAfter });
+        }
+        return json(res, 400, { error: e.message });
+      }
     }
     if (url.pathname === '/api/auth/logout') { if (user) { tick(); endSession(user); } auth.revoke(user, res); return json(res, 200, { ok: true }); }
     if (!user) return json(res, 401, { error: '로그인이 필요합니다.' });

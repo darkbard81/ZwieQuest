@@ -2,7 +2,15 @@ const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<'
 export function skillDescription(item) {
   if (!item.enabled) return '사용할 수 없는 스킬';
   const e=item.effect || {}, duration=item.durationMs ? ` · ${(item.durationMs/1000).toFixed(1)}초(INT)` : '';
-  const effect = item.effectType === 'equipmentMastery' ? `${item.description} · ${item.toggleOn ? 'ON' : 'OFF'}${item.masteryMatches ? '' : ' · 해당 장비 미착용'}` : item.activationMode === 'toggle' ? `유지 효과 · 명중 +${item.accuracyBonus} · ${item.toggleOn ? 'ON' : 'OFF'}` : item.effectType === 'heal' ? `HP ${item.heal} 회복` : item.effectType === 'attack' ? `명중 vs ${e.defense} · 피해 +${Math.round(((e.damageMultiplier || 1)-1)*100)}%${e.accuracyBonus ? ` · 명중 +${e.accuracyBonus}` : ''}${e.penetrationBonus ? ` · 관통 +${e.penetrationBonus}` : ''} · 명중/치명타 시 ${item.statusName}${duration}` : item.effectType === 'status' ? `${item.statusName}: ${item.statusDescription || ''}${duration}` : item.effectType === 'mirror' ? `회피 +30 · 피명중마다 -10${duration}` : item.description;
+  const defenseNames={DEF:'회피(DEF)',REF:'반사(REF)',FOR:'인내(FOR)',WIL:'의지(WIL)'};
+  const bonuses=[e.damageMultiplier && e.damageMultiplier!==1 ? `피해 +${Math.round((e.damageMultiplier-1)*100)}%` : '',e.accuracyBonus ? `명중 +${e.accuracyBonus}` : '',e.penetrationBonus ? `관통력 +${e.penetrationBonus}` : ''].filter(Boolean).join(' · ');
+  const effect = item.effectType === 'equipmentMastery' ? `${item.description} ${item.toggleOn ? 'ON' : 'OFF'}${item.masteryMatches ? '' : ' · 해당 장비 미착용'}`
+    : item.activationMode === 'toggle' ? `유지 효과 · 명중 +${item.accuracyBonus} · ${item.toggleOn ? 'ON' : 'OFF'}`
+    : item.effectType === 'heal' ? `자신 HP ${item.heal} 회복`
+    : item.effectType === 'attack' ? `무기 명중 vs 회피(DEF)${bonuses ? ' · '+bonuses : ''} → 명중/치명타 후 상태 판정: 명중 vs ${defenseNames[e.statusDefense]} → 성공 시 ${item.statusName}${duration}${item.statusDescription ? ' ['+item.statusDescription+']' : ''}`
+    : item.effectType === 'status' ? `자신에게 ${item.statusName}${duration} · ${item.statusDescription || ''}`
+    : item.effectType === 'mirror' ? `자신 회피 +30${duration} · 적의 명중/치명타마다 -10`
+    : item.description;
   const limit = item.perBattleLimit == null ? '전투당 제한 없음' : item.remainingUses == null ? `전투당 ${item.perBattleLimit}회` : `남은 ${item.remainingUses}/${item.perBattleLimit}회${item.remainingUses === 0 ? ' · 소진' : ''}`;
   const context = item.useContexts?.length === 2 ? '전투/비전투' : item.useContexts?.includes('nonCombat') ? '비전투' : '전투';
   return `${effect} · ${context} · ${limit}`;

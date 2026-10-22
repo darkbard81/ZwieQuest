@@ -2,7 +2,7 @@ import test from 'node:test';
 import { losslessWebpInfo } from './helpers/webp.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { REGIONS } from '../public/regions.js';
+import { REGIONS } from '../src/regions.js';
 import { Game, THEMES } from '../src/game.js';
 
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));

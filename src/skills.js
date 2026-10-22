@@ -33,7 +33,7 @@ export function validateSkillCatalog(catalog) {
       if (['attack','status','mirror'].includes(s.effect.type) && !(Number.isFinite(s.effect.durationMs) && s.effect.durationMs > 0)) fail(`${s.id}: invalid duration`);
       if (['attack','status'].includes(s.effect.type) && !statusDefinition(s.effect.statusId)) fail(`${s.id}: unknown status`);
       if (s.effect.type === 'attack') {
-        if (!['DEF','REF','FOR','WIL'].includes(s.effect.defense)) fail(`${s.id}: invalid defense`);
+        if (!['DEF','REF','FOR','WIL'].includes(s.effect.statusDefense)) fail(`${s.id}: invalid status defense`);
         for (const k of ['damageMultiplier','accuracyBonus','penetrationBonus']) if (!Number.isFinite(s.effect[k]) || s.effect[k] < 0) fail(`${s.id}: invalid ${k}`);
       }
     } else fail(`${s.id}: unsupported effect/mode; add a server handler first`);
@@ -55,8 +55,8 @@ export function initializeBattleSkills(battle, events) {
   }
   battle.skillToggles ||= {};
 }
-// Learned skills and cooldowns belong to one character. Per-battle state is
-// initialized only at battle creation or one-time legacy migration, not per turn.
+// Learned skills are shared by the account. Slots and preferences remain per character.
+// Per-battle state is initialized only at battle creation or legacy migration.
 const owner = state => state.characters ? activeCharacter(state) : state;
 const learned = state => state.characters ? owner(state)?.skills || [] : state.inventory;
 // Equipment mastery preferences belong to the character, including outside battle.
@@ -99,6 +99,37 @@ export function initializeSkills(state, catalog = SKILL_CATALOG) {
     owner(state).skillGrants.push(def.id);
   }
 }
+// Merge old per-character discoveries without changing independent loadouts. Keep
+// character.skills as a compatibility view of the account library in memory.
+export function initializeSharedSkills(state, catalog = SKILL_CATALOG) {
+  const byTemplate = new Map(), aliases = new Map();
+  const sources = [...(state.sharedSkills || []), ...state.characters.flatMap(c => c.skills || [])];
+  for (const item of sources) {
+    if (item.slot !== 'skill') continue;
+    const templateId = item.templateId === 'dagger-mastery' && !skillDefinition('dagger-mastery', catalog)?.enabled && skillDefinition('light-weapon-mastery', catalog)?.enabled ? 'light-weapon-mastery' : item.templateId;
+    let canonical = byTemplate.get(templateId);
+    if (!canonical) {
+      canonical = { ...item, templateId, name: skillDefinition(templateId, catalog)?.name || item.name };
+      byTemplate.set(templateId, canonical);
+    }
+    aliases.set(item.id, canonical.id);
+  }
+  state.sharedSkills = [...byTemplate.values()];
+  for (const c of state.characters) {
+    const used = new Set();
+    c.skillSlots = c.skillSlots.map(id => {
+      const canonical = aliases.get(id);
+      if (!canonical || used.has(canonical)) return null;
+      used.add(canonical); return canonical;
+    });
+    c.skills = state.sharedSkills;
+  }
+  const pending = state.battle?.pendingSkill;
+  if (pending && aliases.has(pending.itemId)) {
+    pending.itemId = aliases.get(pending.itemId);
+    pending.skillId = state.sharedSkills.find(i => i.id === pending.itemId).templateId;
+  }
+}
 export function skillValues(def, hero) {
   return { ...(def.effect.type === 'heal' ? { heal: Math.max(0, Math.floor(hero.maxHp * (def.effect.maxHpRate + hero.INT * def.effect.intelligenceRate))) } : def.effect.type === 'accuracyBonus' ? { accuracyBonus: def.effect.amount } : {}),
     ...(def.effect.durationMs ? { durationMs: durationMs(def.effect.durationMs, hero.INT) } : {}) };
@@ -115,7 +146,7 @@ export function skillItemView(item, state, hero, catalog = SKILL_CATALOG) {
   const used = inCombat ? state.battle?.skillUseCounts?.[item.templateId] || 0 : 0;
   const values = def ? skillValues(def, hero) : {};
   if (def?.effect.type === 'attack' && inCombat) values.durationMs *= resolveDurationMultiplier((state.enemy?.RES || 0) + (modifiers(state.battle, 'enemy').RES || 0)) * modifiers(state.battle, 'hero').debuffDurationMultiplier * modifiers(state.battle, 'enemy').hostileDurationMultiplier;
-  return { ...item, name: def?.name || item.name, icon: def?.icon || '?', iconPath: def?.iconPath, effect: def?.effect, statusName: statusDefinition(def?.effect.statusId)?.name, statusDescription: statusDefinition(def?.effect.statusId)?.description, description: [def?.description || '등록되지 않은 스킬입니다.', statusDefinition(def?.effect.statusId)?.description].filter(Boolean).join(' '), enabled: !!def?.enabled,
+  return { ...item, name: def?.name || item.name, icon: def?.icon || '?', iconPath: def?.iconPath, effect: def?.effect, statusName: statusDefinition(def?.effect.statusId)?.name, statusDescription: statusDefinition(def?.effect.statusId)?.description, description: def?.description || '등록되지 않은 스킬입니다.', enabled: !!def?.enabled,
     useContexts: def?.useContexts || [], activationMode: def?.activationMode, effectType: def?.effect.type, perBattleLimit: def?.perBattleLimit ?? null,
     usesThisBattle: used, remainingUses: inCombat && def?.perBattleLimit != null ? Math.max(0, def.perBattleLimit - used) : null,
     masteryMatches: def?.effect.type === 'equipmentMastery' ? masteryMatches(state, def.effect) : true,
@@ -123,8 +154,8 @@ export function skillItemView(item, state, hero, catalog = SKILL_CATALOG) {
     ...values, ...(def?.effect.type === 'heal' ? { heal: Math.floor(skillValues(def, hero).heal * modifiers(state.battle, 'hero').healingReceived) } : {}) };
 }
 export function equipSkill(state, item, unequip = false, slotIndex, catalog = SKILL_CATALOG) {
-  if (!owner(state) || !learned(state).some(i => i.id === item.id)) throw Error('이 캐릭터가 습득한 스킬이 아닙니다.');
-  const current = owner(state).skillSlots.indexOf(item.id);
+  if (!owner(state) || !learned(state).some(i => i.id === item.id)) throw Error('이 계정이 습득한 스킬이 아닙니다.');
+  const current = owner(state).skillSlots.findIndex(id => learned(state).some(i => i.id === id && i.templateId === item.templateId));
   if (unequip) {
     if (current === -1) throw Error('장착 중인 스킬이 아닙니다.');
     owner(state).skillSlots[current] = null; return;

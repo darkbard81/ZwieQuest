@@ -14,7 +14,7 @@ export async function createWorld(container) {
   container.prepend(renderer.canvas);
   const stage = new Container();
   await Assets.init({ preferences: { preferWorkers: false } });
-  const names = ['village', 'volcano', 'beach', 'desert', 'snow', 'pub', 'icons'];
+  const names = [...Object.keys(REGIONS), 'pub', 'icons'];
   const loaded = await Promise.all(names.map(name => Assets.load(REGIONS[name]?.canvas || (name === 'pub' ? '/assets/pub.webp' : `/assets/${name}.png`))));
   const backgrounds = Object.fromEntries(names.slice(0, -1).map((name, i) => [name, loaded[i]]));
   const heroes = Object.fromEntries(await Promise.all(APPEARANCES.map(async appearance => {

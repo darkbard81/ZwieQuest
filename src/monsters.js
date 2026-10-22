@@ -2,11 +2,12 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { BASE_STATS, EQUIPMENT_CATALOG, generateEquipment, rollGrade, validateCatalog } from './equipment.js';
 import { pointBudget } from './characters.js';
-import { statDetails } from './combat.js';
-import { REGIONS } from '../public/regions.js';
+import { statDetails, levelCombatBonus } from './combat.js';
+import { REGIONS } from './regions.js';
 
 const root = new URL('../', import.meta.url);
-export const ENCOUNTER_CONFIG = JSON.parse(readFileSync(new URL('data-templates/encounters.json', root)));
+// Keep the runtime rules shape for callers; all region data comes from regions.json.
+export const ENCOUNTER_CONFIG = { ...JSON.parse(readFileSync(new URL('data-templates/encounters.json', root))), regions: REGIONS };
 const folder = new URL('data-templates/monster/', root);
 export const MONSTER_CATALOG = readdirSync(folder).filter(name => name.endsWith('.json')).sort().flatMap(name =>
   Object.entries(JSON.parse(readFileSync(new URL(name, folder)))).map(([id, definition]) => ({ id, ...definition })));
@@ -24,14 +25,21 @@ export function eligibleBossVariations(mapId, catalog = MONSTER_CATALOG, rules =
   return eligibleVariations(mapId, catalog, rules).filter(({ variation }) => variation.weapon.damageTypes.includes(type));
 }
 export function validateMonsters(catalog, rules) {
-  const ids = new Set(), types = new Set(Object.keys(EQUIPMENT_CATALOG.damageTypes));
+  const typeOrders = new Set(), ids = new Set(), types = new Set(Object.keys(EQUIPMENT_CATALOG.damageTypes));
   if (!catalog.length || rules.version !== 1) throw Error('Missing monster templates or unsupported encounter version');
   for (const monster of catalog) {
+    if (!Number.isSafeInteger(monster.codexOrder) || monster.codexOrder <= 0) throw Error(`Invalid monster codexOrder: ${monster.id}`);
+    if (typeOrders.has(monster.codexOrder)) throw Error(`duplicate monster codexOrder: ${monster.codexOrder}`);
+    typeOrders.add(monster.codexOrder);
+    const variationOrders = new Set();
     if (!/^[a-z0-9_-]+$/.test(monster.id) || !Number.isInteger(monster.hp) || monster.hp < 1 || !Number.isInteger(monster.hpGrowth) || monster.hpGrowth < 0 || !Number.isFinite(monster.hpConPercent) || monster.hpConPercent < 0 || typeof monster.description !== 'string') throw Error('Invalid monster base');
     for (const key of BASE_STATS) if (!Number.isInteger(monster.A?.[key]) || monster.A[key] < 0) throw Error('Invalid monster attribute');
     for (const key of ['ACC','DEF','REF','FOR','WIL']) if (!Number.isInteger(monster.B?.[key])) throw Error('Invalid monster defense');
     if (!Array.isArray(monster.variation) || !monster.variation.length) throw Error('Missing monster variations');
     for (const variation of monster.variation) {
+      if (!Number.isSafeInteger(variation.codexOrder) || variation.codexOrder <= 0) throw Error(`Invalid variation codexOrder: ${monster.id}/${variation.id}`);
+      if (variationOrders.has(variation.codexOrder)) throw Error(`duplicate variation codexOrder: ${monster.id}/${variation.codexOrder}`);
+      variationOrders.add(variation.codexOrder);
       if (!/^[a-z0-9_-]+$/.test(variation.id) || ids.has(variation.id) || !variation.name || !Array.isArray(variation.skills)) throw Error('Invalid or duplicate variation');
       ids.add(variation.id);
       for (const path of [variation.img_path, variation.icon_path]) if (!safePath(path) || !existsSync(new URL(path, root))) throw Error(`Missing monster image: ${path}`);
@@ -43,7 +51,7 @@ export function validateMonsters(catalog, rules) {
     const region = rules.regions[id];
     if (!region || !Number.isInteger(region.minLevel) || !Number.isInteger(region.maxLevel) || region.minLevel < 1 || region.maxLevel < region.minLevel || !Array.isArray(region.excludedDamageTypes) || region.excludedDamageTypes.some(type => !types.has(type))) throw Error(`Invalid monster region: ${id}`);
     if (!eligibleVariations(id, catalog, rules).length) throw Error(`No eligible monsters for ${id}`);
-    if (id !== 'village' && (!types.has(region.bossDamageType) || !eligibleBossVariations(id, catalog, rules).length)) throw Error(`Invalid regional boss: ${id}`);
+    if (region.boss && (!types.has(region.bossDamageType) || !eligibleBossVariations(id, catalog, rules).length)) throw Error(`Invalid regional boss: ${id}`);
   }
   const r = rules.rewards;
   if (!r || !Number.isInteger(r.equalLevelKills) || r.equalLevelKills < 1 || !Number.isFinite(r.xpBonusPerLevel) || r.xpBonusPerLevel < 0 || !Number.isInteger(r.maxBonusLevels) || r.maxBonusLevels < 0 || !Number.isFinite(r.goldBase) || r.goldBase < 0 || !Number.isFinite(r.goldPerLevel) || r.goldPerLevel < 0 || EQUIPMENT_CATALOG.grades.some(g => !Number.isFinite(r.goldMultipliers?.[g.id]) || r.goldMultipliers[g.id] <= 0)) throw Error('Invalid monster rewards');
@@ -79,7 +87,7 @@ function buildMonster({ monster, variation }, level, grade, rng, mapId, config) 
   return { ...values, id: randomUUID(), generationVersion: 1, boss: false, monsterId: monster.id, variationId: variation.id,
     name: grade.id === 'normal' ? variation.name : `${grade.name} ${variation.name}`, variationName: variation.name,
     description: monster.description, img_path: variation.img_path, icon_path: variation.icon_path,
-    level, gradeId: grade.id, gradeName: grade.name, attributes, allocatedAttributes,
+    level, levelBonusApplied: levelCombatBonus(level), gradeId: grade.id, gradeName: grade.name, attributes, allocatedAttributes,
     hp: values.maxHp, weapon, armor, damageTypes: [...weapon.damageTypes], hitDefense: weapon.hitDefense,
     statusHpBase: monster.hp + monster.hpGrowth * (level - 1),
     skills: variation.skills.length ? structuredClone(variation.skills) : ({ slime: ['weakening-strike'], golem: ['constitution-inspiration'], harpy: ['binding-strike'], ghost: ['mind-fog'] }[monster.id] || []), ...(variation.attackName ? { attackName: variation.attackName } : {}), mapId };
@@ -106,4 +114,26 @@ export function recordMonsterEncounter(state, enemy) {
   if (!entry.maps.includes(enemy.mapId)) entry.maps.push(enemy.mapId);
   entry.sample = structuredClone(enemy); // Keep the encountered specimen, not unencountered catalog entries.
   state.bestiary[enemy.variationId] = entry;
+}
+
+// Resolve display order from current templates, never from historical encounter samples.
+// Sorting a fresh entry array keeps saved discovery order and RNG candidate order intact.
+export function sortedBestiaryEntries(bestiary = {}, catalog = MONSTER_CATALOG) {
+  const orders = new Map(catalog.flatMap(monster => monster.variation.map(variation =>
+    [variation.id, [monster.codexOrder, variation.codexOrder]])));
+  return Object.entries(bestiary).sort(([a], [b]) => {
+    const left = orders.get(a) || [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+    const right = orders.get(b) || [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+    return left[0] - right[0] || left[1] - right[1] || (a < b ? -1 : a > b ? 1 : 0);
+  });
+}
+
+// Saved specimens store derived stats; adjust only the newly introduced level term.
+export function migrateMonsterLevelBonuses(state) {
+  for (const enemy of [state.enemy, ...Object.values(state.bestiary || {}).map(entry => entry.sample)]) {
+    if (!enemy || !Number.isSafeInteger(enemy.level) || enemy.level < 1) continue;
+    const bonus = levelCombatBonus(enemy.level), previous = enemy.levelBonusApplied || 0;
+    for (const key of ['ACC','DEF','REF','FOR','WIL']) enemy[key] = (enemy[key] || 0) + bonus - previous;
+    enemy.levelBonusApplied = bonus;
+  }
 }

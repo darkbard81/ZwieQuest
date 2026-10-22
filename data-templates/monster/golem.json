@@ -1,5 +1,6 @@
 {
   "golem": {
+    "codexOrder": 30,
     "hp": 50,
     "hpGrowth": 10,
     "hpConPercent": 5,
@@ -21,6 +22,7 @@
     "description": "마력으로 움직이는 암석과 수정의 골렘. 육중한 몸체와 속성을 품은 주먹, 수정 무기로 적을 짓누른다.",
     "variation": [
       {
+        "codexOrder": 10,
         "id": "slash_golem",
         "name": "골렘(베기)",
         "img_path": "public/assets/monster/golem/05-golem-slash.webp",
@@ -36,7 +38,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "FOR"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "slash_golem_armor",
@@ -54,6 +56,7 @@
         "attackName": "붉은 수정 대검"
       },
       {
+        "codexOrder": 20,
         "id": "pierce_golem",
         "name": "골렘(관통)",
         "img_path": "public/assets/monster/golem/07-golem-pierce.webp",
@@ -69,7 +72,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "FOR"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "pierce_golem_armor",
@@ -87,6 +90,7 @@
         "attackName": "보랏빛 수정 창"
       },
       {
+        "codexOrder": 30,
         "id": "blunt_golem",
         "name": "골렘(부수기)",
         "img_path": "public/assets/monster/golem/06-golem-blunt.webp",
@@ -102,7 +106,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "FOR"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "blunt_golem_armor",
@@ -120,6 +124,7 @@
         "attackName": "암석 대망치"
       },
       {
+        "codexOrder": 40,
         "id": "fire_golem",
         "name": "골렘(소각)",
         "img_path": "public/assets/monster/golem/01-golem-fire.webp",
@@ -135,7 +140,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "FOR"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "fire_golem_armor",
@@ -153,6 +158,7 @@
         "attackName": "용암 주먹"
       },
       {
+        "codexOrder": 50,
         "id": "cold_golem",
         "name": "골렘(동결)",
         "img_path": "public/assets/monster/golem/02-golem-cold.webp",
@@ -168,7 +174,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "FOR"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "cold_golem_armor",
@@ -186,6 +192,7 @@
         "attackName": "빙결 수정 폭발"
       },
       {
+        "codexOrder": 60,
         "id": "lightning_golem",
         "name": "골렘(충격)",
         "img_path": "public/assets/monster/golem/04-golem-lightning.webp",
@@ -201,7 +208,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "FOR"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "lightning_golem_armor",
@@ -219,6 +226,7 @@
         "attackName": "뇌광 주먹"
       },
       {
+        "codexOrder": 70,
         "id": "corrosion_golem",
         "name": "골렘(부식)",
         "img_path": "public/assets/monster/golem/03-golem-corrosion.webp",
@@ -234,7 +242,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "FOR"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "corrosion_golem_armor",

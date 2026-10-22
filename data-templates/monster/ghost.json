@@ -1,5 +1,6 @@
 {
   "ghost": {
+    "codexOrder": 40,
     "hp": 50,
     "hpGrowth": 10,
     "hpConPercent": 5,
@@ -21,6 +22,7 @@
     "description": "원한과 마력이 형체를 이룬 유령. 혼불과 영체의 무기로 정신을 파고들며, 굳센 의지로 그 공격에 맞서야 한다.",
     "variation": [
       {
+        "codexOrder": 10,
         "id": "slash_ghost",
         "name": "유령(베기)",
         "img_path": "public/assets/monster/ghost/05-ghost-slash.webp",
@@ -36,7 +38,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "WIL"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "slash_ghost_armor",
@@ -54,6 +56,7 @@
         "attackName": "붉은 영혼검"
       },
       {
+        "codexOrder": 20,
         "id": "pierce_ghost",
         "name": "유령(관통)",
         "img_path": "public/assets/monster/ghost/07-ghost-pierce.webp",
@@ -69,7 +72,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "WIL"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "pierce_ghost_armor",
@@ -87,6 +90,7 @@
         "attackName": "보랏빛 영혼창"
       },
       {
+        "codexOrder": 30,
         "id": "blunt_ghost",
         "name": "유령(부수기)",
         "img_path": "public/assets/monster/ghost/06-ghost-blunt.webp",
@@ -102,7 +106,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "WIL"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "blunt_ghost_armor",
@@ -120,6 +124,7 @@
         "attackName": "망령의 강타"
       },
       {
+        "codexOrder": 40,
         "id": "fire_ghost",
         "name": "유령(소각)",
         "img_path": "public/assets/monster/ghost/01-ghost-fire.webp",
@@ -135,7 +140,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "WIL"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "fire_ghost_armor",
@@ -153,6 +158,7 @@
         "attackName": "혼불 폭발"
       },
       {
+        "codexOrder": 50,
         "id": "cold_ghost",
         "name": "유령(동결)",
         "img_path": "public/assets/monster/ghost/02-ghost-cold.webp",
@@ -168,7 +174,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "WIL"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "cold_ghost_armor",
@@ -186,6 +192,7 @@
         "attackName": "빙령의 한기"
       },
       {
+        "codexOrder": 60,
         "id": "lightning_ghost",
         "name": "유령(충격)",
         "img_path": "public/assets/monster/ghost/04-ghost-lightning.webp",
@@ -201,7 +208,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "WIL"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "lightning_ghost_armor",
@@ -219,6 +226,7 @@
         "attackName": "뇌령의 번개"
       },
       {
+        "codexOrder": 70,
         "id": "corrosion_ghost",
         "name": "유령(부식)",
         "img_path": "public/assets/monster/ghost/03-ghost-corrosion.webp",
@@ -234,7 +242,7 @@
           "damageMax": 10,
           "ACC": -1,
           "PEN": 5,
-          "hitDefense": "WIL"
+          "hitDefense": "DEF"
         },
         "armor": {
           "id": "corrosion_ghost_armor",

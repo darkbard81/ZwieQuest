@@ -70,7 +70,7 @@ export function generateEquipment({ slot, rng, gradeId, templateId, specials = t
   const types = Object.keys(catalog.damageTypes).filter(d => d !== 'raw');
   if (slot === 'weapon') {
     item.weaponCategory = t.weaponCategory; item.actionSpeedPenaltyRate = catalog.weaponCategories[t.weaponCategory].actionSpeedPenaltyRate; item.weaponBalanceRulesVersion = catalog.weaponBalanceRulesVersion;
-    item.hitDefense = t.hitDefense; item.damageTypes = [...t.damageTypes];
+    item.hitDefense = 'DEF'; item.damageTypes = [...t.damageTypes];
     const raw = t.damageTypes.includes('raw');
     item.stats.ACC = (t.ACC || 0) + g.ACC;
     if (raw) item.fixedDamage = t.fixedDamage;
@@ -106,8 +106,7 @@ export function rollWeaponDamage(weapon, rng) {
 
 // Old classId metadata remains stored for compatibility, but is never an equip gate.
 export function weaponDefense(item) {
-  if (!item) return 'DEF';
-  return item.hitDefense || EQUIPMENT_CATALOG.weapons.find(t => t.id === item.templateId)?.hitDefense || (item.icon === 'staff' ? 'WIL' : 'DEF');
+  return 'DEF';
 }
 export function migrateArmorSpeed(inventory) {
   for (const item of inventory) if (item.slot === 'armor') {
@@ -157,4 +156,14 @@ export function migrateLegacyEquipment(state, rng) {
     return { ...item, id: old.id };
   });
   return changed;
+}
+
+// Adopt universal weapon targeting without rerolling equipment or battle state.
+export function migrateWeaponDefenses(state) {
+  for (const item of state.inventory || []) if (item.slot === 'weapon') item.hitDefense = 'DEF';
+  for (const enemy of [state.enemy, ...Object.values(state.bestiary || {}).map(entry => entry.sample)]) {
+    if (!enemy) continue;
+    enemy.hitDefense = 'DEF';
+    if (enemy.weapon) enemy.weapon.hitDefense = 'DEF';
+  }
 }

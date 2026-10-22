@@ -37,12 +37,12 @@ test('grades share equipment bonuses and exact weights, normal omits name prefix
  }
  assert.deepEqual(Object.values(counts),[60,25,10,4,1]);
 });
-test('point allocation and derived HP, ACC and weighted defenses use template without level bonus',()=>{
+test('point allocation and derived HP, ACC and weighted defenses use template with level bonus',()=>{
  for(const map of ['village','volcano'])for(let level=0;level<=ENCOUNTER_CONFIG.regions[map].maxLevel-ENCOUNTER_CONFIG.regions[map].minLevel;level++)for(let attr=0;attr<6;attr++){
   const e=generateMonster(map,rngFor(0,level,0,attr));
   assert.equal(Object.values(e.allocatedAttributes).reduce((a,b)=>a+b,0),pointBudget(e.level));
-  assert.equal(e.hp,Math.floor((50+10*(e.level-1))*(100+5*e.CON)/100));assert.equal(e.maxHp,e.hp);assert.equal(e.ACC,9+e.PER);
-  assert.equal(e.DEF,10+e.RES);assert.equal(e.REF,10+2*e.DEX+2*e.PER);assert.equal(e.FOR,10+2*e.STR+2*e.CON);assert.equal(e.WIL,10+2*e.INT+2*e.RES);
+  assert.equal(e.hp,Math.floor((50+10*(e.level-1))*(100+5*e.CON)/100));assert.equal(e.maxHp,e.hp);assert.equal(e.ACC,9+e.PER+3*Math.floor(e.level/2));
+  assert.equal(e.DEF,10+e.RES+3*Math.floor(e.level/2));assert.equal(e.REF,10+2*e.DEX+2*e.PER+3*Math.floor(e.level/2));assert.equal(e.FOR,10+2*e.STR+2*e.CON+3*Math.floor(e.level/2));assert.equal(e.WIL,10+2*e.INT+2*e.RES+3*Math.floor(e.level/2));
  }
  const a=make(),b=make();b.character.level=99;b.character.attributes.STR=200;b.state.risk=20;b.state.step=10;a.beginBattle();b.beginBattle();
  for(const key of ['level','attributes','ACC','DEF','maxHp','gradeId','variationId'])assert.deepEqual(a.state.enemy[key],b.state.enemy[key]);
@@ -95,52 +95,52 @@ test('bestiary groups by encountered variation, records grade/level/history and 
  restored.rng=()=>9999;restored.reward('victory');assert.equal(restored.state.bestiary[secondId].defeats,1);assert.equal(restored.state.bestiary[firstId].defeats,0);
  assert.equal(first.maxHp,50);assert.deepEqual(make().state.bestiary,{});assert.deepEqual(resetGameProgress(restored,false).state.bestiary,{});
 });
-test('generated bosses enter the bestiary, keep boss rewards, and old in-flight enemies stay unchanged',()=>{
+test('generated bosses enter the bestiary, keep boss rewards, and old in-flight enemies preserve stats while adopting DEF',()=>{
  const g=make();g.state.mapId='volcano';g.beginBattle(true);assert.equal(g.state.enemy.generationVersion,1);const id=g.state.enemy.variationId;assert.equal(g.state.bestiary[id].encounters,1);g.reward('boss');assert.equal(g.state.lastReward.xp,config.balance.bossXP);assert.equal(g.state.bestiary[id].defeats,1);
- g.state.enemy={name:'old',hp:7,maxHp:12,DEX:1,base:9};const h=new Game(config,structuredClone(g.state));assert.deepEqual(h.state.enemy,{...g.state.enemy,...actionSpeed(g.state.enemy.DEX)});assert.deepEqual(h.state.bestiary,g.state.bestiary);
+ g.state.enemy={name:'old',hp:7,maxHp:12,DEX:1,base:9};const h=new Game(config,structuredClone(g.state));assert.deepEqual(h.state.enemy,{...g.state.enemy,hitDefense:'DEF',...actionSpeed(g.state.enemy.DEX)});assert.deepEqual(h.state.bestiary,g.state.bestiary);
 });
 
-test('all seven harpy attacks use Reflex in generated combat and retain their names',()=>{
+test('all seven harpy attacks use Deflection in generated combat and retain their names',()=>{
  const pool=eligibleVariations('village'),harpies=pool.filter(({monster})=>monster.id==='harpy');
  assert.equal(harpies.length,7);
  assert.equal(new Set(harpies.flatMap(({variation})=>variation.weapon.damageTypes)).size,7);
  for(const {variation:v} of harpies){
   const g=make();g.character.attributes.DEX=7;g.character.attributes.RES=1;
   g.rng=rngFor(pool.findIndex(({variation})=>variation.id===v.id));g.beginBattle();
-  assert.equal(g.state.enemy.monsterId,'harpy');assert.equal(g.state.enemy.hitDefense,'REF');assert.equal(g.state.enemy.weapon.hitDefense,'REF');
+  assert.equal(g.state.enemy.monsterId,'harpy');assert.equal(g.state.enemy.hitDefense,'DEF');assert.equal(g.state.enemy.weapon.hitDefense,'DEF');
   assert.match(g.state.enemy.name,/하피/);assert.equal(g.state.enemy.attackName,v.weapon.name);
   const hero=stats(g.state,config);assert.notEqual(hero.REF,hero.DEF);
   g.rng=()=>0;g.battleAction('enemy');
-  assert.equal(g.state.battle.lastHit.target,'REF');assert.equal(g.state.battle.lastHit.calculation.defense,hero.REF);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
+  assert.equal(g.state.battle.lastHit.target,'DEF');assert.equal(g.state.battle.lastHit.calculation.defense,hero.DEF);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
  }
 });
 
-test('all seven golem attacks use Fortitude in generated combat and retain their names',()=>{
+test('all seven golem attacks use Deflection in generated combat and retain their names',()=>{
  const pool=eligibleVariations('village'),golems=pool.filter(({monster})=>monster.id==='golem');
  assert.equal(golems.length,7);
  assert.equal(new Set(golems.flatMap(({variation})=>variation.weapon.damageTypes)).size,7);
  for(const {variation:v} of golems){
   const g=make();g.character.attributes.STR=7;g.character.attributes.RES=1;
   g.rng=rngFor(pool.findIndex(({variation})=>variation.id===v.id));g.beginBattle();
-  assert.equal(g.state.enemy.monsterId,'golem');assert.equal(g.state.enemy.hitDefense,'FOR');assert.equal(g.state.enemy.weapon.hitDefense,'FOR');
+  assert.equal(g.state.enemy.monsterId,'golem');assert.equal(g.state.enemy.hitDefense,'DEF');assert.equal(g.state.enemy.weapon.hitDefense,'DEF');
   assert.match(g.state.enemy.name,/골렘/);assert.equal(g.state.enemy.attackName,v.weapon.name);
   const hero=stats(g.state,config);assert.notEqual(hero.FOR,hero.DEF);
   g.rng=()=>0;g.battleAction('enemy');
-  assert.equal(g.state.battle.lastHit.target,'FOR');assert.equal(g.state.battle.lastHit.calculation.defense,hero.FOR);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
+  assert.equal(g.state.battle.lastHit.target,'DEF');assert.equal(g.state.battle.lastHit.calculation.defense,hero.DEF);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
  }
 });
 
-test('all seven ghost attacks use Will in generated combat and retain their names',()=>{
+test('all seven ghost attacks use Deflection in generated combat and retain their names',()=>{
  const pool=eligibleVariations('village'),ghosts=pool.filter(({monster})=>monster.id==='ghost');
  assert.equal(ghosts.length,7);
  assert.equal(new Set(ghosts.flatMap(({variation})=>variation.weapon.damageTypes)).size,7);
  for(const {variation:v} of ghosts){
   const g=make();g.character.attributes.INT=7;g.character.attributes.RES=1;
   g.rng=rngFor(pool.findIndex(({variation})=>variation.id===v.id));g.beginBattle();
-  assert.equal(g.state.enemy.monsterId,'ghost');assert.equal(g.state.enemy.hitDefense,'WIL');assert.equal(g.state.enemy.weapon.hitDefense,'WIL');
+  assert.equal(g.state.enemy.monsterId,'ghost');assert.equal(g.state.enemy.hitDefense,'DEF');assert.equal(g.state.enemy.weapon.hitDefense,'DEF');
   assert.match(g.state.enemy.name,/유령/);assert.equal(g.state.enemy.attackName,v.weapon.name);
   const hero=stats(g.state,config);assert.notEqual(hero.WIL,hero.DEF);
   g.rng=()=>0;g.battleAction('enemy');
-  assert.equal(g.state.battle.lastHit.target,'WIL');assert.equal(g.state.battle.lastHit.calculation.defense,hero.WIL);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
+  assert.equal(g.state.battle.lastHit.target,'DEF');assert.equal(g.state.battle.lastHit.calculation.defense,hero.DEF);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
  }
 });

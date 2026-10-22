@@ -6,7 +6,7 @@ import { randomUUID } from 'node:crypto';
 import { createServer } from 'node:net';
 import { Game } from '../src/game.js';
 import { sortInventory } from '../public/inventory-order.js';
-import { treasureCardHTML } from '../public/treasure-view.js';
+import { treasureCardHTML, treasureListHTML } from '../public/treasure-view.js';
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
 const buy = g => g.command({ type: 'BUY_TREASURE', treasureId: 'welcome-title', price: -999, gold: 999 });
 test('free collectible is opt-in, account-owned, idempotent and survives character changes and restore', () => {
@@ -14,14 +14,14 @@ test('free collectible is opt-in, account-owned, idempotent and survives charact
  assert.equal(g.state.inventory.length, 0); assert.equal(g.snapshot().treasureOffers[0].price, 0);
  assert.throws(() => g.command({ type: 'BUY_TREASURE', treasureId: 'forged', price: 0 }), /보물/);
  buy(g); const item = g.state.inventory[0], seq = g.state.eventSeq;
- assert.equal(item.name, '환영합니다'); assert.equal(item.slot, 'treasure'); assert.equal(g.state.gold, 0); assert.deepEqual(g.snapshot().treasureOffers, []);
+ assert.equal(item.name, '환영합니다'); assert.equal(item.slot, 'treasure'); assert.equal(g.state.gold, 0); assert.deepEqual(g.snapshot().treasureOffers.map(item => item.id), ['tutorial-introduction']);
  buy(g); assert.equal(g.state.eventSeq, seq); assert.equal(g.state.inventory.length, 1);
  g.create({ name: '첫째', appearanceId: 'warrior' }); const first = g.character;
  const second = g.create({ name: '둘째', appearanceId: 'wizard' }); g.selectCharacter(second.id);
  assert.equal(sortInventory(g.snapshot(), 'treasure', true)[0].id, item.id);
  g.retireCharacter(first.id, first.name); assert.ok(g.state.inventory.some(i => i.id === item.id));
  const restored = new Game(config, JSON.parse(JSON.stringify(g.state)), () => 0); buy(restored);
- assert.equal(restored.state.inventory.filter(i => i.slot === 'treasure').length, 1); assert.equal(restored.state.gold, 0); assert.deepEqual(restored.snapshot().treasureOffers, []);
+ assert.equal(restored.state.inventory.filter(i => i.slot === 'treasure').length, 1); assert.equal(restored.state.gold, 0); assert.deepEqual(restored.snapshot().treasureOffers.map(item => item.id), ['tutorial-introduction']);
 });
 test('collectible cannot equip or sell and never enters bulk sale or combat stats', () => {
  const g = new Game(config, null, () => 0); g.create({ name: '시험', appearanceId: 'warrior' });
@@ -47,9 +47,54 @@ test('HTTP purchase enforces account isolation, duplicate retries, restart persi
   const a=await req('/api/auth/register',{username:'treasure_alpha',password:'123456'}), b=await req('/api/auth/register',{username:'treasure_beta',password:'123456'}); assert.equal(a.status,200);assert.equal(b.status,200);
   const [x,y]=await Promise.all([req('/api/command',command,a.cookie),req('/api/command',{...command,requestId:randomUUID()},a.cookie)]);assert.equal(x.status,200);assert.equal(y.status,200);
   assert.equal((await req('/api/command',command,a.cookie)).body.duplicate,true);
-  let saved=(await req('/api/state',null,a.cookie)).body.state;assert.equal(saved.inventory.length,1);assert.equal(saved.gold,0);assert.equal(saved.treasureOffers.length,0);
-  const other=(await req('/api/state',null,b.cookie)).body.state;assert.equal(other.inventory.length,0);assert.equal(other.treasureOffers.length,1);
+  let saved=(await req('/api/state',null,a.cookie)).body.state;assert.equal(saved.inventory.length,1);assert.equal(saved.gold,0);assert.equal(saved.treasureOffers.length,1);
+  const other=(await req('/api/state',null,b.cookie)).body.state;assert.equal(other.inventory.length,0);assert.equal(other.treasureOffers.length,2);
   assert.equal((await req('/api/command',{type:'SELL',itemId:saved.inventory[0].id,requestId:randomUUID()},b.cookie)).status,409);
-  await stop();await start();saved=(await req('/api/state',null,a.cookie)).body.state;assert.equal(saved.inventory[0].slot,'treasure');assert.equal(saved.gold,0);assert.equal(saved.treasureOffers.length,0);
+  const tutorial=await req('/api/command',{type:'BUY_TREASURE',treasureId:'tutorial-introduction',requestId:randomUUID(),price:-999},a.cookie);
+  assert.equal(tutorial.status,200);assert.equal(tutorial.body.state.gold,0);assert.equal(tutorial.body.state.treasureOffers.length,0);
+  const art=await fetch(base+'/assets/treasures/tutorial-introduction-v1.webp');assert.equal(art.status,200);assert.equal(art.headers.get('content-type'),'image/webp');
+  assert.deepEqual(Buffer.from(await art.arrayBuffer()),readFileSync(new URL('../public/assets/treasures/tutorial-introduction-v1.webp',import.meta.url)));
+  await stop();await start();saved=(await req('/api/state',null,a.cookie)).body.state;assert.equal(saved.inventory.length,2);assert.equal(saved.gold,0);assert.equal(saved.treasureOffers.length,0);
+  assert.deepEqual(sortInventory(saved,'treasure').map(item=>item.id_sort),[10,20]);
  } finally { await stop();rmSync(dir,{recursive:true,force:true}); }
+});
+
+test('tutorial purchases and legacy owned items use current catalog order across ownership and restart', () => {
+ for (const order of [['tutorial-introduction','welcome-title'], ['welcome-title','tutorial-introduction']]) {
+  const g = new Game(config, null, () => 0);
+  assert.deepEqual(g.snapshot().treasureOffers.map(item => item.id_sort), [10,20]);
+  for (const treasureId of order) {
+   g.command({ type: 'BUY_TREASURE', treasureId });
+   const state = g.snapshot(), html = treasureListHTML(sortInventory(state,'treasure'),state.treasureOffers);
+   assert.ok(html.indexOf('<h3>환영합니다</h3>') < html.indexOf('<h3>01. 게임의 소개</h3>'));
+  }
+  assert.equal(g.state.gold,0); assert.equal(g.snapshot().treasureOffers.length,0);
+  const tutorial=g.state.inventory.find(item => item.templateId==='tutorial-introduction');
+  assert.equal(tutorial.imagePath,'/assets/treasures/tutorial-introduction-v1.webp');
+  g.command({ type:'BUY_TREASURE',treasureId:'tutorial-introduction' }); assert.equal(g.state.inventory.length,2);
+  // Old saves have no order; stale saved values must not override treasures.js.
+  delete g.state.inventory.find(item=>item.templateId==='welcome-title').id_sort;
+  tutorial.id_sort=-100;
+  const restored=new Game(config,structuredClone(g.state),()=>0), before=structuredClone(restored.state.inventory);
+  const sorted=sortInventory(restored.snapshot(),'treasure');
+  assert.deepEqual(sorted.map(item=>item.name),['환영합니다','01. 게임의 소개']);
+  assert.deepEqual(sorted.map(item=>item.id_sort),[10,20]);
+  assert.deepEqual(restored.state.inventory,before,'view must not rewrite saved inventory');
+ }
+});
+
+test('tutorial WebP uses lossy VP8 at original 4:3 resolution', () => {
+ const data=readFileSync(new URL('../public/assets/treasures/tutorial-introduction-v1.webp',import.meta.url));
+ assert.equal(data.toString('ascii',0,4),'RIFF'); assert.equal(data.toString('ascii',8,12),'WEBP');
+ let found=false;
+ for(let offset=12;offset+8<=data.length;) {
+  const type=data.toString('ascii',offset,offset+4),size=data.readUInt32LE(offset+4),start=offset+8;
+  assert.notEqual(type,'VP8L');
+  if(type==='VP8 ') {
+   assert.deepEqual([...data.subarray(start+3,start+6)],[0x9d,0x01,0x2a]);
+   assert.equal(data.readUInt16LE(start+6)&0x3fff,1448);assert.equal(data.readUInt16LE(start+8)&0x3fff,1086);found=true;
+  }
+  offset=start+size+(size&1);
+ }
+ assert.ok(found);
 });

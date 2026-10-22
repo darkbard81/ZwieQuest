@@ -110,7 +110,7 @@
       "damageMax": 13,
       "ACC": 2,
       "PEN": 3,
-      "hitDefense": "REF",
+      "hitDefense": "DEF",
       "weaponCategory": "light"
     },
     {
@@ -154,7 +154,7 @@
       "damageMax": 16,
       "ACC": 2,
       "PEN": 4,
-      "hitDefense": "REF",
+      "hitDefense": "DEF",
       "weaponCategory": "light"
     },
     {
@@ -211,7 +211,7 @@
       "damageMax": 21,
       "ACC": 0,
       "PEN": 3,
-      "hitDefense": "FOR",
+      "hitDefense": "DEF",
       "weaponCategory": "mace"
     },
     {
@@ -225,7 +225,7 @@
       "damageMax": 29,
       "ACC": -1,
       "PEN": 4,
-      "hitDefense": "FOR",
+      "hitDefense": "DEF",
       "weaponCategory": "heavy"
     },
     {
@@ -239,7 +239,7 @@
       "damageMax": 19,
       "ACC": 0,
       "PEN": 3,
-      "hitDefense": "REF",
+      "hitDefense": "DEF",
       "weaponCategory": "spear"
     },
     {
@@ -268,7 +268,7 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "WIL",
+      "hitDefense": "DEF",
       "weaponCategory": "staff"
     },
     {
@@ -282,7 +282,7 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "WIL",
+      "hitDefense": "DEF",
       "weaponCategory": "staff"
     },
     {
@@ -296,7 +296,7 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "WIL",
+      "hitDefense": "DEF",
       "weaponCategory": "staff"
     },
     {
@@ -310,7 +310,7 @@
       "damageMax": 18,
       "ACC": 0,
       "PEN": 2,
-      "hitDefense": "WIL",
+      "hitDefense": "DEF",
       "weaponCategory": "staff"
     }
   ],

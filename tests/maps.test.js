@@ -121,7 +121,7 @@ test('regional boss battle rewards once and returns HOME; checkpoint passage rec
  const map=g.state.maps.snow;const path=route(map,map.terminalIds[0]);
  for(let i=0;i<path.length;i++){g.command({characterId: g.character?.id, type:'CHOOSE',direction:path[i],choiceId:g.state.choiceId});g.advance();if(i===path.length-1)break;while(['BATTLE','TREASURE'].includes(g.state.phase))g.advance();}
  assert.equal(g.state.enemy.boss,true);assert.equal(g.state.currentNodeId,map.terminalIds[0]);assert.equal(g.state.step,10);
- g.character.hp=10000;g.state.enemy.hp=1;g.state.battle.actor='hero';g.state.battle.attacks=0;g.battleAction('hero');assert.equal(g.state.phase,'TREASURE');assert.equal(g.state.bossDefeats,1);
+ g.character.hp=10000;g.state.enemy.hp=1;g.state.enemy.DEF=-100;g.state.battle.actor='hero';g.state.battle.attacks=0;g.battleAction('hero');assert.equal(g.state.phase,'TREASURE');assert.equal(g.state.bossDefeats,1);
  const gold=g.state.gold,items=g.state.inventory.length,seq=g.state.eventSeq;g.reward('boss');assert.equal(g.state.gold,gold);assert.equal(g.state.inventory.length,items);assert.equal(g.state.eventSeq,seq);
  g.advance();assert.equal(g.state.phase,'RETURN_HOME');g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.state.mapId,'village');assert.equal(g.state.currentNodeId,g.state.maps.village.rootId);g.advance();assert.equal(g.state.mapId,'village');assert.equal(g.state.checkpointHistory.length,1);
 });

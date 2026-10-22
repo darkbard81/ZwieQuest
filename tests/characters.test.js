@@ -10,10 +10,10 @@ const make=()=>new Game(config,null,()=>0);
 const create=(g,name='모험가',appearanceId='warrior')=>g.create({name,appearanceId});
 const cmd=(g,type,fields={})=>g.command({type,characterId:g.character?.id,...fields});
 
-test('account starts at inn with no characters, no auto departure; 1 to 3 characters get exclusive starter gear and skills',()=>{
+test('account starts at inn with no characters, no auto departure; 1 to 3 characters get exclusive starter gear and shared starter skills',()=>{
  const g=make();for(let n=0;n<20;n++)g.tick(100000,1.5);assert.equal(g.state.phase,'HOME');assert.equal(g.state.run,0);assert.equal(g.snapshot().activeCharacterId,null);
  for(let n=0;n<3;n++){const c=create(g,'동일 외형 '+n);assert.match(c.id,/^[0-9a-f-]{36}$/);assert.equal(c.level,1);assert.deepEqual(Object.values(c.attributes),[0,0,0,0,0,0]);assert.equal(remainingPoints(c),10);assert.equal(c.hp,50);assert.equal(c.skills.length,1);assert.equal(c.skillSlots[0],c.skills[0].id);}
- assert.equal(new Set(g.state.characters.flatMap(c=>[...Object.values(c.equipment),...c.skills.map(i=>i.id)])).size,9);
+ assert.equal(new Set(g.state.characters.flatMap(c=>[...Object.values(c.equipment),...c.skills.map(i=>i.id)])).size,7);
  for(const c of g.state.characters){const armor=g.state.inventory.find(i=>i.id===c.equipment.armor);assert.equal(armor.templateId,'robe');assert.equal(armor.name,'로브');assert.equal(armor.stats.AR,3);assert.equal(armor.stats.DEX,undefined);}
  assert.equal(g.state.inventory.length,6);assert.ok(g.state.inventory.every(i=>['dagger','robe'].includes(i.templateId)&&i.gradeId==='normal'&&!i.special));
  assert.throws(()=>create(g,'4명'),/최대 3/);assert.equal(g.state.characters.length,3);assert.equal(g.state.inventory.length,6);
@@ -35,13 +35,13 @@ test('common stats use invested plus equipped attributes, base defenses and ACC 
  const g=make();create(g,'first','warrior');const base=stats(g.state,config);g.character.equipment={};let st=stats(g.state,config);
  for(const k of ['ACC','DEF','REF','FOR','WIL'])assert.equal(st[k],10,k);assert.equal(st.maxHp,50);
  for(const stat of BASE_STATS)cmd(g,'ALLOCATE_STAT',{stat});g.character.level=10;st=stats(g.state,config);
- assert.equal(st.ACC,11);assert.equal(st.DEF,11);for(const k of ['REF','FOR','WIL'])assert.equal(st[k],14);assert.equal(st.maxHp,147);
+ assert.equal(st.ACC,26);assert.equal(st.DEF,26);for(const k of ['REF','FOR','WIL'])assert.equal(st[k],29);assert.equal(st.maxHp,147);
  g.character.appearanceId='wizard';assert.deepEqual(stats(g.state,config),st);assert.equal(base.DEX,0);assert.equal(base.REF,10);assert.equal(base.AR,3);
 });
-test('selected character alone gains XP, retains HP/skills/cooldowns and cannot use another character skill',()=>{
+test('selected character alone gains XP, retains HP/settings and can equip shared skills',()=>{
  const g=make(),a=create(g,'첫째'),b=create(g,'둘째');a.hp=3;a.skillCooldowns.heal={readyAt:9999999999999};const before=structuredClone(a);
  cmd(g,'SELECT_CHARACTER',{characterId:b.id});assert.deepEqual(a,before);const aBefore=structuredClone(a);b.hp=2;g.state.risk=0;g.reward('victory');assert.ok(b.xp>0);assert.deepEqual(a,aBefore);assert.equal(b.hp,2);
- assert.throws(()=>cmd(g,'SELECT_CHARACTER',{characterId:a.id}),/여관/);assert.throws(()=>cmd(g,'EQUIP',{itemId:a.skills[0].id}),/없는 아이템/);
+ assert.throws(()=>cmd(g,'SELECT_CHARACTER',{characterId:a.id}),/여관/);assert.doesNotThrow(()=>cmd(g,'EQUIP',{itemId:a.skills[0].id}));assert.equal(b.skillSlots[0],a.skillSlots[0]);
  g.phase('HOME',1);cmd(g,'SELECT_CHARACTER',{characterId:a.id});assert.deepEqual(a,before);assert.equal(g.snapshot().inventory.filter(i=>i.slot==='skill').length,1);cmd(g,'DEPART');assert.equal(a.hp,stats(g.state,config).maxHp);assert.equal(b.hp,2);
 });
 test('exclusive equipment, stale-character commands, foreign IDs, sale and retirement preserve shared possessions',()=>{
@@ -65,7 +65,7 @@ test('legacy migration preserves active battle and common state, removes duplica
  Object.assign(old,{classId:'wizard',appearanceId:'wizard',level:a.level,xp:a.xp,hp:a.hp,equipment:a.equipment,skillSlots:a.skillSlots,skillGrants:a.skillGrants,skillCooldowns:a.skillCooldowns,inactiveClasses:{warrior:{level:4,xp:7,equipment:{...a.equipment}}}});old.inventory.push(...structuredClone(a.skills));
  const before=structuredClone(old),migrated=new Game(config,old),c=migrated.character;
  assert.equal(c.level,8);assert.equal(c.xp,19);assert.equal(c.hp,3);assert.deepEqual(c.equipment,before.equipment);assert.deepEqual(c.skillSlots,before.skillSlots);assert.deepEqual(c.skillCooldowns,{});assert.equal(remainingPoints(c),14);
- assert.equal(migrated.state.characters.length,2);assert.equal(migrated.state.characters[1].level,4);assert.deepEqual(migrated.state.characters[1].equipment,{});assert.notEqual(c.skills[0].id,migrated.state.characters[1].skills[0].id);
+ assert.equal(migrated.state.characters.length,2);assert.equal(migrated.state.characters[1].level,4);assert.deepEqual(migrated.state.characters[1].equipment,{});assert.equal(c.skills[0].id,migrated.state.characters[1].skills[0].id);
  for(const key of ['maps','path','gold','remaining','enemy','checkpointHistory','autoRoute','currentNodeId'])assert.deepEqual(migrated.state[key],before[key],key);
  assert.equal(migrated.state.battle.ap,undefined);assert.equal(migrated.state.battle.attacks,undefined);assert.deepEqual(migrated.state.battle.skillUseCounts,{heal:2});assert.equal(migrated.state.classId,undefined);
  assert.deepEqual(new Game(config,structuredClone(migrated.state),()=>{throw Error('No reroll');}).state,migrated.state);

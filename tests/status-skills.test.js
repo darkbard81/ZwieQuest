@@ -21,7 +21,7 @@ const records=g=>g.events.filter(e=>['hit','skill','status'].includes(e.type)).m
 
 test('30 enabled skills including 12 equipment masteries: two attacks for each defense, six inspirations, four utilities and real opaque icons',()=>{
  const enabled=SKILL_CATALOG.skills.filter(d=>d.enabled);assert.equal(enabled.length,30);assert.equal(enabled.filter(d=>d.effect.type==='status').length,6);
- for(const target of ['DEF','REF','FOR','WIL'])assert.equal(enabled.filter(d=>d.effect.defense===target).length,2);
+ for(const target of ['DEF','REF','FOR','WIL'])assert.equal(enabled.filter(d=>d.effect.statusDefense===target).length,2);
  for(const d of enabled){assert.equal(d.cooldown,undefined);assert.ok(existsSync(new URL(`../public${d.iconPath}`,import.meta.url)));assert.equal(d.perBattleLimit,d.activationMode==='toggle'?null:d.id==='heal'?2:1);}
  assert.deepEqual(enabled.filter(d=>['heal','mirror','cleanse','dispel'].includes(d.effect.type)).map(d=>d.effect.type).sort(),['cleanse','dispel','heal','mirror']);
 });
@@ -50,10 +50,10 @@ test('all timed effects snapshot INT, Acute and hostile duration, Resolve decays
  clearStatuses(g.state.battle,'hero','buff');put(g,'hero','resolute',10000);put(g,'hero','quick',10000);advanceStatuses(g.state.battle,1000);assert.equal(g.state.battle.statuses.hero[0].remainingMs,9500);assert.equal(g.state.battle.statuses.hero[1].remainingMs,9500);
  put(g,'hero','frightened');put(g,'hero','frightened');advanceStatuses(g.state.battle,1000);assert.equal(g.state.battle.statuses.hero.find(s=>s.id==='quick').remainingMs,7500);
 });
-test('all eight attacks use their own defense and bonuses, consume once on execution, apply only on hit/crit, replace the normal attack',()=>{
+test('all eight attacks use DEF then their status defense and bonuses, consume once on execution, apply only on hit/crit, replace the normal attack',()=>{
  for(const def of SKILL_CATALOG.skills.filter(s=>s.effect.type==='attack'))for(const roll of [1,20]){
   const g=make();learn(g,def.id);g.rng=n=>n===20?roll-1:0;const baseAcc=stats(g.state,g.config).ACC;g.command(cmd(g,def.id));assert.equal(g.state.battle.skillUseCounts[def.id],undefined);assert.throws(()=>g.command(cmd(g,def.id)),/이미/);
-  g.battleAction('hero');const hit=g.state.battle.lastHit;assert.equal(hit.target,def.effect.defense);assert.equal(hit.skillId,def.id);assert.equal(hit.calculation.acc,baseAcc+def.effect.accuracyBonus);assert.equal(g.events.filter(e=>e.type==='hit').length,1);assert.equal(g.state.battle.skillUseCounts[def.id],1);
+  g.battleAction('hero');const hit=g.state.battle.lastHit;assert.equal(hit.target,'DEF');if(hit.statusCheck)assert.equal(hit.statusCheck.target,def.effect.statusDefense);assert.equal(hit.skillId,def.id);assert.equal(hit.calculation.acc,baseAcc+def.effect.accuracyBonus);assert.equal(g.events.filter(e=>e.type==='hit').length,1);assert.equal(g.state.battle.skillUseCounts[def.id],1);
   assert.equal(ids(g,'enemy').includes(def.effect.statusId),hit.tier>=2);assert.equal(g.state.battle.pendingSkill,undefined);assert.equal(g.state.battle.combatants.hero.actionSeq,1);
   assert.throws(()=>g.command(cmd(g,def.id)),/소진/);
  }
@@ -110,10 +110,10 @@ test('battle exit, death and restored ended battle discard statuses and pending 
  for(const finish of [g=>g.reward('victory'),g=>g.phase('DOWNED',1000),g=>g.beginBattle()]){const g=make();put(g,'hero','quick');g.command(cmd(g,'heal'));finish(g);assert.equal(g.state.battle?.pendingSkill,undefined);assert.equal(g.state.battle?.statuses?.hero.length||0,0);}
  const g=make();put(g,'hero','quick');g.character.hp=0;const restored=new Game(g.config,structuredClone(g.state));assert.deepEqual(ids(restored,'hero'),[]);
 });
-test('skill-category treasure grants every unlearned skill exactly once to current character, no sale or implicit equip; all learned falls back to gold',()=>{
+test('skill-category treasure grants every unlearned skill exactly once to the account, no sale or implicit equip; all learned falls back to gold',()=>{
  const g=make();g.config.probabilities={dropPercent:100,weaponWeight:0,armorWeight:0,charmWeight:0,skillWeight:1};g.phase('HOME',1000);const other=g.create({name:'다른 모험가',appearanceId:'warrior'});g.selectCharacter(g.state.characters[0].id);const slots=structuredClone(g.character.skillSlots);
  for(let i=0;i<29;i++){g.reward('treasure');assert.ok(g.state.lastReward.skillId);assert.equal(g.state.lastReward.goldOnly,false);}
- assert.equal(g.character.skills.length,30);assert.equal(new Set(g.character.skills.map(i=>i.templateId)).size,30);assert.deepEqual(g.character.skillSlots,slots);assert.equal(other.skills.length,1);
+ assert.equal(g.character.skills.length,30);assert.equal(new Set(g.character.skills.map(i=>i.templateId)).size,30);assert.deepEqual(g.character.skillSlots,slots);assert.equal(other.skills.length,30);assert.deepEqual(other.skills,g.character.skills);
  const gold=g.state.gold;g.reward('treasure');assert.equal(g.state.lastReward.goldOnly,true);assert.equal(g.character.skills.length,30);assert.ok(g.state.gold>gold);const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skills.length,30);
 });
 test('new monsters receive a limited skill, use it on third action, then return to basic attacks; saved old enemies are not granted abilities',()=>{

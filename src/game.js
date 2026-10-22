@@ -1,15 +1,16 @@
-import { buyTreasure, treasureOffers } from './treasures.js';
-import { initializeStatuses, modifiers, effectiveEnemy, applyStatus, consumeMirror, convertHit, nextStatusEvent, advanceStatuses, resolveStatusEvents, statusViews } from './status-effects.js';
+import { buyTreasure, treasureOffers, treasureItemView } from './treasures.js';
+import { statusDefinition, initializeStatuses, modifiers, effectiveEnemy, applyStatus, consumeMirror, convertHit, nextStatusEvent, advanceStatuses, resolveStatusEvents, statusViews } from './status-effects.js';
 import { randomInt, randomUUID } from 'node:crypto';
 import { CHARACTER_VERSION, MAX_CHARACTERS, activeCharacter, newCharacter, migrateCharacters, equipmentUsers, remainingPoints, allocatePoint } from './characters.js';
-import { attack, stats, statDetails } from './combat.js';
+import { attack, stats, statDetails, basicAttackRange, hitResult } from './combat.js';
 import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
-import { availableStarts, navigationPosition, routeTo, visibleTarget } from './navigation.js';
+import { REGIONS } from './regions.js';
+import { availableStarts, navigationPosition, routeTo, visibleTarget, initializeReservedRoute, navigationGoal } from './navigation.js';
 import { rollDropSlot } from './probabilities.js';
 import { rollEncounter } from './encounters.js';
-import { generateMonster, generateBoss, monsterRewards, recordMonsterEncounter } from './monsters.js';
-import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorSpeed, migrateWeaponBalance, migrateLegacyEquipment } from './equipment.js';
-import { skillDefinition, grantTreasureSkill, applySkillEffect, initializeSkills, initializeBattleSkills, skillItemView, equipSkill, useSkill, resolvePendingSkill, resolveAutoSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
+import { generateMonster, generateBoss, monsterRewards, recordMonsterEncounter, sortedBestiaryEntries, migrateMonsterLevelBonuses } from './monsters.js';
+import { EQUIPMENT_CATALOG, DAMAGE_NAMES, generateEquipment, rollWeaponDamage, chance, weaponDefense, migrateArmorSpeed, migrateWeaponBalance, migrateLegacyEquipment, migrateWeaponDefenses } from './equipment.js';
+import { skillDefinition, grantTreasureSkill, applySkillEffect, initializeSkills, initializeSharedSkills, initializeBattleSkills, skillItemView, equipSkill, useSkill, resolvePendingSkill, resolveAutoSkill, toggleSkill, maintainedSkillBonuses } from './skills.js';
 import { COMBAT_RULES_VERSION, DEFAULT_SPEED, enemyActionSpeed, newCombatants, migrateBattle, nextAction, advanceReadiness } from './action-speed.js';
 export const THEMES = Object.entries(MAP_DEFS).map(([id, def]) => ({ id, name: def.name, subtitle: def.subtitle }));
 export class Game {
@@ -26,12 +27,15 @@ export class Game {
       this.rememberExploration();
       if (!availableStarts(state).includes(state.departureMapId)) state.departureMapId = 'village';
       state.autoRoute ??= null;
+      initializeReservedRoute(state);
       // Keep geometry and in-flight encounters; only remove obsolete fixed assignments.
       for (const map of Object.values(state.maps)) for (const node of Object.values(map.nodes)) delete node.event;
       // Convert retired gear using the legacy appearance hint before removing class fields.
       migrateLegacyEquipment(state, this.rng);
       migrateArmorSpeed(state.inventory);
       const weaponBalanceChanged = migrateWeaponBalance(state.inventory);
+      migrateWeaponDefenses(state);
+      migrateMonsterLevelBonuses(state);
       const migrated = migrateCharacters(state);
       if (state.characters.length > MAX_CHARACTERS || (state.characters.length && !activeCharacter(state))) throw Error('잘못된 캐릭터 저장 상태입니다.');
       for (const character of state.characters) {
@@ -39,6 +43,7 @@ export class Game {
         const maxHp = statDetails(state, config, character).values.maxHp;
         character.hp = character.hp == null ? maxHp : Math.min(character.hp, maxHp);
       }
+      initializeSharedSkills(state);
       if (!state.characters.length) { state.activeCharacterId = null; state.homePaused = true; if (state.phase !== 'HOME') this.phase('HOME', config.homeMs); }
       if (migrated) this.log('character', '캐릭터별 성장으로 이전했습니다. 기존 성장과 소지품은 보존하고 능력치 포인트를 지급했습니다.');
       initializeBattleSkills(state.battle); initializeStatuses(state.battle);
@@ -55,7 +60,7 @@ export class Game {
       if (state.phase === 'HOME' && state.mapId !== 'village') this.nextChoice();
     }
   }
-  installMaps() { const s = this.state; s.maps = createMaps(this.rng); s.mapId = 'village'; s.departureMapId = 'village'; s.autoRoute = null; s.checkpointHistory = []; s.currentNodeId = s.maps.village.rootId; s.theme = 'village'; s.step = 0; s.path = []; s.exploredNodes = {}; this.rememberExploration(); s.bossDefeats = s.bossDefeats || 0; s.enemy = null; s.battle = null; }
+  installMaps() { const s = this.state; s.maps = createMaps(this.rng); s.mapId = 'village'; s.departureMapId = 'village'; s.autoRoute = null; s.reservedRoute = null; s.checkpointHistory = []; s.currentNodeId = s.maps.village.rootId; s.theme = 'village'; s.step = 0; s.path = []; s.exploredNodes = {}; this.rememberExploration(); s.bossDefeats = s.bossDefeats || 0; s.enemy = null; s.battle = null; }
   rememberExploration() {
     const s = this.state;
     s.exploredNodes ||= {};
@@ -76,7 +81,7 @@ export class Game {
   get character() { return activeCharacter(this.state); }
   createAccount() {
     this.state = { characterVersion: CHARACTER_VERSION, characters: [], activeCharacterId: null, homePaused: true,
-      progressId: randomUUID(), bestiary: {}, gold: 0, inventory: [], run: 0, step: 0, eventSeq: 0, version: 0,
+      progressId: randomUUID(), bestiary: {}, gold: 0, inventory: [], sharedSkills: [], run: 0, step: 0, eventSeq: 0, version: 0,
       completed: 0, victories: 0, chests: 0, theme: 'village', direction: 'right', combatRulesVersion: COMBAT_RULES_VERSION, path: [], lastSummary: null };
     this.installMaps(); this.phase('HOME', this.config.homeMs);
   }
@@ -97,6 +102,7 @@ export class Game {
     }
     initializeSkills({ characters: [character], activeCharacterId: character.id, battle:character.id===this.state.activeCharacterId?this.state.battle:null });
     s.characters.push(character);
+    initializeSharedSkills(s);
     character.hp = statDetails(s, this.config, character).values.maxHp;
     s.activeCharacterId ||= character.id; s.homePaused = true;
     this.log('character', `${character.name}이 여관에 도착했습니다. 능력치 포인트 10점을 자유롭게 배분하세요.`, { characterId: character.id });
@@ -135,7 +141,19 @@ export class Game {
     this.log('choice', '두 갈래 길을 만났습니다. 선택하지 않아도 모험은 계속됩니다.');
     this.followAutoRoute();
   }
+  clearReachedRoute() {
+    const s = this.state;
+    const reached = target => target?.mapId === s.mapId && target.nodeId === s.currentNodeId;
+    if (reached(s.autoRoute)) s.autoRoute = null;
+    if (reached(s.reservedRoute) && s.run >= s.reservedRoute.startRun) s.reservedRoute = null;
+  }
+  activateReservedRoute() {
+    const s = this.state, target = s.reservedRoute;
+    if (!target || s.run < target.startRun || target.mapId !== s.mapId) return;
+    if (routeTo(s.maps[s.mapId], s.currentNodeId, target.nodeId)?.length) s.autoRoute = { mapId: target.mapId, nodeId: target.nodeId };
+  }
   followAutoRoute() {
+    if (!this.state.autoRoute) this.activateReservedRoute();
     const s = this.state, target = s.autoRoute;
     if (!target) return false;
     const path = target.mapId === s.mapId ? routeTo(s.maps[s.mapId], s.currentNodeId, target.nodeId) : null;
@@ -149,6 +167,7 @@ export class Game {
     if (!s.checkpointHistory.some(c => c.mapId === region && c.nodeId === s.currentNodeId)) s.checkpointHistory.push({ mapId: region, nodeId: s.currentNodeId, firstPassedAt: Date.now() });
     s.step = 0; s.path = []; s.enemy = null; s.battle = null;
     this.rememberExploration();
+    this.clearReachedRoute();
     this.log('checkpoint', `${MAP_DEFS[region].name}에 도착했습니다. 다음 여관 출발 지역으로 선택할 수 있습니다.`);
     this.nextChoice();
   }
@@ -226,18 +245,25 @@ export class Game {
     const targetActor=am.selfAttack?actor:(isHero?'enemy':'hero'),defender=targetActor==='hero'?hero:enemy;
     const weapon=isHero?s.inventory.find(i=>i.id===this.character.equipment.weapon):enemy.weapon;
     const modern=weapon&&Array.isArray(weapon.damageTypes),raw=modern&&weapon.damageTypes.includes('raw');
-    const target=skill?.effect.defense||(isHero?weaponDefense(weapon):(enemy.hitDefense||'DEF'));
+    const target='DEF';
+    const accuracy=attacker.ACC+(isHero?maintainedSkillBonuses(s).ACC:0)+(skill?.effect.accuracyBonus||0);
     const legacyMagic=weapon?.icon==='staff';
     const base=modern?(raw?weapon.fixedDamage:rollWeaponDamage(weapon,this.rng)):isHero?(weapon?(legacyMagic?tune.legacyStaffBasic:tune.legacySwordBasic)+hero.power:1):enemy.base;
     const damageTypes=modern?weapon.damageTypes:isHero?[!weapon?'blunt':legacyMagic?'fire':'slash']:(enemy.damageTypes||['blunt']);
-    const result=attack({roll:this.rng(20)+1,acc:attacker.ACC+(isHero?maintainedSkillBonuses(s).ACC:0)+(skill?.effect.accuracyBonus||0),defense:defender[target],str:attacker.STR,base,
+    const result=attack({roll:this.rng(20)+1,acc:accuracy,defense:defender[target],str:attacker.STR,base,
       pen:attacker.PEN+(skill?.effect.penetrationBonus||0),ar:defender.AR,damageTypes,typeModifiers:defender.typeModifiers,
       damageRate:modern?weapon.damageRate||0:0,fixedDamage:raw?weapon.fixedDamage:undefined,skillDamageMultiplier:skill?.effect.damageMultiplier||1,masteryDamageRate:isHero?(maintainedSkillBonuses(s).damageRate||0):0,
       transformHit:hit=>convertHit(hit,am,modifiers(b,targetActor),this.rng)});
     const recipient=targetActor==='hero'?this.character:s.enemy;recipient.hp=Math.max(0,recipient.hp-result.damage);
     if(targetActor!==actor && result.tier>=2)consumeMirror(b,targetActor);
     if(skill && result.tier>=2 && recipient.hp>0) {
-      result.statusResult=applyStatus(b,targetActor,skill.effect.statusId,skill.effect.durationMs,attacker,actor,recipient.statusResistance||{},skill.skillId,defender);
+      const statusTarget=skill.effect.statusDefense;
+      // A second accuracy roll decides only the rider; weapon-hit conversions,
+      // damage, mirror depletion, interrupt and action costs occur only once.
+      result.statusCheck={...hitResult(this.rng(20)+1,accuracy,defender[statusTarget]),acc:accuracy,defense:defender[statusTarget],target:statusTarget,statusId:skill.effect.statusId,statusName:statusDefinition(skill.effect.statusId).name};
+      result.statusResult=result.statusCheck.tier>=2
+        ? applyStatus(b,targetActor,skill.effect.statusId,skill.effect.durationMs,attacker,actor,recipient.statusResistance||{},skill.skillId,defender)
+        : {applied:false,reason:'miss'};
     }
     if(targetActor!==actor && result.tier===3 && am.interruptOnCrit && !modifiers(b,targetActor).interruptImmune && recipient.hp>0) {
       b.combatants[targetActor].readiness=0;
@@ -291,11 +317,12 @@ export class Game {
         s.run++; s.runGold = s.gold; s.step = 0; s.path = []; s.pendingBossReturn = false;
         s.theme = s.mapId; s.currentNodeId = s.maps[s.mapId].rootId;
         this.rememberExploration();
+        this.clearReachedRoute();
         this.log('depart', `${s.run}번째 여행 · ${MAP_DEFS[s.mapId].name} 출발점에서 모험을 시작합니다.`); this.nextChoice(); break;
       case 'CHOICE_WAIT': if (!this.followAutoRoute()) this.choose(this.rng(2) ? 'right' : 'left', true); break;
       case 'TRAVEL': {
         const node = s.maps[s.mapId].nodes[s.currentNodeId];
-        if (s.autoRoute?.mapId === s.mapId && s.autoRoute.nodeId === node.id) s.autoRoute = null;
+        this.clearReachedRoute();
         if (node.kind === 'deadend') this.finish(false);
         else if (node.kind === 'exit') this.enterRegion(node.region);
         else if (node.kind === 'boss') this.beginBattle(true);
@@ -389,12 +416,21 @@ export class Game {
       const position = navigationPosition(s), map = s.maps[position.mapId];
       if (cmd.mapId !== position.mapId || !map.nodes[cmd.nodeId] || !visibleTarget(s, position.mapId, cmd.nodeId)) throw Error('지도에 표시된 노드를 선택하세요.');
       const path = routeTo(map, position.nodeId, cmd.nodeId);
-      if (!path?.length) throw Error('현재 위치보다 앞으로 이어지는 노드를 선택하세요.');
-      s.autoRoute = { mapId: position.mapId, nodeId: cmd.nodeId };
-      this.log('map', '자동 이동 목표를 선택했습니다. 도착할 때까지 갈림길 방향을 자동으로 선택합니다.');
-      if (s.phase === 'CHOICE_WAIT') this.followAutoRoute();
+      if (position.nodeId === cmd.nodeId) throw Error('현재 위치가 아닌 목적지를 선택하세요.');
+      if (path?.length) {
+        s.reservedRoute = null;
+        s.autoRoute = { mapId: position.mapId, nodeId: cmd.nodeId };
+        this.log('map', '자동 이동 목표를 선택했습니다. 도착할 때까지 갈림길 방향을 자동으로 선택합니다.');
+        if (s.phase === 'CHOICE_WAIT') this.followAutoRoute();
+      } else {
+        // Current journeys keep moving; only a subsequent run may activate this goal.
+        s.autoRoute = null;
+        s.reservedRoute = { mapId: position.mapId, nodeId: cmd.nodeId, startRun: s.run + 1 };
+        s.departureMapId = position.mapId;
+        this.log('map', '다음 모험 목적지를 예약했습니다. 도착할 때까지 예약을 유지합니다.');
+      }
     }
-    else if (cmd.type === 'CANCEL_ROUTE') { s.autoRoute = null; }
+    else if (cmd.type === 'CANCEL_ROUTE') { s.autoRoute = null; s.reservedRoute = null; }
     else if (cmd.type === 'BUY_TREASURE') {
       const result = buyTreasure(s, cmd.treasureId);
       if (result) this.log('treasure-purchase', `${result.item.name} 구입 · 금화 -${result.price}`, { itemId: result.item.id, treasureId: result.item.templateId, price: result.price });
@@ -448,7 +484,7 @@ export class Game {
     if (!this.state) return null;
     const { maps, characters, ...state } = this.state;
     const c = this.character;
-    const { values: hero, defenses: defenseBreakdown } = statDetails(this.state, this.config);
+    const { values: hero, defenses: defenseBreakdown, attributes: attributeBreakdown } = statDetails(this.state, this.config);
     const weapon = state.inventory.find(i => i.id === c?.equipment.weapon);
     const battleTiming = state.phase === 'BATTLE' && state.battle ? Object.fromEntries(['hero','enemy'].map(actor => {
       const values = actor === 'hero' ? hero : effectiveEnemy(state.enemy, state.battle, this.config);
@@ -462,11 +498,15 @@ export class Game {
       treasureOffers: treasureOffers(this.state),
       normalSale: this.normalSaleItems().reduce((total, item) => ({ count: total.count + 1, gold: total.gold + item.value }), { count: 0, gold: 0 }),
       equipmentUsers: Object.fromEntries(state.inventory.map(i => [i.id, equipmentUsers(this.state, i.id)])),
-      inventory: [...structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : i), ...(c?.skills || []).map(i => skillItemView(i, this.state, hero))],
-      availableStarts: availableStarts(this.state).map(id => ({ id, name: maps[id].name })),
+      inventory: [...structuredClone(state.inventory).map(i => i.slot === 'weapon' ? { ...i, hitDefense: weaponDefense(i) } : treasureItemView(i)), ...(state.sharedSkills || c?.skills || []).map(i => skillItemView(i, this.state, hero))],
+      routeGoal: navigationGoal(this.state),
+      availableStarts: availableStarts(this.state).map(id => {
+        const { minLevel, maxLevel } = REGIONS[id];
+        return { id, name: maps[id].name, label: `${maps[id].name} (레벨: ${minLevel}~${maxLevel})` };
+      }),
       mapGraph: structuredClone(maps[navigationPosition(this.state).mapId]), currentNode: structuredClone(maps[state.mapId].nodes[state.currentNodeId]),
-      bestiary: Object.fromEntries(Object.entries(state.bestiary || {}).map(([id,entry])=>[id,{...structuredClone(entry),sample:{...structuredClone(entry.sample),skills:(entry.sample?.skills || []).map(id=>typeof id === 'string' ? {id,name:skillDefinition(id)?.name || id} : id)}}])),
-      stats: hero, defenseBreakdown, combatStats: { ...hero, ACC: hero.ACC + maintainedSkillBonuses(this.state).ACC },
+      bestiary: Object.fromEntries(sortedBestiaryEntries(state.bestiary).map(([id,entry])=>[id,{...structuredClone(entry),sample:{...structuredClone(entry.sample),skills:(entry.sample?.skills || []).map(id=>typeof id === 'string' ? {id,name:skillDefinition(id)?.name || id} : id)}}])),
+      stats: hero, defenseBreakdown, attributeBreakdown, attackDamage: basicAttackRange(this.state, this.config, hero), combatStats: { ...hero, ACC: hero.ACC + maintainedSkillBonuses(this.state).ACC },
       hitDefense: weaponDefense(weapon), xpNext: (c?.level || 1) * this.config.xpPerLevel };
   }
 }

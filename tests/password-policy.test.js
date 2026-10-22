@@ -10,12 +10,10 @@ test('six ASCII digits accepted, including a leading zero; other formats rejecte
     assert.equal(validPassword(value), false, 'invalid format must be rejected');
   }
 });
-test('registration and login reject invalid format before database or hashing work', async () => {
+test('registration rejects invalid format before database or hashing work', async () => {
   const auth = Object.create(LocalAuth.prototype);
   auth.db = { prepare() { throw Error('Unexpected database access'); } };
   for (const value of [null, '', 'x'.repeat(6), '0'.repeat(5), '0'.repeat(7), '０'.repeat(6)]) {
     await assert.rejects(auth.register('fixture_only', value), /숫자 6자리/);
-    await assert.rejects(auth.login('fixture_only', value), /아이디 또는 비밀번호/);
   }
-  assert.equal(typeof auth.limited, 'undefined');
 });

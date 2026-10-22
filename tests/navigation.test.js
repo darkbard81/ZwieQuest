@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Game } from '../src/game.js';
-import { prepareAdminGame, resetGameProgress } from '../src/account-progress.js';
+import { prepareAdminGame, resetGameProgress, regenerateAdminMaps } from '../src/account-progress.js';
 import { routeTo, nodeLabels } from '../public/map-navigation.js';
 import { mapSVG } from '../public/map-view.js';
 import { rollEncounter } from '../src/encounters.js';
@@ -49,7 +49,7 @@ test('every unlocked map supports an automatic route from HOME, saves between st
  }
 });
 
-test('hidden targets, other maps and backward paths are rejected; visible unknown child is selectable; manual choice and cancel release the route', () => {
+test('hidden targets and other maps are rejected; visible backward paths reserve and manual choice cancels only immediate routing', () => {
  const g=make(),map=g.state.maps.village,root=map.nodes[map.rootId],hidden=targetAt(map,3);
  assert.throws(()=>g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:hidden}),/표시된/);
  assert.throws(()=>g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'snow',nodeId:g.state.maps.snow.rootId}),/표시된/);
@@ -58,8 +58,8 @@ test('hidden targets, other maps and backward paths are rejected; visible unknow
  reveal(g);g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:hidden});
  g.command({characterId: g.character?.id, type:'START_MAP',mapId:'snow'});assert.equal(g.state.autoRoute,null);
  g.command({characterId: g.character?.id, type:'START_MAP',mapId:'village'});g.advance();g.choose('left');g.advance();
- assert.throws(()=>g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:map.rootId}),/앞으로/);
- assert.throws(()=>g.command({characterId: g.character?.id, type:'AUTO_ROUTE',mapId:'village',nodeId:root.edges.right}),/앞으로/);
+ g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:map.rootId});assert.equal(g.state.reservedRoute.nodeId,map.rootId);
+ g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:root.edges.right});assert.equal(g.state.reservedRoute.nodeId,root.edges.right);assert.equal(g.state.autoRoute,null);
  const child=g.state.maps.village.nodes[g.state.currentNodeId].edges.left;
  g.state.autoRoute={mapId:'village',nodeId:child};
  g.command({characterId: g.character?.id, type:'CHOOSE',direction:'right',choiceId:g.state.choiceId});assert.equal(g.state.autoRoute,null);
@@ -115,4 +115,51 @@ test('dead ends, exits and bosses keep their terminal behavior without rolling o
   g.rng=n=>{if(node.kind!=='boss'||n===10000)throw Error('No random encounter at a terminal');return 0;};g.advance();
   assert.equal(g.state.phase,node.kind==='boss'?'BATTLE':node.kind==='exit'?'CHOICE_WAIT':'RETURN_HOME');
  }
+});
+
+
+test('all maps persist an unreachable goal across defeat, HOME, restore and repeated journeys until actual arrival',()=>{
+ for(const mapId of ['village','volcano','snow','desert','beach']) {
+  let g=make();reveal(g);g.command({type:'START_MAP',mapId});g.advance();const map=g.state.maps[mapId],root=map.nodes[map.rootId];g.choose('left');
+  const target=map.nodes[root.edges.right].edges.left, before=structuredClone(g.state);
+  g.command({type:'AUTO_ROUTE',mapId,nodeId:target});const goal=structuredClone(g.state.reservedRoute);
+  assert.deepEqual(goal,{mapId,nodeId:target,startRun:g.state.run+1});assert.equal(g.state.autoRoute,null);assert.equal(g.state.departureMapId,mapId);
+  for(const k of ['phase','currentNodeId','path','remaining','run'])assert.deepEqual(g.state[k],before[k]);
+  assert.match(mapSVG(g.snapshot()),/다음 모험 예약/);assert.equal(g.snapshot().routeGoal.pending,true);
+  g=new Game(config,structuredClone(g.state),quiet);assert.deepEqual(g.state.reservedRoute,goal);
+  g.advance();assert.equal(g.state.phase,'CHOICE_WAIT');assert.equal(g.state.autoRoute,null);g.finish(true);assert.deepEqual(g.state.reservedRoute,goal);
+  g=new Game(config,structuredClone(g.state),quiet);g.advance();assert.equal(g.state.phase,'HOME');assert.deepEqual(g.state.reservedRoute,goal);
+  g=new Game(config,structuredClone(g.state),quiet);g.advance();assert.equal(g.state.mapId,mapId);assert.equal(g.state.currentNodeId,root.edges.right);assert.ok(g.state.autoRoute);assert.equal(g.snapshot().routeGoal.pending,false);
+  // Fail again while following the reserved goal. It must be retried, not lost.
+  g.finish(true);g.advance();g=new Game(config,structuredClone(g.state),quiet);g.advance();assert.equal(g.state.currentNodeId,root.edges.right);assert.deepEqual(g.state.reservedRoute,goal);
+  g.advance();assert.equal(g.state.phase,'TRAVEL');assert.equal(g.state.currentNodeId,target);assert.ok(g.state.reservedRoute);
+  g=new Game(config,structuredClone(g.state),quiet);assert.ok(g.state.reservedRoute);g.advance();assert.equal(g.state.phase,'CHOICE_WAIT');assert.equal(g.state.autoRoute,null);assert.equal(g.state.reservedRoute,null);assert.equal(g.snapshot().routeGoal,null);
+  assert.equal(new Game(config,structuredClone(g.state),quiet).state.reservedRoute,null);
+ }
+});
+test('latest selection replaces reservation; cancellation clears both and explicit departure changes keep the reserved goal',()=>{
+ const g=make();reveal(g);g.advance();const map=g.state.maps.village,root=map.nodes[map.rootId];g.choose('left');
+ const select=nodeId=>g.command({type:'AUTO_ROUTE',mapId:'village',nodeId});
+ select(root.edges.right);select(map.rootId);assert.equal(g.state.reservedRoute.nodeId,map.rootId);
+ const child=map.nodes[g.state.currentNodeId].edges.left;select(child);assert.equal(g.state.reservedRoute,null);assert.equal(g.state.autoRoute.nodeId,child);
+ select(root.edges.right);assert.equal(g.state.autoRoute,null);const saved=structuredClone(g.state.reservedRoute);
+ g.command({type:'START_MAP',mapId:'snow'});assert.deepEqual(g.state.reservedRoute,saved);
+ g.command({type:'CANCEL_ROUTE'});assert.equal(g.state.autoRoute,null);assert.equal(g.state.reservedRoute,null);
+});
+test('reserved start node clears at next departure, and terminal destinations clear before region or battle transitions',()=>{
+ const g=make();reveal(g);g.advance();g.choose('left');const map=g.state.maps.village;
+ g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:map.rootId});g.finish(false);g.advance();g.advance();assert.equal(g.state.currentNodeId,map.rootId);assert.equal(g.state.phase,'CHOICE_WAIT');assert.equal(g.state.reservedRoute,null);
+ for(const m of Object.values(g.state.maps))for(const kind of ['deadend','exit','boss']) {
+  const node=Object.values(m.nodes).find(n=>n.kind===kind);if(!node)continue;
+  Object.assign(g.state,{mapId:m.id,theme:m.id,currentNodeId:node.id,step:node.depth,runGold:g.state.gold,risk:0,reservedRoute:{mapId:m.id,nodeId:node.id,startRun:g.state.run},autoRoute:{mapId:m.id,nodeId:node.id}});
+  g.phase('TRAVEL',1);g.advance();assert.equal(g.state.autoRoute,null);assert.equal(g.state.reservedRoute,null);
+ }
+});
+test('manual deviation retains deferred goal and map regeneration discards obsolete destinations; old saves remain compatible',()=>{
+ const g=make();reveal(g);g.advance();const map=g.state.maps.village,root=map.nodes[map.rootId];g.choose('left');const target=map.nodes[root.edges.right].edges.left;
+ g.command({type:'AUTO_ROUTE',mapId:'village',nodeId:target});const goal=structuredClone(g.state.reservedRoute);g.finish(false);g.advance();g.advance();g.state.autoRoute=null;g.phase('CHOICE_WAIT',config.choiceMs);
+ g.choose('right');g.advance();assert.deepEqual(g.state.reservedRoute,goal);assert.equal(g.state.autoRoute,null);
+ const restored=new Game(config,structuredClone(g.state),quiet);assert.deepEqual(restored.state.reservedRoute,goal);regenerateAdminMaps(restored);assert.equal(restored.state.reservedRoute,null);assert.equal(restored.state.autoRoute,null);
+ const old=structuredClone(g.state);delete old.reservedRoute;old.autoRoute={mapId:'village',nodeId:target};const legacy=new Game(config,old,quiet);assert.equal(legacy.state.reservedRoute,null);assert.deepEqual(legacy.state.autoRoute,old.autoRoute);
+ const invalid=structuredClone(g.state);invalid.reservedRoute={mapId:'village',nodeId:'deleted-node',startRun:0};assert.equal(new Game(config,invalid,quiet).state.reservedRoute,null);
 });

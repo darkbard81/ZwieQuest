@@ -7,7 +7,7 @@
       "name": "회복",
       "icon": "✦",
       "iconPath": "/assets/skills/heal-v1.webp",
-      "description": "최대 HP의 (10% + INT × 5%)를 회복합니다. 전투당 2회.",
+      "description": "자신의 체력을 회복합니다.",
       "enabled": true,
       "grantOnCreate": true,
       "equipByDefault": true,
@@ -28,7 +28,7 @@
       "name": "무력화",
       "icon": "✦",
       "iconPath": "/assets/skills/hamstring-v1.webp",
-      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "description": "무기 공격이 명중하면 별도 판정으로 무력화의 약화를 시도합니다.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -40,12 +40,12 @@
       "treasureDrop": true,
       "effect": {
         "type": "attack",
-        "defense": "FOR",
         "statusId": "hobbled",
         "durationMs": 15000,
         "damageMultiplier": 1.25,
         "accuracyBonus": 0,
-        "penetrationBonus": 2
+        "penetrationBonus": 2,
+        "statusDefense": "FOR"
       }
     },
     {
@@ -53,7 +53,7 @@
       "name": "눈찌르기",
       "icon": "✦",
       "iconPath": "/assets/skills/eye-gouge-v1.webp",
-      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "description": "무기 공격이 명중하면 별도 판정으로 눈찌르기의 약화를 시도합니다.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -65,12 +65,12 @@
       "treasureDrop": true,
       "effect": {
         "type": "attack",
-        "defense": "REF",
         "statusId": "blinded",
         "durationMs": 15000,
         "damageMultiplier": 1.25,
         "accuracyBonus": 10,
-        "penetrationBonus": 0
+        "penetrationBonus": 0,
+        "statusDefense": "REF"
       }
     },
     {
@@ -78,7 +78,7 @@
       "name": "충격의 일격",
       "icon": "✦",
       "iconPath": "/assets/skills/staggering-blow-v1.webp",
-      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "description": "무기 공격이 명중하면 별도 판정으로 충격의 일격의 약화를 시도합니다.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -90,12 +90,12 @@
       "treasureDrop": true,
       "effect": {
         "type": "attack",
-        "defense": "DEF",
         "statusId": "dazed",
         "durationMs": 15000,
         "damageMultiplier": 1.25,
         "accuracyBonus": 0,
-        "penetrationBonus": 0
+        "penetrationBonus": 0,
+        "statusDefense": "DEF"
       }
     },
     {
@@ -103,7 +103,7 @@
       "name": "위압의 일격",
       "icon": "✦",
       "iconPath": "/assets/skills/intimidating-strike-v1.webp",
-      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "description": "무기 공격이 명중하면 별도 판정으로 위압의 일격의 약화를 시도합니다.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -115,12 +115,12 @@
       "treasureDrop": true,
       "effect": {
         "type": "attack",
-        "defense": "DEF",
         "statusId": "terrified",
         "durationMs": 15000,
         "damageMultiplier": 1,
         "accuracyBonus": 0,
-        "penetrationBonus": 0
+        "penetrationBonus": 0,
+        "statusDefense": "DEF"
       }
     },
     {
@@ -128,7 +128,7 @@
       "name": "발목 묶기",
       "icon": "✦",
       "iconPath": "/assets/skills/binding-strike-v1.webp",
-      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "description": "무기 공격이 명중하면 별도 판정으로 발목 묶기의 약화를 시도합니다.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -140,12 +140,12 @@
       "treasureDrop": true,
       "effect": {
         "type": "attack",
-        "defense": "REF",
         "statusId": "immobilized",
         "durationMs": 15000,
         "damageMultiplier": 1.25,
         "accuracyBonus": 0,
-        "penetrationBonus": 0
+        "penetrationBonus": 0,
+        "statusDefense": "REF"
       }
     },
     {
@@ -153,7 +153,7 @@
       "name": "쇠약의 일격",
       "icon": "✦",
       "iconPath": "/assets/skills/weakening-strike-v1.webp",
-      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "description": "무기 공격이 명중하면 별도 판정으로 쇠약의 일격의 약화를 시도합니다.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -165,12 +165,12 @@
       "treasureDrop": true,
       "effect": {
         "type": "attack",
-        "defense": "FOR",
         "statusId": "weakened",
         "durationMs": 15000,
         "damageMultiplier": 1.25,
         "accuracyBonus": 0,
-        "penetrationBonus": 0
+        "penetrationBonus": 0,
+        "statusDefense": "FOR"
       }
     },
     {
@@ -178,7 +178,7 @@
       "name": "정신 교란",
       "icon": "✦",
       "iconPath": "/assets/skills/mind-fog-v1.webp",
-      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "description": "무기 공격이 명중하면 별도 판정으로 정신 교란의 약화를 시도합니다.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -190,12 +190,12 @@
       "treasureDrop": true,
       "effect": {
         "type": "attack",
-        "defense": "WIL",
         "statusId": "charmed",
         "durationMs": 15000,
         "damageMultiplier": 1,
         "accuracyBonus": 0,
-        "penetrationBonus": 0
+        "penetrationBonus": 0,
+        "statusDefense": "WIL"
       }
     },
     {
@@ -203,7 +203,7 @@
       "name": "공포의 속삭임",
       "icon": "✦",
       "iconPath": "/assets/skills/dread-whisper-v1.webp",
-      "description": "무기 공격. 명중 또는 치명타 시 상태를 적용합니다.",
+      "description": "무기 공격이 명중하면 별도 판정으로 공포의 속삭임의 약화를 시도합니다.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -215,12 +215,12 @@
       "treasureDrop": true,
       "effect": {
         "type": "attack",
-        "defense": "WIL",
         "statusId": "frightened",
         "durationMs": 15000,
         "damageMultiplier": 1.25,
         "accuracyBonus": 0,
-        "penetrationBonus": 0
+        "penetrationBonus": 0,
+        "statusDefense": "WIL"
       }
     },
     {
@@ -434,7 +434,7 @@
       "name": "단검·숏소드·레이피어 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/light-weapon-mastery-v1.webp",
-      "description": "적용 장비: 단검, 숏소드, 레이피어. 해당 장비 착용 중 ON일 때 명중 +2, 행동속도 +10%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 단검, 숏소드, 레이피어. 착용 중 ON: 명중 +2, 행동속도 +10%, 피해 -10%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -460,7 +460,7 @@
       "name": "롱소드 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/sword-mastery-v1.webp",
-      "description": "적용 장비: 롱소드. 해당 장비 착용 중 ON일 때 명중 +2, 행동속도 -5%, 피해 +10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 롱소드. 착용 중 ON: 명중 +2, 행동속도 -5%, 피해 +10%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -486,7 +486,7 @@
       "name": "손도끼 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/axe-mastery-v1.webp",
-      "description": "적용 장비: 손도끼. 해당 장비 착용 중 ON일 때 명중 -2, 행동속도 +0%, 피해 +25%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 손도끼. 착용 중 ON: 명중 -2, 피해 +25%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -512,7 +512,7 @@
       "name": "메이스 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/mace-mastery-v1.webp",
-      "description": "적용 장비: 메이스. 해당 장비 착용 중 ON일 때 명중 +3, 행동속도 -10%, 피해 +0%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 메이스. 착용 중 ON: 명중 +3, 행동속도 -10%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -538,7 +538,7 @@
       "name": "창 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/spear-mastery-v1.webp",
-      "description": "적용 장비: 창. 해당 장비 착용 중 ON일 때 명중 +3, 행동속도 +0%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 창. 착용 중 ON: 명중 +3, 피해 -10%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -564,7 +564,7 @@
       "name": "할버드 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/polearm-mastery-v1.webp",
-      "description": "적용 장비: 할버드. 해당 장비 착용 중 ON일 때 명중 +0, 행동속도 -10%, 피해 +20%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 할버드. 착용 중 ON: 행동속도 -10%, 피해 +20%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -590,7 +590,7 @@
       "name": "대검·전투도끼·전투망치 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/heavy-weapon-mastery-v1.webp",
-      "description": "적용 장비: 대검, 전투도끼, 전투망치. 해당 장비 착용 중 ON일 때 명중 +0, 행동속도 -15%, 피해 +30%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 대검, 전투도끼, 전투망치. 착용 중 ON: 행동속도 -15%, 피해 +30%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -616,7 +616,7 @@
       "name": "원소 지팡이 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/staff-mastery-v1.webp",
-      "description": "적용 장비: 화염 지팡이, 냉기 지팡이, 번개 지팡이, 부식 지팡이. 해당 장비 착용 중 ON일 때 명중 -1, 행동속도 +0%, 피해 +20%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 화염 지팡이, 냉기 지팡이, 번개 지팡이, 부식 지팡이. 착용 중 ON: 명중 -1, 피해 +20%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -642,7 +642,7 @@
       "name": "천옷 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/cloth-armor-mastery-v1.webp",
-      "description": "적용 장비: 로브. 해당 장비 착용 중 ON일 때 명중 -1, 행동속도 +0%, 피해 +15%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 로브. 착용 중 ON: 명중 -1, 피해 +15%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -668,7 +668,7 @@
       "name": "경량 갑옷 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/light-armor-mastery-v1.webp",
-      "description": "적용 장비: 가죽 갑옷, 덧댄 갑옷, 생가죽 갑옷. 해당 장비 착용 중 ON일 때 명중 +0, 행동속도 +15%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 가죽 갑옷, 덧댄 갑옷, 생가죽 갑옷. 착용 중 ON: 행동속도 +15%, 피해 -10%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -694,7 +694,7 @@
       "name": "중형 갑옷 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/medium-armor-mastery-v1.webp",
-      "description": "적용 장비: 사슬 갑옷, 비늘 갑옷, 흉갑. 해당 장비 착용 중 ON일 때 명중 +2, 행동속도 -5%, 피해 +0%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 사슬 갑옷, 비늘 갑옷, 흉갑. 착용 중 ON: 명중 +2, 행동속도 -5%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,
@@ -720,7 +720,7 @@
       "name": "중장 갑옷 숙련",
       "icon": "✦",
       "iconPath": "/assets/skills/heavy-armor-mastery-v1.webp",
-      "description": "적용 장비: 브리건딘, 판금 갑옷. 해당 장비 착용 중 ON일 때 명중 +0, 행동속도 +20%, 피해 -10%. OFF 또는 장비 불일치 시 효과 없음.",
+      "description": "적용 장비: 브리건딘, 판금 갑옷. 착용 중 ON: 행동속도 +20%, 피해 -10%.",
       "enabled": true,
       "grantOnCreate": false,
       "equipByDefault": false,

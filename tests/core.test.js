@@ -16,20 +16,20 @@ test('penetration thresholds and exact examples; magic scales with STR', () => {
   assert.equal(attack({roll:8,acc:5,defense:6,str:0,base:40,pen:2,ar:4}).damage,10);
   const a={roll:12,acc:5,defense:4,base:40,pen:4,ar:4};assert.equal(attack({...a,str:4}).damage,48);
 });
-test('level growth increases HP without passive accuracy or defense bonuses', () => {
+test('level growth adds three per two levels to accuracy and defenses alongside HP', () => {
   for(const cls of ['warrior','wizard']){const g=make(cls),a=stats(g.state,config);
-    for(const level of [4,7,10,40]){g.character.level=level;const b=stats(g.state,config);for(const k of ['STR','CON','DEX','PER','INT','RES','PEN','AR','ACC','DEF','FOR','REF','WIL'])assert.equal(a[k],b[k],k);assert.equal(b.maxHp,a.maxHp+10*(level-1));assert.equal(b.LB,undefined);}
+    for(const level of [4,7,10,40]){g.character.level=level;const b=stats(g.state,config);for(const k of ['STR','CON','DEX','PER','INT','RES','PEN','AR'])assert.equal(a[k],b[k],k);for(const k of ['ACC','DEF','FOR','REF','WIL'])assert.equal(b[k]-a[k],3*Math.floor(level/2),k);assert.equal(b.maxHp,a.maxHp+10*(level-1));assert.equal(b.LB,undefined);}
   }
 });
 test('each invested point has the requested defense coefficients',()=>{
  const effects={STR:{FOR:2},CON:{FOR:2,maxHp:2},DEX:{REF:2},PER:{ACC:1,REF:2},INT:{WIL:2},RES:{DEF:1,WIL:2}};
  for(const [attribute,effect] of Object.entries(effects)){const g=make(),before=stats(g.state,config);g.command({type:'ALLOCATE_STAT',characterId:g.character.id,stat:attribute});const after=stats(g.state,config);for(const key of ['ACC','DEF','REF','FOR','WIL','maxHp','PEN','AR'])assert.equal(after[key]-before[key],effect[key]||0,`${attribute} -> ${key}`);}
 });
-test('boss accuracy and defenses use attributes and legendary gear without a level bonus',()=>{
- const g=make();g.state.mapId='volcano';for(const level of [1,4,10,40]){g.character.level=level;g.beginBattle(true);const e=g.state.enemy;assert.equal(e.level,level);assert.equal(e.ACC,10+e.PER+e.weapon.stats.ACC);assert.equal(e.DEF,10+e.RES);assert.equal(e.REF,10+2*e.DEX+2*e.PER);assert.equal(e.FOR,10+2*e.STR+2*e.CON);assert.equal(e.WIL,10+2*e.INT+2*e.RES);}
+test('boss accuracy and defenses use attributes and legendary gear with a level bonus',()=>{
+ const g=make();g.state.mapId='volcano';for(const level of [1,4,10,40]){g.character.level=level;g.beginBattle(true);const e=g.state.enemy;assert.equal(e.level,level);assert.equal(e.ACC,10+e.PER+e.weapon.stats.ACC+3*Math.floor(e.level/2));assert.equal(e.DEF,10+e.RES+3*Math.floor(e.level/2));assert.equal(e.REF,10+2*e.DEX+2*e.PER+3*Math.floor(e.level/2));assert.equal(e.FOR,10+2*e.STR+2*e.CON+3*Math.floor(e.level/2));assert.equal(e.WIL,10+2*e.INT+2*e.RES+3*Math.floor(e.level/2));}
 });
 test('both classes finish unattended map attempts and preserve XP/items', () => {
-  for(const cls of ['warrior','wizard']){const g=make(cls,n=>Math.min(n-1,11));g.character.attributes.STR=100;g.character.attributes.CON=100;let arrivals=0;g.rng=n=>n===10000&&g.state.phase==='TRAVEL'?(arrivals++%2?2000:0):n===4?0:Math.min(n-1,11);const themes=new Set();let count=0;while(g.state.completed<3&&count++<1500){g.tick(20000,1);themes.add(g.state.theme);}assert.equal(g.state.completed,3);assert.ok(themes.has('village'));assert.ok(g.character.level>1);assert.ok(g.state.inventory.length>3);assert.ok(g.state.victories>0);assert.ok(g.state.chests>0);}
+  for(const cls of ['warrior','wizard']){const g=make(cls,n=>Math.min(n-1,11));g.character.attributes.STR=100;g.character.attributes.CON=100;g.character.attributes.PER=100;let arrivals=0;g.rng=n=>n===10000&&g.state.phase==='TRAVEL'?(arrivals++%2?2000:0):n===4?0:Math.min(n-1,11);const themes=new Set();let count=0;while(g.state.completed<3&&count++<1500){g.tick(20000,1);themes.add(g.state.theme);}assert.equal(g.state.completed,3);assert.ok(themes.has('village'));assert.ok(g.character.level>1);assert.ok(g.state.inventory.length>3);assert.ok(g.state.victories>0);assert.ok(g.state.chests>0);}
 });
 test('branch choices only advance; stale choice rejected; default choice progresses', () => {
   const g=make();g.character.attributes.CON=100;g.character.attributes.STR=100;g.advance();let previous=0;while(g.state.phase==='CHOICE_WAIT'&&previous<10){const choiceId=g.state.choiceId;g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'});assert.equal(g.state.step,++previous);assert.throws(()=>g.command({characterId: g.character?.id, type:'CHOOSE',choiceId,direction:'left'}));while(!['CHOICE_WAIT','RETURN_HOME'].includes(g.state.phase))g.tick(g.state.remaining,1);}assert.ok(previous>0);assert.equal(g.state.phase,'RETURN_HOME');

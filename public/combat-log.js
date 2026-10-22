@@ -25,5 +25,8 @@ export function combatLogHTML(entry) {
     const multiplier = Object.values(allFactors).reduce((total, value) => total * value, 1);
     damage = `${stat('PEN', h.pen)} vs ${stat('AR', h.effectiveAR, '이번 피해 타입의 약점·저항과 전술을 반영한 방어도')} = ${tag('기본 피해', h.base)} × ${tag('배율', percent(multiplier), factors.join(' × ') || '추가 보정 없음')} = ${tag('피해', h.damage, '모든 보정을 곱한 뒤 소수점 버림')}`;
   }
-  return `<span class="combat-summary">${summary}</span>\n<span class="combat-calculation combat-accuracy">${accuracy}</span>\n<span class="combat-calculation combat-damage">${damage}</span>`;
+  const check=h.statusCheck, status=h.statusResult;
+  const statusOutcome=status?.applied ? '적용' : status?.cancelled ? '상쇄' : status?.reason==='immune' ? '저항으로 무효' : status?.reason==='stronger' ? '기존 상위 상태 유지' : '실패';
+  const statusLine=check ? `\n<span class="combat-calculation combat-status">${tag(check.statusName || check.statusId)}: ${stat('ACC',check.acc)} + ${tag('🎲',check.roll)} vs ${stat(check.target,check.defense)} + ${tag('기준',10)} → ${tag(check.label)} · ${tag(statusOutcome)}</span>` : '';
+  return `<span class="combat-summary">${summary}</span>\n<span class="combat-calculation combat-accuracy">${accuracy}</span>\n<span class="combat-calculation combat-damage">${damage}</span>${statusLine}`;
 }

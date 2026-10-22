@@ -30,7 +30,7 @@ test('HTTP character ownership, duplicate/multitab allocation, cap/retirement, r
   assert.equal((await send(a.cookie,'SELECT_CHARACTER',{characterId:id2})).status,200);
   assert.equal((await send(second.cookie,'ALLOCATE_STAT',{characterId:id,stat:'STR'})).status,409);
   assert.equal((await send(a.cookie,'EQUIP',{characterId:id2,itemId:weapon})).status,409);
-  assert.equal((await send(a.cookie,'EQUIP',{characterId:id2,itemId:created.body.state.skillSlots[0]})).status,409);
+  assert.equal((await send(a.cookie,'EQUIP',{characterId:id2,itemId:created.body.state.skillSlots[0]})).status,200);
   await sleep(1100);
   assert.equal((await send(a.cookie,'CREATE_CHARACTER',{name:'셋째',appearanceId:'lamia'})).status,200);assert.equal((await send(a.cookie,'CREATE_CHARACTER',{name:'넷째',appearanceId:'ranger'})).status,409);
   assert.equal((await send(a.cookie,'SELECT_CHARACTER',{characterId:id})).status,200);

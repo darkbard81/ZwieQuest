@@ -1,18 +1,19 @@
 import { uiIconHTML } from './ui-icons.js';
 import { damageNames, damageTagHTML } from './damage-tags.js';
 export const statNames = Object.freeze({ STR: '힘', CON: '체질', DEX: '민첩', PER: '통찰', INT: '지능', RES: '결의',
-  ACC: '명중', DEF: '회피', FOR: '인내', REF: '반사', WIL: '의지', PEN: '관통력', AR: '방어도', HP: '체력', AP: '행동력', actionSpeed: '행동속도', LB: '레벨 보너스', power: '피해' });
+  ACC: '명중', DEF: '회피', FOR: '인내', REF: '반사', WIL: '의지', PEN: '관통력', AR: '방어도', HP: '체력', AP: '행동력', actionSpeed: '행동속도', LB: '레벨 보너스', power: '피해', attackDamage: '공격력' });
 const defenses = new Set(['DEF', 'FOR', 'REF', 'WIL']);
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 export function defenseTooltip(key, detail) {
   if (!detail || !defenses.has(key)) return '';
-  const terms = [`기본값(${detail.base})`, ...detail.attributes.map(a => `${statNames[a.key]}(${a.value})${(a.multiplier ?? 1) === 1 ? '' : ` × ${a.multiplier}`}`), `장비 보정(${detail.equipment})`];
+  const terms = [`${detail.equipment ? '기본·상시' : '기본값'}(${detail.base + (detail.equipment || 0)})`, ...detail.attributes.map(a => `${statNames[a.key]}(${a.value})${(a.multiplier ?? 1) === 1 ? '' : ` × ${a.multiplier}`}`)];
+  if (detail.levelBonus) terms.push(`레벨 보너스(${detail.levelBonus})`);
   if (detail.status) terms.push(`상태 보정(${detail.status})`);
   if (detail.mastery) terms.push(`직업 숙련(${detail.mastery.value})`);
   return `${terms.join(' + ')} = ${detail.total}`;
 }
 export function statLabelHTML(key, value, tooltip = '') {
-  const name = uiIconHTML('stat', key) + escapeHTML(statNames[key] || key);
+  const name = (key === 'attackDamage' ? uiIconHTML('damage', 'slash') : uiIconHTML('stat', key)) + escapeHTML(statNames[key] || key);
   const amount = value == null ? '' : ` <b>${escapeHTML(value)}</b>`;
   if (!defenses.has(key)) return `${name}${amount}`;
   if (tooltip) return `<button type="button" class="defense-tag defense-${key}" data-defense="${key}" aria-expanded="false" aria-controls="defense-details" title="${escapeHTML(tooltip)}">${name}${amount}</button>`;
@@ -29,4 +30,13 @@ export function logHTML(text) {
     cursor = match.index + match[0].length;
   }
   return html + escapeHTML(source.slice(cursor));
+}
+
+// Display formatting never feeds back into combat speed or readiness calculations.
+export const combatStatDisplay = (key, value) => key === 'actionSpeed' ? Math.trunc(value) : Number(value.toFixed(2));
+export function attributeValueHTML(value, detail) {
+  const delta = detail?.status || 0, polarity = delta > 0 ? 'buff' : delta < 0 ? 'debuff' : '';
+  const signed = n => n > 0 ? `+${n}` : String(n);
+  const title = detail ? `기본 ${detail.base} · 장비 ${signed(detail.equipment)} · 상태 ${signed(delta)} = ${value}` : '';
+  return `<b class="attribute-value" data-polarity="${polarity}" title="${escapeHTML(title)}">${escapeHTML(value)}${delta ? `<span class="attribute-status-delta"> (${escapeHTML(signed(delta))})</span>` : ''}</b>`;
 }

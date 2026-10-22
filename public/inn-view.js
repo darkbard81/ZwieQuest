@@ -1,3 +1,4 @@
+import { prepareModalScroll } from './modal-layout.js';
 import { APPEARANCES, appearanceFor, appearanceAssets, restRemaining } from './appearances.js';
 import { sampleAnimationFrame } from './hero-animation.js';
 import { innRoster } from './inn-roster.js';
@@ -7,11 +8,12 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
   let selectedAppearance = APPEARANCES[0].id, retireId = null, worldReady = false, departureKey = '', departurePending = false;
   const guestButtons = new Map();
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  panel.innerHTML = '<div class="inn-heading"><strong>여행자의 여관</strong><span id="inn-status"></span></div><div class="inn-actions"><label class="inn-departure" for="inn-start-region">출발 지역 <select id="inn-start-region" aria-label="여관 출발 지역"></select></label><button id="inn-manage">캐릭터 관리</button></div>';
+  panel.innerHTML = '<div class="inn-actions"><label class="inn-departure" for="inn-start-region">출발 지역 <select id="inn-start-region" aria-label="여관 출발 지역"></select></label><button id="inn-manage">캐릭터 관리</button></div>';
   const guestLayer = document.createElement('div'); guestLayer.id = 'inn-guests'; guestLayer.setAttribute('role', 'group'); guestLayer.setAttribute('aria-label', '캐릭터를 선택하여 출발'); guestLayer.hidden = true;
   panel.before(guestLayer);
   const dialog = document.createElement('dialog'); dialog.id = 'character-dialog'; dialog.setAttribute('aria-labelledby','character-dialog-title');
-  dialog.innerHTML = `<button type="button" class="dialog-close" aria-label="캐릭터 관리 닫기">×</button><p class="eyebrow">TRAVELERS AT THE INN</p><h2 id="character-dialog-title">함께 떠날 모험가</h2><p class="muted">한 번의 모험에 한 명만 출전합니다. 관리 중에는 자동 출발을 멈춥니다.</p><div id="character-roster" class="character-roster"></div><form id="character-create"><h3>새 모험가 <small id="character-capacity"></small></h3><label for="character-name">이름</label><input id="character-name" name="name" required maxlength="20" autocomplete="off" placeholder="1~20자"><p class="muted">외형은 능력치에 영향을 주지 않습니다.</p><div class="appearance-list" role="group" aria-label="새 캐릭터 외형"></div><p>기본 능력치 0 · 자유 배분 10점<br>일반 단검 · 일반 로브 · 회복 스킬</p><button type="submit" class="primary" id="character-create-submit">캐릭터 생성</button></form><form id="character-retire" hidden><h3 id="character-retire-title"></h3><p>성장·스킬은 삭제됩니다. 공용 소지품·금화·지도는 보존됩니다.</p><label for="character-retire-name">확인을 위해 캐릭터 이름을 입력하세요</label><input id="character-retire-name" autocomplete="off"><button type="submit" class="danger">은퇴 확정</button><button type="button" id="character-retire-cancel">취소</button></form><p id="character-manager-status" role="status"></p><button type="button" id="character-manager-done">관리 완료</button>`;
+  dialog.innerHTML = `<button type="button" class="dialog-close" aria-label="캐릭터 관리 닫기">×</button><p class="eyebrow">TRAVELERS AT THE INN</p><h2 id="character-dialog-title">함께 떠날 모험가</h2><p class="muted">한 번의 모험에 한 명만 출전합니다. 관리 중에는 자동 출발을 멈춥니다.</p><div id="character-roster" class="character-roster"></div><form id="character-create"><h3>새 모험가 <small id="character-capacity"></small></h3><label for="character-name">이름</label><input id="character-name" name="name" required maxlength="20" autocomplete="off" placeholder="1~20자"><p class="muted">외형은 능력치에 영향을 주지 않습니다.</p><div class="appearance-list" role="group" aria-label="새 캐릭터 외형"></div><p>기본 능력치 0 · 자유 배분 10점<br>일반 단검 · 일반 로브 · 회복 스킬</p><button type="submit" class="primary" id="character-create-submit">캐릭터 생성</button></form><form id="character-retire" hidden><h3 id="character-retire-title"></h3><p>성장·캐릭터별 스킬 설정은 삭제됩니다. 공용 스킬·소지품·금화·지도는 보존됩니다.</p><label for="character-retire-name">확인을 위해 캐릭터 이름을 입력하세요</label><input id="character-retire-name" autocomplete="off"><button type="submit" class="danger">은퇴 확정</button><button type="button" id="character-retire-cancel">취소</button></form><p id="character-manager-status" role="status"></p><button type="button" id="character-manager-done">관리 완료</button>`;
+  prepareModalScroll(dialog);
   document.body.append(dialog);
   const $ = selector => dialog.querySelector(selector);
   const views = APPEARANCES.map(appearance => {
@@ -91,12 +93,11 @@ export function initInn({ panel, portrait, countdown, onCommand }) {
     panel.hidden = !state || state.phase !== 'HOME'; countdown.hidden = panel.hidden;
     if (panel.hidden && dialog.open) close();
     const count = state?.characters.length || 0;
-    panel.querySelector('#inn-status').textContent = count ? '모험가를 클릭하거나 터치하면 출발합니다' : '첫 캐릭터를 생성해 주세요';
     panel.querySelector('#inn-manage').disabled = !canManage();
     const starts = state?.availableStarts || [], nextDepartureKey = JSON.stringify(starts);
     if (nextDepartureKey !== departureKey) {
       departureKey = nextDepartureKey;
-      departure.innerHTML = starts.map(start => `<option value="${esc(start.id)}">${esc(start.name)}</option>`).join('');
+      departure.innerHTML = starts.map(start => `<option value="${esc(start.id)}">${esc(start.label || start.name)}</option>`).join('');
     }
     if (!departurePending) departure.value = state?.departureMapId || 'village';
     departure.disabled = !canManage() || !starts.length;

@@ -1,6 +1,8 @@
-import { initTreasureViewer, treasureCardHTML } from './treasure-view.js';
+import { initModalViewport, prepareModalScroll } from './modal-layout.js';
+import { combatStatDisplay, attributeValueHTML } from './labels.js';
+import { initTreasureViewer, treasureCardHTML, treasureListHTML } from './treasure-view.js';
 import { mapSVG } from './map-view.js';
-import { REGIONS } from './regions.js';
+import { REGIONS, loadRegions } from './regions.js';
 import { mapViewState, nodeLabels } from './map-navigation.js';
 import { initJournal } from './journal-view.js';
 import { sortInventory } from './inventory-order.js';
@@ -30,6 +32,8 @@ let hideOtherEquipment = false;
 try { hideOtherEquipment = localStorage.getItem(hideOthersKey) === 'true'; } catch {}
 $('#hide-other-equipment').checked = hideOtherEquipment;
 const equipmentViews = new Map();
+initModalViewport();
+prepareModalScroll($('#help'));
 const treasureViewer = initTreasureViewer();
 let statsHTML = '';
 const defenseDetails = initDefenseDetails($('#stats'), $('#defense-details'));
@@ -44,7 +48,8 @@ const skills = initSkills({ bar: $('#skill-bar'), slots: $('#skill-slots'), mode
 const statusEffects = initStatusEffects({ world: $('#world'), columns: { hero: $('#hero-status-effects'), enemy: $('#enemy-status-effects') }, tooltip: $('#world-status-tooltip') });
 const inn = initInn({ panel: $('#inn-selection'), portrait: $('#portrait'), countdown: $('#rest-countdown'), onCommand: (type, fields) => command(type, fields) });
 function updateInn() { inn.update(data?.state, receivedAt, data?.rate || 1, connected && !!user); }
-createWorld($('#world')).then(w => { world = w; if (data?.state) w.update(data.state); inn.setWorldReady(); }).catch(e => { $('#render-error').hidden = false; $('#render-error').textContent = '게임 화면을 불러오지 못했습니다. 새로고침해 주세요. ' + e.message; console.error(e); });
+const regionsReady = loadRegions();
+regionsReady.then(() => createWorld($('#world'))).then(w => { world = w; if (data?.state) w.update(data.state); inn.setWorldReady(); }).catch(e => { $('#render-error').hidden = false; $('#render-error').textContent = '게임 화면을 불러오지 못했습니다. 새로고침해 주세요. ' + e.message; console.error(e); });
 initWindows();
 const journal = initJournal($('#journal'), $('#journal-panel'), $('#journal-unread'));
 initInfoTabs();
@@ -53,7 +58,7 @@ async function api(path, body) {
   const r = await fetch(path, body === undefined ? { cache: 'no-store' } : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const result = await r.json();
   if (r.status === 401) { disconnect(); user = null; showAuth(); }
-  if (!r.ok) { if (result.state) receive(result); throw Object.assign(Error(result.error || '서버에 연결할 수 없습니다.'), { status: r.status }); } return result;
+  if (!r.ok) { if (result.state) receive(result); throw Object.assign(Error(result.error || '서버에 연결할 수 없습니다.'), { status: r.status, code: result.code, retryAfter: result.retryAfter }); } return result;
 }
 async function command(type, fields = {}, button) {
   if (!connected) { toast('서버 연결을 기다려 주세요.'); return; }
@@ -100,7 +105,8 @@ function receive(next) {
   $('#hero-world-hp').setAttribute('aria-valuemax', String(worldMaxHp));
   $('#hero-world-hp').setAttribute('aria-valuenow', String(worldHp));
   $('#xp-label').textContent = `${s.xp} / ${s.xpNext}`; $('#xp-fill').style.width = `${100 * s.xp / s.xpNext}%`;
-  const nextStatsHTML = `<div class="combat-stats">${['ACC', 'PEN', 'AR', 'actionSpeed'].map(k => `<div><small>${statLabelHTML(k)}</small><b>${Number((s.combatStats || s.stats)[k].toFixed(2))}</b></div>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="attribute-heading">능력치 배분 <b>남은 ${s.attributePoints}점</b></div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<button type="button" data-stat="${k}" ${!s.activeCharacterId || !s.attributePoints || !connected ? 'disabled' : ''} aria-label="${statNames[k]} 1점 배분">${statLabelHTML(k)} <b>${s.stats[k]}</b></button>`).join('')}</div>`;
+  const attackRange = s.attackDamage ? `${s.attackDamage.min}~${s.attackDamage.max}` : '—';
+  const nextStatsHTML = `<div class="attribute-heading">능력치 배분 <b>남은 ${s.attributePoints}점</b></div><div class="base-stats">${['STR', 'CON', 'DEX', 'PER', 'INT', 'RES'].map(k => `<button type="button" data-stat="${k}" ${!s.activeCharacterId || !s.attributePoints || !connected ? 'disabled' : ''} aria-label="${statNames[k]} 1점 배분">${statLabelHTML(k)} ${attributeValueHTML(s.stats[k], s.attributeBreakdown?.[k])}</button>`).join('')}</div><div class="defense-stats">${['DEF', 'REF', 'FOR', 'WIL'].map(k => statLabelHTML(k, s.stats[k], defenseTooltip(k, s.defenseBreakdown?.[k]))).join('')}</div><div class="combat-stats">${['ACC', 'attackDamage', 'PEN', 'AR', 'actionSpeed'].map(k => `<div class="combat-stat" data-combat-stat="${k}"${k === 'attackDamage' ? ' title="일반 명중 기준 · 힘·무기 등급·숙련 반영 · 적 방어도·치명타·스킬 보정 제외"' : ''}><small>${statLabelHTML(k)}</small><b>${k === 'attackDamage' ? attackRange : combatStatDisplay(k, (s.combatStats || s.stats)[k])}</b></div>`).join('')}</div>`;
   // Preserve hovered defense badges across unchanged server snapshots.
   if (nextStatsHTML !== statsHTML) { $('#stats').innerHTML = nextStatsHTML; statsHTML = nextStatsHTML; }
   defenseDetails.update();
@@ -147,18 +153,22 @@ function renderInventory(s) {
   const key = JSON.stringify([s.inventory.map(({cooldown, ...item}) => item), s.equipment, s.skillSlots, s.equipmentUsers, s.characters.map(c=>[c.id,c.name]), s.activeCharacterId, s.treasureOffers, filter, hideOtherEquipment]); if (key === inventoryKey) return; inventoryKey = key;
   const items = sortInventory(s, filter, hideOtherEquipment);
   const offers = filter === 'treasure' ? s.treasureOffers || [] : [];
-  $('#sell-normal').closest('.inventory-tools').hidden = filter === 'treasure';
+  $('#sell-normal').closest('.inventory-tools').hidden = ['skill','treasure'].includes(filter);
   $('#drop-probability-summary').hidden = filter === 'treasure';
-  $('.inventory-footer > span:last-child').textContent = filter === 'treasure' ? '소장한 보물상자 아이콘을 눌러 감상하세요.' : '모든 캐릭터에서 장착 해제 후 판매 가능';
+  $('.inventory-footer > span:last-child').textContent = filter === 'treasure' ? '소장한 보물상자 아이콘을 눌러 감상하세요.' : filter === 'skill' ? '계정 공용 스킬 · 캐릭터별 최대 6개 장착 · 판매 불가' : '모든 캐릭터에서 장착 해제 후 판매 가능';
   $('#item-count').textContent = hideOtherEquipment ? `${items.length} / ${s.inventory.length}개` : `${s.inventory.length}개`;
   const sale = s.normalSale || { count: 0, gold: 0 };
   $('#sell-normal').textContent = `일반 일괄 판매 (${sale.count}개 · ${sale.gold} G)`;
   $('#sell-normal').disabled = !sale.count;
+  if (filter === 'treasure' && (items.length || offers.length)) {
+    $('#inventory-list').innerHTML = treasureListHTML(items, offers);
+    return;
+  }
   const ownedHTML = items.length ? items.map(item => {
     if (item.slot === 'treasure') return treasureCardHTML(item);
     const skill = item.slot === 'skill';
     const equipped = skill ? s.skillSlots.includes(item.id) : Object.values(s.equipment).includes(item.id);
-    if (skill) return `<article class="item skill-item"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3>${esc(item.name)}${equipped ? '<span class="equipped">장착</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${esc(item.id)}" ${!equipped && (!item.enabled || s.skillSlots.every(Boolean)) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button></div></div><p>${esc(item.description)}<br>${esc(skillDescription(item))}<br>이 캐릭터의 스킬 · 최대 6개 장착 · 판매 불가</p></div></article>`;
+    if (skill) return `<article class="item skill-item"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3>${esc(item.name)}${equipped ? '<span class="equipped">장착</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${esc(item.id)}" ${!s.activeCharacterId || (!equipped && (!item.enabled || s.skillSlots.every(Boolean))) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button></div></div><p>${esc(skillDescription(item))}</p></div></article>`;
     const users = s.equipmentUsers?.[item.id] || (equipped ? [s.activeCharacterId] : []);
     const names = users.map(id => s.characters.find(c=>c.id === id)?.name || id).join('·');
     return `<article class="item ${!item.gradeId && item.tier >= 2 ? 'rare' : ''}" data-grade="${esc(item.gradeId || 'legacy')}"><div class="item-icon">${itemIconHTML(item)}</div><div><div class="item-heading"><h3><span class="rarity">${esc(item.rarity)}</span> ${esc(item.name)}${users.length ? `<span class="equipped">${esc(names)} 장착</span>` : ''}${item.special ? ' <span class="item-special">특수</span>' : ''}</h3><div class="item-actions"><button data-action="${equipped ? 'UNEQUIP' : 'EQUIP'}" data-item="${item.id}" ${!s.activeCharacterId || (!equipped && users.length) ? 'disabled' : ''}>${equipped ? '해제' : '장착'}</button><button class="sell" data-action="SELL" data-item="${item.id}" ${users.length ? `disabled title="${esc(names)} 캐릭터에서 장착을 해제해 주세요"` : ''}>판매 ${item.value} G</button></div></div><p>${itemDetailsHTML(item)}</p></div></article>`;
@@ -204,7 +214,7 @@ async function presence(active = true) { if (!user) return; if (active) lastHear
 function disconnect() { source?.close(); source = null; connected = false; skills.disconnect(); statusEffects.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '연결 대기'; }
 async function connect() {
   disconnect();
-  try { receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; skills.disconnect(); statusEffects.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
+  try { await regionsReady; receive(await api('/api/state')); await presence(); source = new EventSource('/api/events?clientId=' + clientId); source.onmessage = e => { receive(JSON.parse(e.data)); if (Date.now() - lastHeartbeat > 4000) presence(); }; source.onerror = () => { connected = false; skills.disconnect(); statusEffects.disconnect(); world?.clearTransient(); updateChoices(); updateInn(); $('#connection').classList.add('lost'); $('#connection').textContent = '서버 재연결 중…'; $('#server-status').textContent = 'RECONNECTING'; api('/api/auth/me').then(r => { if (!r.user) { disconnect(); user = null; showAuth(); } }).catch(() => {}); }; } catch (e) { toast(e.message); }
 }
 setInterval(() => { if (user) presence(); }, 4000);
 addEventListener('pagehide', () => { if (user) fetch('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, active: false }), keepalive: true }); });
@@ -218,16 +228,36 @@ authDialog.addEventListener('cancel', e => e.preventDefault());
 const logout = document.createElement('button'); logout.className = 'quiet'; logout.id = 'logout'; logout.textContent = '로그아웃'; logout.hidden = true; $('nav').insertBefore(logout, $('#help-button'));
 const adminSettings = initAdminSettings({ api, getUser: () => user, getState: () => data?.state, onReset: result => { if (result.state) receive(result); } });
 function showAuth() { treasureViewer.close(); bestiary.update(null); adminSettings.setUser(null); logout.hidden = true; if (!authDialog.open) authDialog.showModal(); }
-function setAuthMode(mode) { passwordInput.clear(); authMode = mode; $('#tab-login').classList.toggle('active', mode === 'login'); $('#tab-register').classList.toggle('active', mode === 'register'); $('#auth-title').textContent = mode === 'login' ? '이어서 떠나는 여행' : '첫 여행을 시작해 볼까요?'; $('#auth-submit').textContent = mode === 'login' ? '로그인하고 여행 계속하기' : '계정 만들고 모험 시작하기'; $('#password').autocomplete = mode === 'login' ? 'current-password' : 'new-password'; $('#auth-error').textContent = ''; }
+let authWaitTimer;
+function clearAuthWait() { clearInterval(authWaitTimer); authWaitTimer = undefined; }
+function showAuthWait(seconds) {
+  clearAuthWait();
+  const until = Date.now() + seconds * 1000;
+  const update = () => {
+    const remaining = Math.max(0, Math.ceil((until - Date.now()) / 1000));
+    $('#auth-error').textContent = remaining ? `로그인 5회 실패로 잠겼습니다. ${Math.floor(remaining / 60)}분 ${remaining % 60}초 후 다시 시도해 주세요.` : '대기 시간이 지났습니다. 다시 로그인해 주세요.';
+    if (!remaining) clearAuthWait();
+  };
+  update(); authWaitTimer = setInterval(update, 1000);
+}
+$('#username').addEventListener('input', () => { clearAuthWait(); $('#auth-error').textContent = ''; });
+function setAuthMode(mode) { clearAuthWait(); passwordInput.clear(); authMode = mode; $('#tab-login').classList.toggle('active', mode === 'login'); $('#tab-register').classList.toggle('active', mode === 'register'); $('#auth-title').textContent = mode === 'login' ? '이어서 떠나는 여행' : '첫 여행을 시작해 볼까요?'; $('#auth-submit').textContent = mode === 'login' ? '로그인하고 여행 계속하기' : '계정 만들고 모험 시작하기'; $('#password').autocomplete = mode === 'login' ? 'current-password' : 'new-password'; $('#auth-error').textContent = ''; }
 $('#tab-login').onclick = () => setAuthMode('login'); $('#tab-register').onclick = () => setAuthMode('register');
 $('#auth-form').onsubmit = async e => {
   e.preventDefault(); if (!validPassword($('#password').value)) { $('#auth-error').textContent = '비밀번호는 숫자 6자리로 입력하세요.'; $('#password').focus(); return; } const button = $('#auth-submit'); button.disabled = true; $('#auth-error').textContent = '';
+  clearAuthWait();
+  const submittedMode = authMode, submittedName = $('#username').value.toLowerCase();
   try { const result = await api(`/api/auth/${authMode}`, { username: $('#username').value, password: $('#password').value }); user = result.user; adminSettings.setUser(user); passwordInput.clear(); authDialog.close(); logout.hidden = false; inventoryKey = ''; journalSeq = -1; journal.reset(); await connect(); }
-  catch (error) { $('#auth-error').textContent = error.message; }
+  catch (error) {
+    if (authMode === submittedMode && $('#username').value.toLowerCase() === submittedName) {
+      if (error.code === 'LOGIN_LOCKED' && Number.isFinite(error.retryAfter)) showAuthWait(error.retryAfter);
+      else $('#auth-error').textContent = error.message;
+    }
+  }
   finally { button.disabled = false; }
 };
 logout.onclick = async () => { try { await api('/api/auth/logout', {}); user = null; data = null; statusEffects.update(null); world?.update(null); disconnect(); showAuth(); } catch (e) { toast(e.message); } };
-api('/api/auth/me').then(r => { user = r.user; adminSettings.setUser(user); if (user) { logout.hidden = false; connect(); } else showAuth(); }).catch(e => { toast(e.message); showAuth(); });
+regionsReady.then(() => api('/api/auth/me')).then(r => { user = r.user; adminSettings.setUser(user); if (user) { logout.hidden = false; connect(); } else showAuth(); }).catch(e => { toast(e.message); showAuth(); });
 // Read-only diagnostics for local QA; contains no credentials or authoritative setters.
 window.zwiequestDiagnostics = () => ({ render: world?.diagnostics(), phase: data?.state?.phase, eventSeq: data?.state?.eventSeq, connected });
 
@@ -238,6 +268,7 @@ document.body.append(mapDialog);
 const mapDeparture = document.createElement('div'); mapDeparture.className = 'map-departure';
 mapDeparture.innerHTML = '<label>다음 출발 지역 <select id="map-start-region" aria-label="다음 출발 지역"></select></label><span>여관에서 출발할 때 적용됩니다.</span><button id="map-cancel-route">자동 이동 해제</button><span id="map-route-status" role="status"></span>';
 mapDialog.insertBefore(mapDeparture, $('#map-graph'));
+prepareModalScroll(mapDialog);
 let mapRenderKey = '', mapStartPending = false, mapRoutePending = false;
 function focusMapNode(id) {
   const graph = $('#map-graph'), node = [...graph.querySelectorAll('[data-node]')].find(n => n.dataset.node === id);
@@ -250,7 +281,14 @@ mapDialog.querySelector('.dialog-close').onclick = () => mapDialog.close();
 mapButton.onclick = () => { if (!data?.state) return toast('먼저 모험가를 선택하세요.'); renderMap(); mapDialog.showModal(); requestAnimationFrame(() => focusMapNode(mapViewState(data.state).currentNodeId)); };
 $('#map-root').onclick = () => focusMapNode(data.state.mapGraph.rootId);
 $('#map-current').onclick = () => focusMapNode(mapViewState(data.state).currentNodeId);
-$('#map-scale').onchange = () => { renderMap(); focusMapNode(mapViewState(data.state).currentNodeId); };
+$('#map-scale').onchange = () => {
+  const graph = $('#map-graph'), previousScale = Number(graph.dataset.scale || 1), scale = Number($('#map-scale').value);
+  const centerX = (graph.scrollLeft + graph.clientWidth / 2) / previousScale;
+  const centerY = (graph.scrollTop + graph.clientHeight / 2) / previousScale;
+  renderMap();
+  graph.scrollLeft = centerX * scale - graph.clientWidth / 2;
+  graph.scrollTop = centerY * scale - graph.clientHeight / 2;
+};
 $('#map-start-region').onchange = async event => {
   mapStartPending = true; event.target.disabled = true;
   try { await command('START_MAP', { mapId: event.target.value }); }
@@ -272,19 +310,21 @@ function renderMap() {
   if (!data?.state) return;
   const s = mapViewState(data.state), select = $('#map-start-region');
   const starts = s.availableStarts || [{ id: 'village', name: REGIONS.village.name }], options = JSON.stringify(starts);
-  if (select.dataset.options !== options) { select.innerHTML = starts.map(map => `<option value="${esc(map.id)}">${esc(map.name)}</option>`).join(''); select.dataset.options = options; }
+  if (select.dataset.options !== options) { select.innerHTML = starts.map(map => `<option value="${esc(map.id)}">${esc(map.label || map.name)}</option>`).join(''); select.dataset.options = options; }
   if (!mapStartPending) select.value = s.departureMapId || 'village';
   select.disabled = !connected || mapStartPending;
-  $('#map-cancel-route').disabled = !connected || !s.autoRoute;
-  $('#map-route-status').textContent = s.autoRoute ? `자동 이동 중 · 목표 ${nodeLabels(s.mapGraph)[s.autoRoute.nodeId] || ''}` : '앞으로 이어지는 노드를 선택하면 자동 이동합니다.';
-  const scale = Number($('#map-scale').value), key = JSON.stringify([s.mapGraph, s.currentNodeId, s.path, s.exploredNodes, s.checkpointHistory, s.autoRoute, s.phase, scale]);
+  $('#map-cancel-route').disabled = !connected || !(s.autoRoute || s.reservedRoute);
+  const goal = s.routeGoal;
+  $('#map-route-status').textContent = goal ? `${goal.pending ? '다음 모험 예약' : '자동 이동 중'} · ${goal.mapName} ${goal.label}${goal.reserved ? ' · 도착까지 유지' : ''}` : '노드 선택: 지금 갈 수 있으면 자동 이동, 갈 수 없으면 다음 모험 예약';
+  const scale = Number($('#map-scale').value), key = JSON.stringify([s.mapGraph, s.currentNodeId, s.path, s.exploredNodes, s.checkpointHistory, s.autoRoute, s.reservedRoute, s.phase, scale]);
   if (key === mapRenderKey) return; mapRenderKey = key;
   $('#map-title').textContent = `${s.mapGraph.name} · 깊이 ${s.step} / ${s.mapGraph.depth}`;
   $('#map-subtitle').textContent = '노드 표기: 깊이-번호 · 일반 경로 도착 시 전투 12.5% / 보물 12.5% / 통과 75%';
   const graph = $('#map-graph'), { scrollLeft, scrollTop } = graph;
-  const previousCurrent = graph.querySelector('.map-node.current')?.dataset.node;
+  const focusedNode = graph.contains(document.activeElement) ? document.activeElement.closest('[data-node]')?.dataset.node : null;
+  graph.dataset.scale = String(scale);
   graph.dataset.map = s.mapId; graph.innerHTML = mapSVG(s, scale, data.themes);
   graph.style.backgroundImage = `linear-gradient(#16333166,#11292888),url('${REGIONS[s.mapId].route}')`;
   graph.scrollLeft = scrollLeft; graph.scrollTop = scrollTop;
-  if (mapDialog.open && previousCurrent !== s.currentNodeId) requestAnimationFrame(() => focusMapNode(s.currentNodeId));
+  if (focusedNode) [...graph.querySelectorAll('[data-node]')].find(n => n.dataset.node === focusedNode)?.focus({ preventScroll: true });
 }

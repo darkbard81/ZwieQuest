@@ -1,0 +1,66 @@
+/* Same env() source as the main viewport. Insets are deducted at this boundary only. */
+:root {
+  --modal-safe-left:var(--safe-left);
+  --modal-safe-top:var(--safe-top);
+  --modal-safe-width:max(0px,calc(100vw - var(--safe-left) - var(--safe-right)));
+  --modal-safe-height:max(0px,calc(100dvh - var(--safe-top) - var(--safe-bottom)));
+}
+dialog {
+  --modal-gap-x:12px;
+  --modal-gap-y:12px;
+  --modal-width:680px;
+  --modal-height:auto;
+  --modal-available-width:max(0px,calc(var(--modal-safe-width) - 2 * var(--modal-gap-x)));
+  --modal-available-height:max(0px,calc(var(--modal-safe-height) - 2 * var(--modal-gap-y)));
+  position:fixed;
+  inset:auto;
+  left:calc(var(--modal-safe-left) + var(--modal-safe-width) / 2);
+  top:calc(var(--modal-safe-top) + var(--modal-safe-height) / 2);
+  transform:translate(-50%,-50%);
+  margin:0;
+  min-width:0;
+  min-height:0;
+  width:min(var(--modal-width),var(--modal-available-width));
+  height:var(--modal-height);
+  max-width:var(--modal-available-width);
+  max-height:var(--modal-available-height);
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+#help { --modal-width:520px; --modal-content-padding:30px; }
+#auth-dialog { --modal-width:460px; }
+#admin-settings { --modal-width:660px; --modal-gap-x:16px; --modal-gap-y:16px; }
+#map-dialog { --modal-width:1120px; --modal-content-padding:18px; }
+#character-dialog { --modal-width:680px; --modal-gap-y:16px; --modal-content-padding:24px; }
+#bestiary-dialog {
+  --modal-width:900px;
+  --modal-gap-x:max(12px,2.5vw);
+  --modal-height:min(720px,90dvh,var(--modal-available-height));
+}
+@media(min-width:651px) {
+  #bestiary-dialog { --modal-width:var(--modal-available-width); --modal-gap-x:12px; --modal-height:var(--modal-available-height); }
+}
+
+dialog.scrollable-modal, #help, #map-dialog, #character-dialog { padding:0; overflow:hidden; }
+dialog.scrollable-modal[open] { display:flex; flex-direction:column; gap:0; }
+#map-dialog[open] { gap:0; }
+.modal-scroll { min-height:0; min-width:0; overflow:auto; overscroll-behavior:contain; padding:var(--modal-content-padding); }
+.scrollable-modal > .dialog-close { z-index:2; }
+.modal-scroll > :is(.eyebrow,h2) { padding-right:44px; }
+#map-dialog .modal-scroll { display:flex; flex-direction:column; gap:8px; }
+#map-dialog .modal-scroll > :not(#map-graph) { flex-shrink:0; }
+#map-graph { height:min(65dvh,var(--modal-available-height)); max-height:min(65dvh,var(--modal-available-height)); }
+
+/* Image and controls share the safe rectangle; only the backdrop covers unsafe edges. */
+#treasure-viewer { --modal-gap-x:0px; --modal-gap-y:0px; --modal-width:var(--modal-safe-width); --modal-height:var(--modal-safe-height); }
+#treasure-viewer::backdrop { background:#071012f2; }
+.treasure-viewer-hint { max-width:calc(100% - 24px); white-space:normal; text-align:center; }
+#toast {
+  left:calc(var(--modal-safe-left) + var(--modal-safe-width) / 2);
+  top:calc(var(--modal-safe-top) + var(--modal-safe-height) - 32px);
+  bottom:auto;
+  transform:translate(-50%,-100%);
+  max-width:max(0px,calc(var(--modal-safe-width) - 32px));
+  overflow-wrap:anywhere;
+}
+/* In-world overlays already inherit the main safe viewport; do not inset them again. */

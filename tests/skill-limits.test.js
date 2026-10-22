@@ -63,11 +63,11 @@ test('dagger ON adds exactly one ACC, never percent or stacking; OFF/other weapo
   const duplicate={...skill,id:'copy'};g.character.skills.push(duplicate);g.character.skillSlots[2]=duplicate.id;
   for(let n=0;n<4;n++)assert.deepEqual(maintainedSkillBonuses(g.state),{ACC:1});assert.deepEqual(stats(g.state,g.config),base);
   for(const key of ['DEF','REF','FOR','WIL'])assert.equal(g.snapshot().combatStats[key],base[key]);
-  g.battleAction('hero');assert.equal(g.state.battle.lastHit.calculation.acc,base.ACC+1);assert.equal(g.state.battle.lastHit.target,'REF');
+  g.battleAction('hero');assert.equal(g.state.battle.lastHit.calculation.acc,base.ACC+1);assert.equal(g.state.battle.lastHit.target,'DEF');
   const reloaded=new Game(g.config,structuredClone(g.state));assert.equal(reloaded.snapshot().combatStats.ACC,base.ACC+1);
   toggle(false);assert.equal(g.snapshot().combatStats.ACC,base.ACC);toggle(true);
   const other=generateEquipment({slot:'weapon',templateId:'fire-staff',gradeId:'normal',specials:false,rng:()=>0});g.state.inventory.push(other);g.command({characterId: g.character?.id, type:'EQUIP',itemId:other.id});assert.equal(g.snapshot().combatStats.ACC,stats(g.state,g.config).ACC);
-  g.battleAction('hero');assert.equal(g.state.battle.lastHit.calculation.acc,stats(g.state,g.config).ACC);assert.equal(g.state.battle.lastHit.target,'WIL');
+  g.battleAction('hero');assert.equal(g.state.battle.lastHit.calculation.acc,stats(g.state,g.config).ACC);assert.equal(g.state.battle.lastHit.target,'DEF');
   g.command({characterId: g.character?.id, type:'EQUIP',itemId:dagger.id});g.phase('TREASURE',1000);assert.deepEqual(maintainedSkillBonuses(g.state),{ACC:0});
   g.beginBattle(); g.state.enemy.skills=[];assert.deepEqual(g.state.battle.skillToggles,{});assert.equal(g.snapshot().combatStats.ACC,base.ACC);
  } finally {Object.assign(def,original);}

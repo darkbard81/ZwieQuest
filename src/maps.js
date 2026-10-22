@@ -1,12 +1,16 @@
-import { REGIONS } from '../public/regions.js';
-const bosses = { volcano: '잿불의 군주', snow: '서리 왕관', desert: '사막의 파수꾼', beach: '밀물의 수호자' };
-export const MAP_DEFS = Object.fromEntries(Object.entries(REGIONS).map(([id, { name, subtitle }]) => [id, {
-  name, subtitle,
-  ...(id === 'village' ? { terminals: [
-    ...Array.from({ length: 6 }, (_, i) => ({ kind: 'deadend', label: `마을 막다른 길 ${i + 1}` })),
-    ...Object.keys(bosses).map(region => ({ kind: 'exit', region, label: `${REGIONS[region].name} 연결` }))
-  ] } : { boss: bosses[id] })
-}]));
+import { REGIONS, validateRegions } from './regions.js';
+export function mapDefinitions(regions = REGIONS) {
+  validateRegions(regions);
+  return Object.fromEntries(Object.entries(regions).map(([id, region]) => [id, {
+    name: region.name, subtitle: region.subtitle, depth: region.depth, boss: region.boss,
+    terminals: [
+      ...Array.from({ length: region.deadEnds }, (_, i) => ({ kind: 'deadend', label: `${id === 'village' ? '마을' : region.name} 막다른 길 ${i + 1}` })),
+      ...region.exits.map(target => ({ kind: 'exit', region: target, label: `${regions[target].name} 연결` })),
+      ...(region.boss ? [{ kind: 'boss', label: region.boss }] : [])
+    ]
+  }]));
+}
+export const MAP_DEFS = mapDefinitions();
 
 export function refreshMapNames(map) {
   const def = MAP_DEFS[map.id], previousName = map.name;
@@ -22,9 +26,11 @@ export const MAP_VERSION = 2;
 export const MAP_GENERATION_VERSION = 4;
 const directions = ['left', 'right'];
 
-export function maxNodes(d) {
+export function maxNodes(d, depth = 10, terminalCount = 10) {
   if (d <= 4) return 2 ** d;
-  return 30 - 2 * d;
+  // Preserve the depth-10 taper; longer maps keep a middle plateau.
+  const endWidth = Math.max(10, terminalCount);
+  return Math.min(Math.max(20, endWidth), 2 * (depth - d) + endWidth);
 }
 
 function shuffle(items, rng) {
@@ -36,13 +42,13 @@ function shuffle(items, rng) {
 }
 
 // All regions share the same forward branching rules; only their destinations differ.
-export function generateMap(id, rng) {
-  const def = MAP_DEFS[id], depth = 10, nodes = {};
+export function generateMap(id, rng, definitions = MAP_DEFS) {
+  const def = definitions[id], depth = def.depth, nodes = {};
   const terminals = def.terminals || [{ kind: 'boss', label: def.boss }];
-  const destinations = terminals.map((terminal, i) => ({ id: `${id}:10:${i}`, depth, ...terminal }));
+  const destinations = terminals.map((terminal, i) => ({ id: `${id}:${depth}:${i}`, depth, ...terminal }));
   const terminalIds = destinations.map(node => node.id);
   // Every branching node has two children, including the boss's final dead-end sibling.
-  if (destinations.length % 2) destinations.push({ id: `${id}:10:dead:0`, depth, kind: 'deadend', label: '막다른 길', sideBranch: true });
+  if (destinations.length % 2) destinations.push({ id: `${id}:${depth}:dead:0`, depth, kind: 'deadend', label: '막다른 길', sideBranch: true });
   const pathNode = (d, index) => ({
     id: `${id}:${d}:${index}`, depth: d, kind: d === 0 ? 'start' : 'path',
     label: d === 0 ? (id === 'village' ? 'HOME' : `${def.name} 출발점`) : `${def.name} ${d}-${index + 1}`
@@ -54,7 +60,7 @@ export function generateMap(id, rng) {
     if (d === depth - 1) continuing = destinations.length / 2;
     else if (d >= 4) {
       // Count both continuing paths and dead ends against the NEXT layer cap.
-      const maximum = Math.min(layer.length, Math.floor(maxNodes(d + 1) / 2));
+      const maximum = Math.min(layer.length, Math.floor(maxNodes(d + 1, depth, destinations.length) / 2));
       // Keep several routes alive, and reserve enough capacity for every destination.
       const minimum = Math.max(Math.ceil(maximum / 2), Math.ceil(destinations.length / 2 ** (depth - d)));
       continuing = minimum + rng(maximum - minimum + 1);
