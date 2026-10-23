@@ -55,7 +55,14 @@ for (const appearance of APPEARANCES) {
     validate(JSON.parse(readFileSync(new URL('sprite.json',dir))),appearance.id);
     for(const [action] of contract){
       const data=readFileSync(new URL(`sheets/${action}.webp`,dir));
-      assert.deepEqual(losslessWebpInfo(data),{width:4096,height:1536,alpha:true},'lossless WebP dimensions and transparency');
+      if (appearance.rgbQuality === 90) {
+        assert.equal(data.toString('ascii',0,4),'RIFF'); assert.equal(data.toString('ascii',8,12),'WEBP');
+        const chunks = new Map();
+        for(let offset=12;offset+8<=data.length;){const type=data.toString('ascii',offset,offset+4),size=data.readUInt32LE(offset+4);assert.ok(offset+8+size<=data.length);chunks.set(type,data.subarray(offset+8,offset+8+size));offset+=8+size+(size&1);}
+        assert.ok(chunks.has('VP8 '));assert.ok(chunks.has('ALPH'));
+        const extended=chunks.get('VP8X');assert.ok(extended[0]&16);assert.equal(extended.readUIntLE(4,3)+1,4096);assert.equal(extended.readUIntLE(7,3)+1,1536);
+        const meta=JSON.parse(readFileSync(new URL('sprite.json',dir)));assert.equal(meta.encoding.rgbQuality,90);assert.equal(meta.encoding.alphaQuality,100);assert.equal(meta.encoding.alphaLosslessVerified,true);
+      } else assert.deepEqual(losslessWebpInfo(data),{width:4096,height:1536,alpha:true},'lossless WebP dimensions and transparency');
     }
     assert.equal(appearance.idleDurationMs,undefined);assert.equal(appearance.idleFrameCount,undefined);
   });

@@ -6,7 +6,7 @@ import { APPEARANCES, restRemaining, mirrorAppearance } from '../public/appearan
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
 const make = cls => { const game = new Game(config, null, () => 0); game.create({name: '모험가', appearanceId: cls || 'warrior'});game.state.homePaused=false; return game; };
 
-test('all six appearances are cosmetic and produce the same starting stats',()=>{
+test('all appearances are cosmetic and produce the same starting stats',()=>{
  let expected;for(const appearance of APPEARANCES){const g=make(appearance.id);assert.equal(g.character.appearanceId,appearance.id);assert.equal(appearance.classId,undefined);expected ||= g.snapshot().stats;assert.deepEqual(g.snapshot().stats,expected);const restored=new Game(config,structuredClone(g.state));assert.equal(restored.character.appearanceId,appearance.id);}
 });
 test('rest countdown uses rate, selected character survives departure and cannot switch during travel',()=>{

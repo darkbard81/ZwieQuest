@@ -37,7 +37,7 @@ test('region data has one file source and encounter compatibility uses the same 
   for (const region of Object.values(publicRegions())) {
     assert.equal(Object.hasOwn(region, 'exits'), false);
     assert.equal(Object.hasOwn(region, 'boss'), false);
-    assert.equal(Object.hasOwn(region, 'excludedDamageTypes'), false);
+    assert.equal(Object.hasOwn(region, 'allowedDamageTypes'), false);
   }
 });
 

@@ -447,3 +447,43 @@ html.treasure-viewer-open,html.treasure-viewer-open body{overflow:hidden}
   #stats .combat-stat .ui-icon{display:none}
 }
 @media(max-width:359px){#stats .combat-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Character browsing shares one stage; small portraits stay still. */
+#character-dialog { --inn-accent:#ddc589; --inn-panel:#17372e; }
+#character-dialog [hidden] { display:none !important; }
+.inn-manager-tabs,.inn-motion-actions,.inn-motion-tools { display:flex; flex-wrap:wrap; gap:8px; }
+.inn-manager-tabs { margin:12px 0 16px; }
+.inn-manager-tabs button,.inn-motion-actions button,.inn-motion-tools button { min-height:40px; }
+#character-dialog button[aria-pressed=true] { border-color:var(--inn-accent); background:#385344; color:#fff1cb; box-shadow:inset 0 0 0 1px var(--inn-accent); }
+.inn-manager-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px; align-items:start; }
+.inn-preview { min-width:0; background:var(--inn-panel); border:1px solid #496454; border-radius:12px; padding:12px; }
+.inn-preview h3 { margin:0 0 8px; text-align:center; }
+.inn-preview-stage { display:grid; place-items:center; border-radius:8px; background:radial-gradient(ellipse at 50% 85%,#63725155,transparent 60%),#122b25; }
+.inn-preview-stage canvas { display:block; width:min(100%,300px); height:auto; aspect-ratio:1; }
+#character-dialog .inn-preview-status { min-height:20px; margin:6px 0; font-size:11px; }
+.inn-motion-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
+.inn-motion-actions button { padding:6px; }
+.inn-motion-tools { margin-top:10px; align-items:center; }
+.inn-motion-tools button { padding:6px 8px; font-size:12px; }
+#character-dialog .inn-motion-tools label { display:flex; align-items:center; gap:6px; font-size:12px; margin:0; }
+#character-dialog .inn-motion-tools input { width:18px; height:18px; margin:0; }
+.inn-motion-tools select { color:inherit; background:#132a25; border:1px solid #526a5a; padding:7px; border-radius:5px; }
+.inn-manager-details { min-width:0; }
+#character-dialog .appearance-list { grid-template-columns:repeat(3,minmax(0,1fr)); margin:8px 0 14px; max-height:min(320px,40dvh); overflow-y:auto; overscroll-behavior:contain; padding:2px; }
+#character-dialog .appearance-option { padding:8px 4px; display:grid; justify-items:center; gap:5px; }
+.appearance-option img,.character-card img { object-fit:contain; border-radius:8px; }
+#character-dialog .character-roster { margin:0 0 12px; }
+#character-dialog .character-card { width:100%; text-align:left; display:flex; flex-direction:row; justify-content:flex-start; gap:10px; align-items:center; }
+.character-card span { min-width:0; overflow-wrap:anywhere; }
+.character-card strong,.character-card small { display:block; }
+#character-select { width:100%; margin-bottom:12px; }
+#character-retire-open { display:block; margin-top:16px; }
+#character-create-submit { width:100%; }
+@media(max-width:650px) {
+  .inn-manager-layout { grid-template-columns:minmax(0,1fr); gap:16px; }
+  #character-dialog { --modal-content-padding:16px; }
+  .inn-preview-stage canvas { width:min(100%,240px); }
+}
+@media(min-width:651px) and (max-height:800px) {
+  .inn-preview-stage canvas { width:min(100%,260px); }
+}

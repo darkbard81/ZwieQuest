@@ -42,8 +42,8 @@
 - `public/assets/{warrior,wizard,barbarian,ranger,cat,lamia}/sprite.json`, `sheets/*.png`
 - `public/portraits/*.png`, `public/assets/appearance-sources.json`, `public/assets/manifest.json`
 - `tests/sprite-contract.test.js`, `README.md`, 이 문서
-- 로컬 제작 계약 `art-workbench/sprites/AGENTS.override.md`와 캐릭터별 `latest-animation-run.txt`
+- 로컬 제작 계약 `art-workbench/sprite/AGENTS.override.md`와 캐릭터별 `latest-animation-run.txt`
 
-이전 합본·메타데이터·초상화와 새 raw/clean/cell 프레임·시트·GIF·출처·브라우저 검증 자료는 `art-workbench/sprites/source-512-20261021T054544Z/`에 보존했다. 새 런타임은 합본을 사용하지 않아 기존 `public/assets/<id>/sprite.png`는 백업 후 제거했다. `runtime-backup/`에는 이전 화면 코드와 출처 목록을 보존했다. `browser-review/`에 브라우저 결과·캡처·운영 제공 해시·테스트 로그를 보존했다.
+이전 합본·메타데이터·초상화와 새 raw/clean/cell 프레임·시트·GIF·출처·브라우저 검증 자료는 `art-workbench/sprite/source-512-20261021T054544Z/`에 보존했다. 새 런타임은 합본을 사용하지 않아 기존 `public/assets/<id>/sprite.png`는 백업 후 제거했다. `runtime-backup/`에는 이전 화면 코드와 출처 목록을 보존했다. `browser-review/`에 브라우저 결과·캡처·운영 제공 해시·테스트 로그를 보존했다.
 
 기존 미커밋 변경을 보존했다. 이번 작업에서 커밋·푸시는 수행하지 않았다.

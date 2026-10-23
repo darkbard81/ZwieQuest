@@ -16,8 +16,8 @@ test('seven Werewolf variants use strength/perception, 10–20 base weapon damag
  for(const {monster,variation} of wolves){
   assert.equal(monster.codexOrder,60);assert.equal(monster.A.STR,6);assert.equal(monster.A.PER,6);
   assert.ok(monster.A.STR>arachne.A.STR);assert.ok(monster.A.PER>arachne.A.PER);assert.ok(monster.A.DEX<arachne.A.DEX);
-  for(const offset of [0,15]){
-   const e=spawn(variation.id,offset);assert.equal(e.monsterId,'werewolf');assert.equal(e.level,5+offset);
+  for(const offset of [0,5]){
+   const e=spawn(variation.id,offset);assert.equal(e.monsterId,'werewolf');assert.equal(e.level,10+offset);
    assert.equal(e.PER,6);assert.equal(e.DEX,2);assert.equal(e.CON,3);assert.deepEqual(e.skills,['weakening-strike']);
    assert.equal(e.weapon.damageMin,10);assert.equal(e.weapon.damageMax,20);assert.equal(e.weapon.hitDefense,'DEF');
   }

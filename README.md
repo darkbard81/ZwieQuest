@@ -68,7 +68,7 @@ npm test
 
 ## 자산
 
-추가 맵에 사용하는 배경 5장(새싹마을·홍련 분화구·백야 설원·산성 호수·낙뢰 고원), 초기 숲 배경과 아이콘 아틀라스는 **내장 imagegen**으로 새로 생성하고 `public/assets/`에 저장했습니다. 유료 API/CLI 대체 경로를 사용하지 않았습니다. 캐릭터 6종은 기존 Grok 원본 영상에서 동작별 24프레임을 512×512로 직접 재추출했습니다. 프레임별 위치 보정 없이 6개의 4096×1536 RGBA 무손실 WebP 동작 시트로 배포하며 캔버스에는 256×256으로 표시합니다. 시트·좌표는 `public/assets/character/<appearance>/`, 초상화는 `public/portraits/`에 있습니다. [512px 추출·검증 기록](docs/sprite-512-validation.md)을 참고하세요. 작업용 원본 영상·개별 시트·기존 런타임 시트 백업은 Git 제외된 `art-workbench/sprites/`에 보관합니다. 원본과 TacticsSD 코드·스킬은 변경하지 않았습니다. 자산 출처·해시는 `public/assets/manifest.json`, 생성 기록은 `ASSET-PROMPTS.md`에 있습니다. PixiJS 8.21.0의 공식 배포본과 CSP 호환 모듈을 로컬 설치본에서 복사했으며 라이선스는 `public/PIXI-LICENSE.txt`에 포함했습니다. Three.js 코드와 의존 파일은 제거했습니다.
+추가 맵에 사용하는 배경 5장(새싹마을·홍련 분화구·백야 설원·산성 호수·낙뢰 고원), 초기 숲 배경과 아이콘 아틀라스는 **내장 imagegen**으로 새로 생성하고 `public/assets/`에 저장했습니다. 유료 API/CLI 대체 경로를 사용하지 않았습니다. 캐릭터 6종은 기존 Grok 원본 영상에서 동작별 24프레임을 512×512로 직접 재추출했습니다. 프레임별 위치 보정 없이 6개의 4096×1536 RGBA 무손실 WebP 동작 시트로 배포하며 캔버스에는 256×256으로 표시합니다. 시트·좌표는 `public/assets/character/<appearance>/`, 초상화는 `public/portraits/`에 있습니다. [512px 추출·검증 기록](docs/sprite-512-validation.md)을 참고하세요. 작업용 원본 영상·개별 시트·기존 런타임 시트 백업은 Git 제외된 `art-workbench/sprite/`에 보관합니다. 원본과 TacticsSD 코드·스킬은 변경하지 않았습니다. 자산 출처·해시는 `public/assets/manifest.json`, 생성 기록은 `ASSET-PROMPTS.md`에 있습니다. PixiJS 8.21.0의 공식 배포본과 CSP 호환 모듈을 로컬 설치본에서 복사했으며 라이선스는 `public/PIXI-LICENSE.txt`에 포함했습니다. Three.js 코드와 의존 파일은 제거했습니다.
 
 ### 6자리 숫자 비밀번호
 

@@ -16,7 +16,8 @@ export function eligibleVariations(mapId, catalog = MONSTER_CATALOG, rules = ENC
   const region = rules.regions[mapId];
   if (!region) throw Error(`Unknown monster region: ${mapId}`);
   return catalog.filter(monster => !monster.regions || monster.regions.includes(mapId)).flatMap(monster => monster.variation
-    .filter(variation => !variation.weapon.damageTypes.some(type => region.excludedDamageTypes.includes(type)))
+    .filter(variation => (!region.allowedDamageTypes || variation.weapon.damageTypes.some(type => region.allowedDamageTypes.includes(type)))
+      && !variation.weapon.damageTypes.some(type => region.excludedDamageTypes?.includes(type)))
     .map(variation => ({ monster, variation })));
 }
 export function eligibleBossVariations(mapId, catalog = MONSTER_CATALOG, rules = ENCOUNTER_CONFIG) {
@@ -49,9 +50,9 @@ export function validateMonsters(catalog, rules) {
       validateCatalog({ ...EQUIPMENT_CATALOG, weapons: [{ weaponCategory: 'natural', ...variation.weapon, id: 'monster-weapon' }], armors: [{ ...variation.armor, id: 'monster-armor' }] });
     }
   }
-  for (const id of Object.keys(REGIONS)) {
+  for (const id of Object.keys(rules.regions)) {
     const region = rules.regions[id];
-    if (!region || !Number.isInteger(region.minLevel) || !Number.isInteger(region.maxLevel) || region.minLevel < 1 || region.maxLevel < region.minLevel || !Array.isArray(region.excludedDamageTypes) || region.excludedDamageTypes.some(type => !types.has(type))) throw Error(`Invalid monster region: ${id}`);
+    if (!region || !Number.isInteger(region.minLevel) || !Number.isInteger(region.maxLevel) || region.minLevel < 1 || region.maxLevel < region.minLevel || (region.excludedDamageTypes !== undefined && (!Array.isArray(region.excludedDamageTypes) || new Set(region.excludedDamageTypes).size !== region.excludedDamageTypes.length || region.excludedDamageTypes.some(type => !types.has(type)))) || (region.allowedDamageTypes !== undefined && (!Array.isArray(region.allowedDamageTypes) || !region.allowedDamageTypes.length || new Set(region.allowedDamageTypes).size !== region.allowedDamageTypes.length || region.allowedDamageTypes.some(type => !types.has(type))))) throw Error(`Invalid monster region: ${id}`);
     if (!eligibleVariations(id, catalog, rules).length) throw Error(`No eligible monsters for ${id}`);
     if (region.boss && (!types.has(region.bossDamageType) || !eligibleBossVariations(id, catalog, rules).length)) throw Error(`Invalid regional boss: ${id}`);
   }

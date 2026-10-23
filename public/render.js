@@ -44,7 +44,7 @@ export async function createWorld(container) {
     }).finally(() => h.loading.delete(action));
     h.loading.set(action, loading); return loading;
   }
-  // Keep the six Idle sheets, plus only the active appearance's action sheets.
+  // Keep the appearance Idle sheets, plus only the active appearance's action sheets.
   await Promise.all(APPEARANCES.map(({ id }) => loadHeroAction(id, 'Front_Idle')));
   function prepareAppearance(id) {
     activeHeroId = id;

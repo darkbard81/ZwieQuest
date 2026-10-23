@@ -84,7 +84,7 @@
         89,
         91
       ],
-      "sourceVideo": "art-workbench/sprites/Cat/animations-20261017T054335Z/video/Front_Idle.mp4",
+      "sourceVideo": "art-workbench/sprite/Cat/animations-20261017T054335Z/video/Front_Idle.mp4",
       "sourceVideoSha256": "81775224f647fa8beada444b403eeccc7092f82bfa8628af2fded669c6aa8a69",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -155,7 +155,7 @@
         122,
         130
       ],
-      "sourceVideo": "art-workbench/sprites/Cat/animations-20261017T054335Z/video/Front_Victory.mp4",
+      "sourceVideo": "art-workbench/sprite/Cat/animations-20261017T054335Z/video/Front_Victory.mp4",
       "sourceVideoSha256": "9bf85fa1302f2569e46af796d520314f4b26783f4606ef139ab33330d477ea2e",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -226,7 +226,7 @@
         133,
         134
       ],
-      "sourceVideo": "art-workbench/sprites/Cat/animations-20261017T054335Z/video/Side_Walk.mp4",
+      "sourceVideo": "art-workbench/sprite/Cat/animations-20261017T054335Z/video/Side_Walk.mp4",
       "sourceVideoSha256": "4835135bd66858998811304e585da1fc79f8544b87d2c5359fd8109714cf01c8",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -297,7 +297,7 @@
         89,
         97
       ],
-      "sourceVideo": "art-workbench/sprites/Cat/animations-20261017T054335Z/video/Side_Attack.mp4",
+      "sourceVideo": "art-workbench/sprite/Cat/animations-20261017T054335Z/video/Side_Attack.mp4",
       "sourceVideoSha256": "cf90d3ecddc8bce8b8d55347ca934f5edc135d9c90fc4e3381b43e931c5e6627",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -368,7 +368,7 @@
         55,
         60
       ],
-      "sourceVideo": "art-workbench/sprites/Cat/animations-20261017T054335Z/video/Side_Down.mp4",
+      "sourceVideo": "art-workbench/sprite/Cat/animations-20261017T054335Z/video/Side_Down.mp4",
       "sourceVideoSha256": "027f755817dc5de1da4fe940471ca938ae88d8c6d40fc8647bfde244d97b516c",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -439,7 +439,7 @@
         90,
         99
       ],
-      "sourceVideo": "art-workbench/sprites/Cat/animations-20261017T054335Z/video/Side_Hit.mp4",
+      "sourceVideo": "art-workbench/sprite/Cat/animations-20261017T054335Z/video/Side_Hit.mp4",
       "sourceVideoSha256": "ac46a2f5a4312563eefcb8b86fd472bd565a531e9bfa4951d751041f023aae57",
       "sourceFrames": 145,
       "sourceFps": 24.0,

@@ -84,7 +84,7 @@
         117,
         120
       ],
-      "sourceVideo": "art-workbench/sprites/Barbarian/animations-20261017T024051Z/video/Front_Idle.mp4",
+      "sourceVideo": "art-workbench/sprite/Barbarian/animations-20261017T024051Z/video/Front_Idle.mp4",
       "sourceVideoSha256": "6e87755aa9b73c0cc1be0509cc2c33cbe447c0048fe9b8bbb0c96f9b78bd3f44",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -155,7 +155,7 @@
         95,
         105
       ],
-      "sourceVideo": "art-workbench/sprites/Barbarian/animations-20261017T024051Z/video/Front_Victory.mp4",
+      "sourceVideo": "art-workbench/sprite/Barbarian/animations-20261017T024051Z/video/Front_Victory.mp4",
       "sourceVideoSha256": "c988450cdaacfdf5f33691ecbe3cad97b4dfaa76e64b73560a4ab6463866e114",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -226,7 +226,7 @@
         137,
         140
       ],
-      "sourceVideo": "art-workbench/sprites/Barbarian/animations-20261017T024051Z/video/Side_Walk.mp4",
+      "sourceVideo": "art-workbench/sprite/Barbarian/animations-20261017T024051Z/video/Side_Walk.mp4",
       "sourceVideoSha256": "53c2c1114785f3d720b06dc0857f2425523bde8e2fe4d517f0ca5e388022d99c",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -297,7 +297,7 @@
         112,
         119
       ],
-      "sourceVideo": "art-workbench/sprites/Barbarian/animations-20261017T024051Z/video/Side_Attack.mp4",
+      "sourceVideo": "art-workbench/sprite/Barbarian/animations-20261017T024051Z/video/Side_Attack.mp4",
       "sourceVideoSha256": "8d483ec9a10fce5487be71fcaba7c522337f311825da69276c47d76883232075",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -368,7 +368,7 @@
         72,
         85
       ],
-      "sourceVideo": "art-workbench/sprites/Barbarian/animations-20261017T024051Z/video/Side_Down.mp4",
+      "sourceVideo": "art-workbench/sprite/Barbarian/animations-20261017T024051Z/video/Side_Down.mp4",
       "sourceVideoSha256": "f736eb30648c4fb03308909dae0bae017ff39abb5ae20380d76a98a698aef725",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -439,7 +439,7 @@
         108,
         115
       ],
-      "sourceVideo": "art-workbench/sprites/Barbarian/animations-20261017T024051Z/video/Side_Hit.mp4",
+      "sourceVideo": "art-workbench/sprite/Barbarian/animations-20261017T024051Z/video/Side_Hit.mp4",
       "sourceVideoSha256": "9af1cebab5345102dfea8514e1ac9ec83cff4bf319402426446b0604661725bf",
       "sourceFrames": 145,
       "sourceFps": 24.0,

@@ -84,7 +84,7 @@
         102,
         103
       ],
-      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Front_Idle.mp4",
+      "sourceVideo": "art-workbench/sprite/Wizard/animations-20261016T022431Z/video/Front_Idle.mp4",
       "sourceVideoSha256": "70e97fd00f3969613712e9a3db0984ff652e9fba05dba7238c25d162127f89f0",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -155,7 +155,7 @@
         130,
         133
       ],
-      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Front_Victory.mp4",
+      "sourceVideo": "art-workbench/sprite/Wizard/animations-20261016T022431Z/video/Front_Victory.mp4",
       "sourceVideoSha256": "c95eedb9748f31ac7186814c9620bdd4bba8162835df5c46b782303b15acf063",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -226,7 +226,7 @@
         69,
         70
       ],
-      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Side_Walk.mp4",
+      "sourceVideo": "art-workbench/sprite/Wizard/animations-20261016T022431Z/video/Side_Walk.mp4",
       "sourceVideoSha256": "3c607c1ca0f49f3e194c6f6ee2c04bf1b113d821e4b0c84e40c229a79909f1ab",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -297,7 +297,7 @@
         121,
         123
       ],
-      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Side_Attack.mp4",
+      "sourceVideo": "art-workbench/sprite/Wizard/animations-20261016T022431Z/video/Side_Attack.mp4",
       "sourceVideoSha256": "9a0db06a6b044f5fccaf78f306007b8bf4963f612c0743d75bbfda898753c981",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -368,7 +368,7 @@
         80,
         83
       ],
-      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Side_Down.mp4",
+      "sourceVideo": "art-workbench/sprite/Wizard/animations-20261016T022431Z/video/Side_Down.mp4",
       "sourceVideoSha256": "8d8bb371d7e3842fe426193814bf877427b1ea926a6a6420787a6bf5bd2e542c",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -439,7 +439,7 @@
         115,
         117
       ],
-      "sourceVideo": "art-workbench/sprites/Wizard/animations-20261016T022431Z/video/Side_Hit.mp4",
+      "sourceVideo": "art-workbench/sprite/Wizard/animations-20261016T022431Z/video/Side_Hit.mp4",
       "sourceVideoSha256": "9a6c5cd59d8fdfe6b11f59e0ac5a329b69777a975b1dc6af2be4ed1ad27ed148",
       "sourceFrames": 145,
       "sourceFps": 24.0,

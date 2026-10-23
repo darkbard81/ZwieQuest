@@ -84,7 +84,7 @@
         74,
         76
       ],
-      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Front_Idle.mp4",
+      "sourceVideo": "art-workbench/sprite/Fighter/animations-20261016T010827Z/video/Front_Idle.mp4",
       "sourceVideoSha256": "56531a15bac701ac88da96812f319f7669a063199fb519d5322b6411a4bdbd55",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -155,7 +155,7 @@
         106,
         108
       ],
-      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Front_Victory.mp4",
+      "sourceVideo": "art-workbench/sprite/Fighter/animations-20261016T010827Z/video/Front_Victory.mp4",
       "sourceVideoSha256": "b3cdef6c93ebf9ff39c58332f57fb748ce61247732bbf1d4027858eb7b4de4a6",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -226,7 +226,7 @@
         133,
         134
       ],
-      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Side_Walk.mp4",
+      "sourceVideo": "art-workbench/sprite/Fighter/animations-20261016T010827Z/video/Side_Walk.mp4",
       "sourceVideoSha256": "78c59fed11199ef4b25e28eca74dcd25bda1ccb4ff9e2250679ab5292ae7d97d",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -297,7 +297,7 @@
         94,
         97
       ],
-      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Side_Attack.mp4",
+      "sourceVideo": "art-workbench/sprite/Fighter/animations-20261016T010827Z/video/Side_Attack.mp4",
       "sourceVideoSha256": "d8aaefcaa5978841fb8c89d15731b2cc41dde4517941c66040cd42fee005c2f1",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -368,7 +368,7 @@
         80,
         83
       ],
-      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Side_Down.mp4",
+      "sourceVideo": "art-workbench/sprite/Fighter/animations-20261016T010827Z/video/Side_Down.mp4",
       "sourceVideoSha256": "5538d46d491507813ec643f72e4ef90e8e7171da4f3163bdd6ebe1c7b81c23ac",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -439,7 +439,7 @@
         94,
         97
       ],
-      "sourceVideo": "art-workbench/sprites/Fighter/animations-20261016T010827Z/video/Side_Hit.mp4",
+      "sourceVideo": "art-workbench/sprite/Fighter/animations-20261016T010827Z/video/Side_Hit.mp4",
       "sourceVideoSha256": "f699e223afa4e4016c29e01bea8e3f72e8b132812338a79f53418cd0c846f789",
       "sourceFrames": 145,
       "sourceFps": 24.0,

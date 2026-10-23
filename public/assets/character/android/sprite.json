@@ -1,0 +1,2241 @@
+{
+  "schemaVersion": 4,
+  "name": "android",
+  "layout": "action-sheets",
+  "frameWidth": 512,
+  "frameHeight": 512,
+  "displaySize": 256,
+  "columns": 8,
+  "rows": 3,
+  "anchor": {
+    "x": 256,
+    "y": 472
+  },
+  "facing": "left",
+  "playbackContract": "shared-v2-512",
+  "normalization": {
+    "mode": "full-source-frame-resize",
+    "target": [
+      512,
+      512
+    ],
+    "crop": null,
+    "translation": [
+      0,
+      0
+    ],
+    "perFrameAlignment": false
+  },
+  "encoding": {
+    "rgbQuality": 90,
+    "alphaQuality": 100,
+    "alphaLosslessVerified": true
+  },
+  "motionReviewPerformed": true,
+  "animations": {
+    "Front_Idle": {
+      "frameNames": [
+        "Front_Idle_00",
+        "Front_Idle_01",
+        "Front_Idle_02",
+        "Front_Idle_03",
+        "Front_Idle_04",
+        "Front_Idle_05",
+        "Front_Idle_06",
+        "Front_Idle_07",
+        "Front_Idle_08",
+        "Front_Idle_09",
+        "Front_Idle_10",
+        "Front_Idle_11",
+        "Front_Idle_12",
+        "Front_Idle_13",
+        "Front_Idle_14",
+        "Front_Idle_15",
+        "Front_Idle_16",
+        "Front_Idle_17",
+        "Front_Idle_18",
+        "Front_Idle_19",
+        "Front_Idle_20",
+        "Front_Idle_21",
+        "Front_Idle_22",
+        "Front_Idle_23"
+      ],
+      "frameCount": 24,
+      "durationMs": 2000,
+      "loop": true,
+      "holdLastFrame": false,
+      "sheet": "sheets/Front_Idle.webp",
+      "sheetSize": [
+        4096,
+        1536
+      ],
+      "sourceVideo": "art-workbench/sprite/Android/animations-20261023T052717Z/video/Front_Idle.mp4",
+      "sourceVideoSha256": "de1c0639b8075c4fbe4abe589c6b714b0cae0b242a173ed466e4f90bbfdc6016",
+      "sourceFrameIndices": [
+        0,
+        3,
+        5,
+        8,
+        11,
+        13,
+        16,
+        19,
+        21,
+        24,
+        27,
+        29,
+        32,
+        35,
+        37,
+        40,
+        43,
+        45,
+        48,
+        51,
+        53,
+        56,
+        59,
+        61
+      ],
+      "sourceFps": 24.0,
+      "sourceFrames": 145,
+      "sourceSize": [
+        544,
+        544
+      ]
+    },
+    "Front_Victory": {
+      "frameNames": [
+        "Front_Victory_00",
+        "Front_Victory_01",
+        "Front_Victory_02",
+        "Front_Victory_03",
+        "Front_Victory_04",
+        "Front_Victory_05",
+        "Front_Victory_06",
+        "Front_Victory_07",
+        "Front_Victory_08",
+        "Front_Victory_09",
+        "Front_Victory_10",
+        "Front_Victory_11",
+        "Front_Victory_12",
+        "Front_Victory_13",
+        "Front_Victory_14",
+        "Front_Victory_15",
+        "Front_Victory_16",
+        "Front_Victory_17",
+        "Front_Victory_18",
+        "Front_Victory_19",
+        "Front_Victory_20",
+        "Front_Victory_21",
+        "Front_Victory_22",
+        "Front_Victory_23"
+      ],
+      "frameCount": 24,
+      "durationMs": 2000,
+      "loop": false,
+      "holdLastFrame": false,
+      "sheet": "sheets/Front_Victory.webp",
+      "sheetSize": [
+        4096,
+        1536
+      ],
+      "sourceVideo": "art-workbench/sprite/Android/animations-20261023T052717Z/video/Front_Victory.mp4",
+      "sourceVideoSha256": "5f53b5cfeca9ac529ce9dc44c122ca4971bc12153efc64afd0917aa6988147ee",
+      "sourceFrameIndices": [
+        0,
+        6,
+        13,
+        19,
+        25,
+        31,
+        38,
+        44,
+        50,
+        56,
+        63,
+        69,
+        75,
+        81,
+        88,
+        94,
+        100,
+        106,
+        113,
+        119,
+        125,
+        131,
+        138,
+        144
+      ],
+      "sourceFps": 24.0,
+      "sourceFrames": 145,
+      "sourceSize": [
+        544,
+        544
+      ]
+    },
+    "Side_Walk": {
+      "frameNames": [
+        "Side_Walk_00",
+        "Side_Walk_01",
+        "Side_Walk_02",
+        "Side_Walk_03",
+        "Side_Walk_04",
+        "Side_Walk_05",
+        "Side_Walk_06",
+        "Side_Walk_07",
+        "Side_Walk_08",
+        "Side_Walk_09",
+        "Side_Walk_10",
+        "Side_Walk_11",
+        "Side_Walk_12",
+        "Side_Walk_13",
+        "Side_Walk_14",
+        "Side_Walk_15",
+        "Side_Walk_16",
+        "Side_Walk_17",
+        "Side_Walk_18",
+        "Side_Walk_19",
+        "Side_Walk_20",
+        "Side_Walk_21",
+        "Side_Walk_22",
+        "Side_Walk_23"
+      ],
+      "frameCount": 24,
+      "durationMs": 1200,
+      "loop": true,
+      "holdLastFrame": false,
+      "sheet": "sheets/Side_Walk.webp",
+      "sheetSize": [
+        4096,
+        1536
+      ],
+      "sourceVideo": "art-workbench/sprite/Android/animations-20261023T052717Z/video/Side_Walk.mp4",
+      "sourceVideoSha256": "b53451962ee0359e67a4ec0e616cb7bd7353fadf719f6ba9609dc37e4da4608f",
+      "sourceFrameIndices": [
+        22,
+        23,
+        24,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        34,
+        35,
+        36,
+        37,
+        38,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        48,
+        49
+      ],
+      "sourceFps": 24.0,
+      "sourceFrames": 145,
+      "sourceSize": [
+        544,
+        544
+      ]
+    },
+    "Side_Attack": {
+      "frameNames": [
+        "Side_Attack_00",
+        "Side_Attack_01",
+        "Side_Attack_02",
+        "Side_Attack_03",
+        "Side_Attack_04",
+        "Side_Attack_05",
+        "Side_Attack_06",
+        "Side_Attack_07",
+        "Side_Attack_08",
+        "Side_Attack_09",
+        "Side_Attack_10",
+        "Side_Attack_11",
+        "Side_Attack_12",
+        "Side_Attack_13",
+        "Side_Attack_14",
+        "Side_Attack_15",
+        "Side_Attack_16",
+        "Side_Attack_17",
+        "Side_Attack_18",
+        "Side_Attack_19",
+        "Side_Attack_20",
+        "Side_Attack_21",
+        "Side_Attack_22",
+        "Side_Attack_23"
+      ],
+      "frameCount": 24,
+      "durationMs": 650,
+      "loop": false,
+      "holdLastFrame": false,
+      "sheet": "sheets/Side_Attack.webp",
+      "sheetSize": [
+        4096,
+        1536
+      ],
+      "sourceVideo": "art-workbench/sprite/Android/animations-20261023T052717Z/video/Side_Attack.mp4",
+      "sourceVideoSha256": "c9a1189f89fd7e90d2da60d76a460a1a622a7fa021644ee095861465bfe35edc",
+      "sourceFrameIndices": [
+        16,
+        21,
+        27,
+        32,
+        38,
+        43,
+        48,
+        54,
+        59,
+        65,
+        70,
+        75,
+        81,
+        86,
+        91,
+        97,
+        102,
+        108,
+        113,
+        118,
+        124,
+        129,
+        135,
+        140
+      ],
+      "sourceFps": 24.0,
+      "sourceFrames": 145,
+      "sourceSize": [
+        544,
+        544
+      ]
+    },
+    "Side_Down": {
+      "frameNames": [
+        "Side_Down_00",
+        "Side_Down_01",
+        "Side_Down_02",
+        "Side_Down_03",
+        "Side_Down_04",
+        "Side_Down_05",
+        "Side_Down_06",
+        "Side_Down_07",
+        "Side_Down_08",
+        "Side_Down_09",
+        "Side_Down_10",
+        "Side_Down_11",
+        "Side_Down_12",
+        "Side_Down_13",
+        "Side_Down_14",
+        "Side_Down_15",
+        "Side_Down_16",
+        "Side_Down_17",
+        "Side_Down_18",
+        "Side_Down_19",
+        "Side_Down_20",
+        "Side_Down_21",
+        "Side_Down_22",
+        "Side_Down_23"
+      ],
+      "frameCount": 24,
+      "durationMs": 1500,
+      "loop": false,
+      "holdLastFrame": true,
+      "sheet": "sheets/Side_Down.webp",
+      "sheetSize": [
+        4096,
+        1536
+      ],
+      "sourceVideo": "art-workbench/sprite/Android/animations-20261023T052717Z/video/Side_Down.mp4",
+      "sourceVideoSha256": "a99ed75cd17116e590c8c7ddb6084070debdbd602c286252619949dbe69777ec",
+      "sourceFrameIndices": [
+        24,
+        28,
+        32,
+        35,
+        39,
+        43,
+        47,
+        51,
+        55,
+        58,
+        62,
+        66,
+        70,
+        74,
+        78,
+        81,
+        85,
+        89,
+        93,
+        97,
+        101,
+        104,
+        108,
+        112
+      ],
+      "sourceFps": 24.0,
+      "sourceFrames": 145,
+      "sourceSize": [
+        544,
+        544
+      ]
+    },
+    "Side_Hit": {
+      "frameNames": [
+        "Side_Hit_00",
+        "Side_Hit_01",
+        "Side_Hit_02",
+        "Side_Hit_03",
+        "Side_Hit_04",
+        "Side_Hit_05",
+        "Side_Hit_06",
+        "Side_Hit_07",
+        "Side_Hit_08",
+        "Side_Hit_09",
+        "Side_Hit_10",
+        "Side_Hit_11",
+        "Side_Hit_12",
+        "Side_Hit_13",
+        "Side_Hit_14",
+        "Side_Hit_15",
+        "Side_Hit_16",
+        "Side_Hit_17",
+        "Side_Hit_18",
+        "Side_Hit_19",
+        "Side_Hit_20",
+        "Side_Hit_21",
+        "Side_Hit_22",
+        "Side_Hit_23"
+      ],
+      "frameCount": 24,
+      "durationMs": 360,
+      "loop": false,
+      "holdLastFrame": false,
+      "sheet": "sheets/Side_Hit.webp",
+      "sheetSize": [
+        4096,
+        1536
+      ],
+      "sourceVideo": "art-workbench/sprite/Android/animations-20261023T052717Z/video/Side_Hit.mp4",
+      "sourceVideoSha256": "54d21cb99e193000bbabee928b38ec41648a241050fc8631c0cbeddb0eb8a6fb",
+      "sourceFrameIndices": [
+        0,
+        6,
+        12,
+        18,
+        24,
+        30,
+        35,
+        41,
+        47,
+        53,
+        59,
+        65,
+        71,
+        77,
+        83,
+        89,
+        95,
+        101,
+        106,
+        112,
+        118,
+        124,
+        130,
+        136
+      ],
+      "sourceFps": 24.0,
+      "sourceFrames": 145,
+      "sourceSize": [
+        544,
+        544
+      ]
+    }
+  },
+  "frames": {
+    "Front_Idle_00": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Front_Idle_01": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 3,
+      "sourceTimeSeconds": 0.125
+    },
+    "Front_Idle_02": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 5,
+      "sourceTimeSeconds": 0.20833333333333334
+    },
+    "Front_Idle_03": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 1536,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 8,
+      "sourceTimeSeconds": 0.3333333333333333
+    },
+    "Front_Idle_04": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 2048,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 11,
+      "sourceTimeSeconds": 0.4583333333333333
+    },
+    "Front_Idle_05": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 2560,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 13,
+      "sourceTimeSeconds": 0.5416666666666666
+    },
+    "Front_Idle_06": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 3072,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 16,
+      "sourceTimeSeconds": 0.6666666666666666
+    },
+    "Front_Idle_07": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 3584,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Front_Idle_08": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 0,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 21,
+      "sourceTimeSeconds": 0.875
+    },
+    "Front_Idle_09": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 512,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 24,
+      "sourceTimeSeconds": 1.0
+    },
+    "Front_Idle_10": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 1024,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 27,
+      "sourceTimeSeconds": 1.125
+    },
+    "Front_Idle_11": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 1536,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 29,
+      "sourceTimeSeconds": 1.2083333333333333
+    },
+    "Front_Idle_12": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 2048,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 32,
+      "sourceTimeSeconds": 1.3333333333333333
+    },
+    "Front_Idle_13": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 2560,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 35,
+      "sourceTimeSeconds": 1.4583333333333333
+    },
+    "Front_Idle_14": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 3072,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Front_Idle_15": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 3584,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 40,
+      "sourceTimeSeconds": 1.6666666666666667
+    },
+    "Front_Idle_16": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 0,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 43,
+      "sourceTimeSeconds": 1.7916666666666667
+    },
+    "Front_Idle_17": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 512,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 45,
+      "sourceTimeSeconds": 1.875
+    },
+    "Front_Idle_18": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 1024,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 48,
+      "sourceTimeSeconds": 2.0
+    },
+    "Front_Idle_19": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 1536,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 51,
+      "sourceTimeSeconds": 2.125
+    },
+    "Front_Idle_20": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 2048,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 53,
+      "sourceTimeSeconds": 2.2083333333333335
+    },
+    "Front_Idle_21": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 2560,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 56,
+      "sourceTimeSeconds": 2.3333333333333335
+    },
+    "Front_Idle_22": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 3072,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 59,
+      "sourceTimeSeconds": 2.4583333333333335
+    },
+    "Front_Idle_23": {
+      "image": "sheets/Front_Idle.webp",
+      "frame": {
+        "x": 3584,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 61,
+      "sourceTimeSeconds": 2.5416666666666665
+    },
+    "Front_Victory_00": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Front_Victory_01": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 6,
+      "sourceTimeSeconds": 0.25
+    },
+    "Front_Victory_02": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 13,
+      "sourceTimeSeconds": 0.5416666666666666
+    },
+    "Front_Victory_03": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 1536,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 19,
+      "sourceTimeSeconds": 0.7916666666666666
+    },
+    "Front_Victory_04": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 2048,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 25,
+      "sourceTimeSeconds": 1.0416666666666667
+    },
+    "Front_Victory_05": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 2560,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Front_Victory_06": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 3072,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 38,
+      "sourceTimeSeconds": 1.5833333333333333
+    },
+    "Front_Victory_07": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 3584,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Front_Victory_08": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 0,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 50,
+      "sourceTimeSeconds": 2.0833333333333335
+    },
+    "Front_Victory_09": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 512,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 56,
+      "sourceTimeSeconds": 2.3333333333333335
+    },
+    "Front_Victory_10": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 1024,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 63,
+      "sourceTimeSeconds": 2.625
+    },
+    "Front_Victory_11": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 1536,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 69,
+      "sourceTimeSeconds": 2.875
+    },
+    "Front_Victory_12": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 2048,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 75,
+      "sourceTimeSeconds": 3.125
+    },
+    "Front_Victory_13": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 2560,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Front_Victory_14": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 3072,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 88,
+      "sourceTimeSeconds": 3.6666666666666665
+    },
+    "Front_Victory_15": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 3584,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 94,
+      "sourceTimeSeconds": 3.9166666666666665
+    },
+    "Front_Victory_16": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 0,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 100,
+      "sourceTimeSeconds": 4.166666666666667
+    },
+    "Front_Victory_17": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 512,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 106,
+      "sourceTimeSeconds": 4.416666666666667
+    },
+    "Front_Victory_18": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 1024,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 113,
+      "sourceTimeSeconds": 4.708333333333333
+    },
+    "Front_Victory_19": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 1536,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 119,
+      "sourceTimeSeconds": 4.958333333333333
+    },
+    "Front_Victory_20": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 2048,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 125,
+      "sourceTimeSeconds": 5.208333333333333
+    },
+    "Front_Victory_21": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 2560,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 131,
+      "sourceTimeSeconds": 5.458333333333333
+    },
+    "Front_Victory_22": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 3072,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 138,
+      "sourceTimeSeconds": 5.75
+    },
+    "Front_Victory_23": {
+      "image": "sheets/Front_Victory.webp",
+      "frame": {
+        "x": 3584,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 83.33333333333333,
+      "sourceFrameIndex": 144,
+      "sourceTimeSeconds": 6.0
+    },
+    "Side_Walk_00": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 22,
+      "sourceTimeSeconds": 0.9166666666666666
+    },
+    "Side_Walk_01": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 23,
+      "sourceTimeSeconds": 0.9583333333333334
+    },
+    "Side_Walk_02": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 24,
+      "sourceTimeSeconds": 1.0
+    },
+    "Side_Walk_03": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 1536,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 26,
+      "sourceTimeSeconds": 1.0833333333333333
+    },
+    "Side_Walk_04": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 2048,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 27,
+      "sourceTimeSeconds": 1.125
+    },
+    "Side_Walk_05": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 2560,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 28,
+      "sourceTimeSeconds": 1.1666666666666667
+    },
+    "Side_Walk_06": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 3072,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 29,
+      "sourceTimeSeconds": 1.2083333333333333
+    },
+    "Side_Walk_07": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 3584,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 30,
+      "sourceTimeSeconds": 1.25
+    },
+    "Side_Walk_08": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 0,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 31,
+      "sourceTimeSeconds": 1.2916666666666667
+    },
+    "Side_Walk_09": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 512,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 32,
+      "sourceTimeSeconds": 1.3333333333333333
+    },
+    "Side_Walk_10": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 1024,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 34,
+      "sourceTimeSeconds": 1.4166666666666667
+    },
+    "Side_Walk_11": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 1536,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 35,
+      "sourceTimeSeconds": 1.4583333333333333
+    },
+    "Side_Walk_12": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 2048,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 36,
+      "sourceTimeSeconds": 1.5
+    },
+    "Side_Walk_13": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 2560,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 37,
+      "sourceTimeSeconds": 1.5416666666666667
+    },
+    "Side_Walk_14": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 3072,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 38,
+      "sourceTimeSeconds": 1.5833333333333333
+    },
+    "Side_Walk_15": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 3584,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 40,
+      "sourceTimeSeconds": 1.6666666666666667
+    },
+    "Side_Walk_16": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 0,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 41,
+      "sourceTimeSeconds": 1.7083333333333333
+    },
+    "Side_Walk_17": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 512,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 42,
+      "sourceTimeSeconds": 1.75
+    },
+    "Side_Walk_18": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 1024,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 43,
+      "sourceTimeSeconds": 1.7916666666666667
+    },
+    "Side_Walk_19": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 1536,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 44,
+      "sourceTimeSeconds": 1.8333333333333333
+    },
+    "Side_Walk_20": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 2048,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 45,
+      "sourceTimeSeconds": 1.875
+    },
+    "Side_Walk_21": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 2560,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 46,
+      "sourceTimeSeconds": 1.9166666666666667
+    },
+    "Side_Walk_22": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 3072,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 48,
+      "sourceTimeSeconds": 2.0
+    },
+    "Side_Walk_23": {
+      "image": "sheets/Side_Walk.webp",
+      "frame": {
+        "x": 3584,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 50.0,
+      "sourceFrameIndex": 49,
+      "sourceTimeSeconds": 2.0416666666666665
+    },
+    "Side_Attack_00": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 16,
+      "sourceTimeSeconds": 0.6666666666666666
+    },
+    "Side_Attack_01": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 21,
+      "sourceTimeSeconds": 0.875
+    },
+    "Side_Attack_02": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 27,
+      "sourceTimeSeconds": 1.125
+    },
+    "Side_Attack_03": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 1536,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 32,
+      "sourceTimeSeconds": 1.3333333333333333
+    },
+    "Side_Attack_04": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 2048,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 38,
+      "sourceTimeSeconds": 1.5833333333333333
+    },
+    "Side_Attack_05": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 2560,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 43,
+      "sourceTimeSeconds": 1.7916666666666667
+    },
+    "Side_Attack_06": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 3072,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 48,
+      "sourceTimeSeconds": 2.0
+    },
+    "Side_Attack_07": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 3584,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 54,
+      "sourceTimeSeconds": 2.25
+    },
+    "Side_Attack_08": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 0,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 59,
+      "sourceTimeSeconds": 2.4583333333333335
+    },
+    "Side_Attack_09": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 512,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 65,
+      "sourceTimeSeconds": 2.7083333333333335
+    },
+    "Side_Attack_10": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 1024,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 70,
+      "sourceTimeSeconds": 2.9166666666666665
+    },
+    "Side_Attack_11": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 1536,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 75,
+      "sourceTimeSeconds": 3.125
+    },
+    "Side_Attack_12": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 2048,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Side_Attack_13": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 2560,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 86,
+      "sourceTimeSeconds": 3.5833333333333335
+    },
+    "Side_Attack_14": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 3072,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 91,
+      "sourceTimeSeconds": 3.7916666666666665
+    },
+    "Side_Attack_15": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 3584,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 97,
+      "sourceTimeSeconds": 4.041666666666667
+    },
+    "Side_Attack_16": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 0,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 102,
+      "sourceTimeSeconds": 4.25
+    },
+    "Side_Attack_17": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 512,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 108,
+      "sourceTimeSeconds": 4.5
+    },
+    "Side_Attack_18": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 1024,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 113,
+      "sourceTimeSeconds": 4.708333333333333
+    },
+    "Side_Attack_19": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 1536,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 118,
+      "sourceTimeSeconds": 4.916666666666667
+    },
+    "Side_Attack_20": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 2048,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 124,
+      "sourceTimeSeconds": 5.166666666666667
+    },
+    "Side_Attack_21": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 2560,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 129,
+      "sourceTimeSeconds": 5.375
+    },
+    "Side_Attack_22": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 3072,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 135,
+      "sourceTimeSeconds": 5.625
+    },
+    "Side_Attack_23": {
+      "image": "sheets/Side_Attack.webp",
+      "frame": {
+        "x": 3584,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 27.083333333333332,
+      "sourceFrameIndex": 140,
+      "sourceTimeSeconds": 5.833333333333333
+    },
+    "Side_Down_00": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 24,
+      "sourceTimeSeconds": 1.0
+    },
+    "Side_Down_01": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 28,
+      "sourceTimeSeconds": 1.1666666666666667
+    },
+    "Side_Down_02": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 32,
+      "sourceTimeSeconds": 1.3333333333333333
+    },
+    "Side_Down_03": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 1536,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 35,
+      "sourceTimeSeconds": 1.4583333333333333
+    },
+    "Side_Down_04": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 2048,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 39,
+      "sourceTimeSeconds": 1.625
+    },
+    "Side_Down_05": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 2560,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 43,
+      "sourceTimeSeconds": 1.7916666666666667
+    },
+    "Side_Down_06": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 3072,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 47,
+      "sourceTimeSeconds": 1.9583333333333333
+    },
+    "Side_Down_07": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 3584,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 51,
+      "sourceTimeSeconds": 2.125
+    },
+    "Side_Down_08": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 0,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 55,
+      "sourceTimeSeconds": 2.2916666666666665
+    },
+    "Side_Down_09": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 512,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 58,
+      "sourceTimeSeconds": 2.4166666666666665
+    },
+    "Side_Down_10": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 1024,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 62,
+      "sourceTimeSeconds": 2.5833333333333335
+    },
+    "Side_Down_11": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 1536,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 66,
+      "sourceTimeSeconds": 2.75
+    },
+    "Side_Down_12": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 2048,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 70,
+      "sourceTimeSeconds": 2.9166666666666665
+    },
+    "Side_Down_13": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 2560,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 74,
+      "sourceTimeSeconds": 3.0833333333333335
+    },
+    "Side_Down_14": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 3072,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 78,
+      "sourceTimeSeconds": 3.25
+    },
+    "Side_Down_15": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 3584,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 81,
+      "sourceTimeSeconds": 3.375
+    },
+    "Side_Down_16": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 0,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 85,
+      "sourceTimeSeconds": 3.5416666666666665
+    },
+    "Side_Down_17": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 512,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 89,
+      "sourceTimeSeconds": 3.7083333333333335
+    },
+    "Side_Down_18": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 1024,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 93,
+      "sourceTimeSeconds": 3.875
+    },
+    "Side_Down_19": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 1536,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 97,
+      "sourceTimeSeconds": 4.041666666666667
+    },
+    "Side_Down_20": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 2048,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 101,
+      "sourceTimeSeconds": 4.208333333333333
+    },
+    "Side_Down_21": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 2560,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 104,
+      "sourceTimeSeconds": 4.333333333333333
+    },
+    "Side_Down_22": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 3072,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 108,
+      "sourceTimeSeconds": 4.5
+    },
+    "Side_Down_23": {
+      "image": "sheets/Side_Down.webp",
+      "frame": {
+        "x": 3584,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 62.5,
+      "sourceFrameIndex": 112,
+      "sourceTimeSeconds": 4.666666666666667
+    },
+    "Side_Hit_00": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 0,
+      "sourceTimeSeconds": 0.0
+    },
+    "Side_Hit_01": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 512,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 6,
+      "sourceTimeSeconds": 0.25
+    },
+    "Side_Hit_02": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 12,
+      "sourceTimeSeconds": 0.5
+    },
+    "Side_Hit_03": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 1536,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 18,
+      "sourceTimeSeconds": 0.75
+    },
+    "Side_Hit_04": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 2048,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 24,
+      "sourceTimeSeconds": 1.0
+    },
+    "Side_Hit_05": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 2560,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 30,
+      "sourceTimeSeconds": 1.25
+    },
+    "Side_Hit_06": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 3072,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 35,
+      "sourceTimeSeconds": 1.4583333333333333
+    },
+    "Side_Hit_07": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 3584,
+        "y": 0,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 41,
+      "sourceTimeSeconds": 1.7083333333333333
+    },
+    "Side_Hit_08": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 0,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 47,
+      "sourceTimeSeconds": 1.9583333333333333
+    },
+    "Side_Hit_09": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 512,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 53,
+      "sourceTimeSeconds": 2.2083333333333335
+    },
+    "Side_Hit_10": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 1024,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 59,
+      "sourceTimeSeconds": 2.4583333333333335
+    },
+    "Side_Hit_11": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 1536,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 65,
+      "sourceTimeSeconds": 2.7083333333333335
+    },
+    "Side_Hit_12": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 2048,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 71,
+      "sourceTimeSeconds": 2.9583333333333335
+    },
+    "Side_Hit_13": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 2560,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 77,
+      "sourceTimeSeconds": 3.2083333333333335
+    },
+    "Side_Hit_14": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 3072,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 83,
+      "sourceTimeSeconds": 3.4583333333333335
+    },
+    "Side_Hit_15": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 3584,
+        "y": 512,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 89,
+      "sourceTimeSeconds": 3.7083333333333335
+    },
+    "Side_Hit_16": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 0,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 95,
+      "sourceTimeSeconds": 3.9583333333333335
+    },
+    "Side_Hit_17": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 512,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 101,
+      "sourceTimeSeconds": 4.208333333333333
+    },
+    "Side_Hit_18": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 1024,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 106,
+      "sourceTimeSeconds": 4.416666666666667
+    },
+    "Side_Hit_19": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 1536,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 112,
+      "sourceTimeSeconds": 4.666666666666667
+    },
+    "Side_Hit_20": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 2048,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 118,
+      "sourceTimeSeconds": 4.916666666666667
+    },
+    "Side_Hit_21": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 2560,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 124,
+      "sourceTimeSeconds": 5.166666666666667
+    },
+    "Side_Hit_22": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 3072,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 130,
+      "sourceTimeSeconds": 5.416666666666667
+    },
+    "Side_Hit_23": {
+      "image": "sheets/Side_Hit.webp",
+      "frame": {
+        "x": 3584,
+        "y": 1024,
+        "w": 512,
+        "h": 512
+      },
+      "durationMs": 15.0,
+      "sourceFrameIndex": 136,
+      "sourceTimeSeconds": 5.666666666666667
+    }
+  },
+  "naturalnessReview": {
+    "Front_Idle": {
+      "verdict": "사용 가능 · 발을 드는 대기 동작",
+      "notes": [
+        "양발 사이에 체중을 옮기면서 한쪽 발을 교대로 드는 동작이다. 정적인 호흡형 대기보다 움직임이 크다.",
+        "정면 중립 자세가 나오는 원본 0번에서 시작해 64번 직전까지 한 주기를 사용한다. 원본 한 주기를 공통 2000ms로 재생한다.",
+        "두 발이 교대로 움직이며 어깨·골반도 따라 움직이지만 접지 시 약간의 미끄러짐과 신체 형태 변화가 있다."
+      ]
+    },
+    "Front_Victory": {
+      "verdict": "사용 가능 · 체중 이동과 주먹 들기",
+      "notes": [
+        "발을 벌려 한쪽 다리에 체중을 싣고 주먹을 들었다가 양발을 모아 복귀한다.",
+        "환호 중 표정과 머리·팔 장식 형태가 일부 변한다. 준비·환호·복귀 흐름은 포함돼 있다."
+      ]
+    },
+    "Side_Walk": {
+      "verdict": "사용 가능 · 손발 색 번짐 기록",
+      "notes": [
+        "지지 다리가 바뀌는 한 보행 주기와 팔 스윙이 포함돼 있다.",
+        "원본 영상의 손·발에 순간적인 녹색·보라색 색 번짐이 있다. 디테일과 머리카락 모양도 프레임마다 조금 바뀐다."
+      ]
+    },
+    "Side_Attack": {
+      "verdict": "사용 가능 · 발 디딤 확인, 시점 변화 있음",
+      "notes": [
+        "발을 내딛고 보폭을 벌리며 골반·상체를 움직여 손바닥으로 타격한 뒤 복귀한다. 다리가 고정된 공격은 아니다.",
+        "타격할 때 몸통과 얼굴이 정면 쪽 3/4 시점으로 돌아가므로 측면 유지 조건을 완전히 충족하지 않는다.",
+        "원본 일부에서 머리카락이 오른쪽 화면 경계에 닿거나 잘린다. 650ms 규격에서는 준비 후 타격·복귀가 빠르게 진행된다."
+      ]
+    },
+    "Side_Down": {
+      "verdict": "문제 기록 · 지면 높이와 최종 자세 차이",
+      "notes": [
+        "무릎이 굽혀지고 무게중심이 뒤로 이동하면서 뒤로 주저앉아 눕는다. 요청한 옆으로 쓰러짐과는 차이가 있다.",
+        "머리카락과 발이 화면 경계에 닿거나 잘리는 원본 구간이 있으며, 누운 최종 자세가 최초 서 있던 지면보다 위에 있다.",
+        "넘어지는 과정과 최종 자세를 포함하고 마지막 프레임을 유지한다."
+      ]
+    },
+    "Side_Hit": {
+      "verdict": "문제 기록 · 요청 외 섬광과 큰 회복 동작",
+      "notes": [
+        "몸이 뒤로 젖혀진 뒤 발을 옮겨 균형을 되찾는 흐름이다. 회복 스텝이 커서 달리는 자세처럼 보이는 구간이 있다.",
+        "원본 영상에 요청하지 않은 푸른 충격 섬광이 추가됐다. 프롬프트에는 효과를 요청하지 않았다.",
+        "고개·얼굴 형태 변화가 있으며 공통 360ms 재생에서는 긴 원본 동작이 빠르게 압축된다."
+      ]
+    }
+  }
+}

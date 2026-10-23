@@ -9,14 +9,14 @@ const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)))
 test('old forest is reachable, unlocks an inn start and supplies seven stronger arachne variations',()=>{
  const g=new Game(config,null,()=>0);g.create({name:'숲 테스트',appearanceId:'warrior'});
  assert.equal(REGIONS.old_forest.depth,10);
- assert.deepEqual([REGIONS.old_forest.minLevel,REGIONS.old_forest.maxLevel],[5,20]);
+ assert.deepEqual([REGIONS.old_forest.minLevel,REGIONS.old_forest.maxLevel],[10,15]);
  assert.equal(Object.values(g.state.maps.village.nodes).filter(n=>n.kind==='exit'&&n.region==='old_forest').length,1);
- g.enterRegion('old_forest');assert.ok(g.snapshot().availableStarts.some(s=>s.label==='오래된 숲 (레벨: 5~20)'));
+ g.enterRegion('old_forest');assert.ok(g.snapshot().availableStarts.some(s=>s.label==='오래된 숲 (레벨: 10~15)'));
  const pool=eligibleVariations('old_forest'),arachnes=pool.filter(p=>p.monster.id==='arachne');assert.equal(arachnes.length,7);
  for(const {monster,variation} of arachnes){
   assert.ok(monster.A.DEX>MONSTER_CATALOG.find(m=>m.id==='harpy').A.DEX);
-  for(const level of [0,15]){let draw=0;const e=generateMonster('old_forest',()=>[pool.indexOf(arachnes.find(p=>p.variation===variation)),level,0][draw++]??0);
-   assert.equal(e.monsterId,'arachne');assert.equal(e.level,5+level);assert.equal(e.DEX,6);assert.equal(e.CON,3);assert.equal(e.AR,4);assert.deepEqual(e.skills,['binding-strike']);
+  for(const level of [0,5]){let draw=0;const e=generateMonster('old_forest',()=>[pool.indexOf(arachnes.find(p=>p.variation===variation)),level,0][draw++]??0);
+   assert.equal(e.monsterId,'arachne');assert.equal(e.level,10+level);assert.equal(e.DEX,6);assert.equal(e.CON,3);assert.equal(e.AR,4);assert.deepEqual(e.skills,['binding-strike']);
   }
  }
  for(const id of ['village','volcano','snow','desert','beach'])assert.ok(eligibleVariations(id).every(p=>p.monster.id!=='arachne'));

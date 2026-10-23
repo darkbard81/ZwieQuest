@@ -11,9 +11,11 @@ export function validateRegions(regions) {
     if (!Array.isArray(region.exits) || new Set(region.exits).size !== region.exits.length || region.exits.some(target => !Object.hasOwn(regions, target) || target === id)) throw Error(`Invalid region exits: ${id}`);
     if (region.boss !== null && (typeof region.boss !== 'string' || !region.boss.trim())) throw Error(`Invalid region boss: ${id}`);
     if (region.bossMonsterId !== undefined && (!region.boss || typeof region.bossMonsterId !== 'string' || !/^[a-z0-9_-]+$/.test(region.bossMonsterId))) throw Error(`Invalid region bossMonsterId: ${id}`);
+    if ((region.allowedDamageTypes !== undefined && (!Array.isArray(region.allowedDamageTypes) || !region.allowedDamageTypes.length || new Set(region.allowedDamageTypes).size !== region.allowedDamageTypes.length || region.allowedDamageTypes.some(type => typeof type !== 'string' || !type)))) throw Error(`Invalid region allowedDamageTypes: ${id}`);
+    if (region.excludedDamageTypes !== undefined && (!Array.isArray(region.excludedDamageTypes) || new Set(region.excludedDamageTypes).size !== region.excludedDamageTypes.length || region.excludedDamageTypes.some(type => typeof type !== 'string' || !type))) throw Error(`Invalid region excludedDamageTypes: ${id}`);
     const terminals = region.deadEnds + region.exits.length + (region.boss ? 1 : 0);
     if (!terminals || region.depth < Math.ceil(Math.log2(terminals + terminals % 2))) throw Error(`Region depth cannot fit destinations: ${id}`);
-    if (!Number.isSafeInteger(region.minLevel) || !Number.isSafeInteger(region.maxLevel) || region.minLevel < 1 || region.maxLevel < region.minLevel || !Array.isArray(region.excludedDamageTypes)) throw Error(`Invalid region levels or damage types: ${id}`);
+    if (!Number.isSafeInteger(region.minLevel) || !Number.isSafeInteger(region.maxLevel) || region.minLevel < 1 || region.maxLevel < region.minLevel) throw Error(`Invalid region levels or damage types: ${id}`);
   }
   return regions;
 }

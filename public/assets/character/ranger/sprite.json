@@ -84,7 +84,7 @@
         70,
         73
       ],
-      "sourceVideo": "art-workbench/sprites/Ranger/idle-contract-20261017T092306Z/video/Front_Idle.mp4",
+      "sourceVideo": "art-workbench/sprite/Ranger/idle-contract-20261017T092306Z/video/Front_Idle.mp4",
       "sourceVideoSha256": "6d0a5cb67132bf6ee27b657b9c59f7d030a42bc54e7c4b60e6633513a60a206f",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -155,7 +155,7 @@
         104,
         112
       ],
-      "sourceVideo": "art-workbench/sprites/Ranger/animations-20261017T031445Z/video/Front_Victory.mp4",
+      "sourceVideo": "art-workbench/sprite/Ranger/animations-20261017T031445Z/video/Front_Victory.mp4",
       "sourceVideoSha256": "8f8a9bb730b3c69d85e622728a41ea9136e2719ddbe43c951c0af43074e2757c",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -226,7 +226,7 @@
         134,
         135
       ],
-      "sourceVideo": "art-workbench/sprites/Ranger/animations-20261017T031445Z/video/Side_Walk.mp4",
+      "sourceVideo": "art-workbench/sprite/Ranger/animations-20261017T031445Z/video/Side_Walk.mp4",
       "sourceVideoSha256": "65d4fd46bd26f59f01e7271b3dfc8e4e1292b8a966d31565a2892179d9db90ec",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -297,7 +297,7 @@
         106,
         114
       ],
-      "sourceVideo": "art-workbench/sprites/Ranger/animations-20261017T031445Z/video/Side_Attack.mp4",
+      "sourceVideo": "art-workbench/sprite/Ranger/animations-20261017T031445Z/video/Side_Attack.mp4",
       "sourceVideoSha256": "8b19084f38aefb45d1ae63bd79a4253598e4b5ae3c578fa58275168f34928088",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -368,7 +368,7 @@
         73,
         83
       ],
-      "sourceVideo": "art-workbench/sprites/Ranger/animations-20261017T031445Z/video/Side_Down.mp4",
+      "sourceVideo": "art-workbench/sprite/Ranger/animations-20261017T031445Z/video/Side_Down.mp4",
       "sourceVideoSha256": "fcd32802c5a7330f03543811667aafbdc1158b957ec849a0ad26715b704e85a5",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -439,7 +439,7 @@
         89,
         98
       ],
-      "sourceVideo": "art-workbench/sprites/Ranger/animations-20261017T031445Z/video/Side_Hit.mp4",
+      "sourceVideo": "art-workbench/sprite/Ranger/animations-20261017T031445Z/video/Side_Hit.mp4",
       "sourceVideoSha256": "460202f1b949949aa4694c00fe76c9e2c83eb20c6c9f9003f4fa78370313e0b5",
       "sourceFrames": 145,
       "sourceFps": 24.0,

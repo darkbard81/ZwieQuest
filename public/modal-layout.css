@@ -31,7 +31,7 @@ dialog {
 #auth-dialog { --modal-width:460px; }
 #admin-settings { --modal-width:660px; --modal-gap-x:16px; --modal-gap-y:16px; }
 #map-dialog { --modal-width:1120px; --modal-content-padding:18px; }
-#character-dialog { --modal-width:680px; --modal-gap-y:16px; --modal-content-padding:24px; }
+#character-dialog { --modal-width:960px; --modal-gap-y:16px; --modal-content-padding:24px; }
 #bestiary-dialog {
   --modal-width:900px;
   --modal-gap-x:max(12px,2.5vw);

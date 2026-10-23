@@ -1,7 +1,7 @@
 {
   "barbarian": {
-    "source": "art-workbench/sprites/source-512-20261021T054544Z/barbarian",
-    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/barbarian",
+    "source": "art-workbench/sprite/source-512-20261021T054544Z/barbarian",
+    "previousSource": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/barbarian",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -15,7 +15,7 @@
     "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
     "displaySize": 256,
     "previousRecord": {
-      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/barbarian",
+      "source": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/barbarian",
       "facing": "right",
       "animations": [
         "Front_Idle",
@@ -34,7 +34,7 @@
         "reason": "Eyes-open neutral combat wait from original attack video; only cell 00 replaced.",
         "sameNormalization": true
       },
-      "previousSource": "art-workbench/sprites/Barbarian/battle-ready-20261017T080605Z",
+      "previousSource": "art-workbench/sprite/Barbarian/battle-ready-20261017T080605Z",
       "playbackContract": "shared-v1"
     },
     "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
@@ -47,8 +47,8 @@
     }
   },
   "ranger": {
-    "source": "art-workbench/sprites/source-512-20261021T054544Z/ranger",
-    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/ranger",
+    "source": "art-workbench/sprite/source-512-20261021T054544Z/ranger",
+    "previousSource": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/ranger",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -62,7 +62,7 @@
     "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
     "displaySize": 256,
     "previousRecord": {
-      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/ranger",
+      "source": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/ranger",
       "facing": "right",
       "animations": [
         "Front_Idle",
@@ -77,14 +77,14 @@
         "motion": "compact hand-to-brow scouting gesture",
         "frameCount": 24,
         "durationMs": 2000,
-        "sourceRun": "art-workbench/sprites/Ranger/idle-contract-20261017T092306Z",
+        "sourceRun": "art-workbench/sprite/Ranger/idle-contract-20261017T092306Z",
         "sourceRangeSeconds": [
           0,
           3.1666666666666665
         ],
         "other120FramesUnchanged": true
       },
-      "previousSource": "art-workbench/sprites/Ranger/idle-scout-smooth-20261017T090415Z",
+      "previousSource": "art-workbench/sprite/Ranger/idle-scout-smooth-20261017T090415Z",
       "playbackContract": "shared-v1"
     },
     "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
@@ -97,8 +97,8 @@
     }
   },
   "cat": {
-    "source": "art-workbench/sprites/source-512-20261021T054544Z/cat",
-    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/cat",
+    "source": "art-workbench/sprite/source-512-20261021T054544Z/cat",
+    "previousSource": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/cat",
     "facing": "left",
     "animations": [
       "Front_Idle",
@@ -112,7 +112,7 @@
     "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
     "displaySize": 256,
     "previousRecord": {
-      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/cat",
+      "source": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/cat",
       "facing": "left",
       "animations": [
         "Front_Idle",
@@ -124,13 +124,13 @@
       ],
       "outlineRemoval": {
         "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
-        "originalBackup": "art-workbench/sprites/Cat/original-white-outline-20261017T081151Z",
+        "originalBackup": "art-workbench/sprite/Cat/original-white-outline-20261017T081151Z",
         "rgbPreserved": true,
         "interiorBeyond4pxPreserved": true,
         "frameGeometryAndTimingPreserved": true,
         "generationUsed": false
       },
-      "previousSource": "art-workbench/sprites/Cat/no-white-outline-20261017T081915Z",
+      "previousSource": "art-workbench/sprite/Cat/no-white-outline-20261017T081915Z",
       "playbackContract": "shared-v1"
     },
     "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
@@ -143,8 +143,8 @@
     }
   },
   "lamia": {
-    "source": "art-workbench/sprites/source-512-20261021T054544Z/lamia",
-    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/lamia",
+    "source": "art-workbench/sprite/source-512-20261021T054544Z/lamia",
+    "previousSource": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/lamia",
     "facing": "left",
     "animations": [
       "Front_Idle",
@@ -158,7 +158,7 @@
     "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
     "displaySize": 256,
     "previousRecord": {
-      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/lamia",
+      "source": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/lamia",
       "facing": "left",
       "animations": [
         "Front_Idle",
@@ -170,13 +170,13 @@
       ],
       "outlineRemoval": {
         "method": "Pillow RGBA alpha-only cleanup; boundary-connected near-white mask, maximum 3px original contour depth, subtractive 0.35px edge antialiasing within 4px",
-        "originalBackup": "art-workbench/sprites/Lamia/original-white-outline-20261017T081151Z",
+        "originalBackup": "art-workbench/sprite/Lamia/original-white-outline-20261017T081151Z",
         "rgbPreserved": true,
         "interiorBeyond4pxPreserved": true,
         "frameGeometryAndTimingPreserved": true,
         "generationUsed": false
       },
-      "previousSource": "art-workbench/sprites/Lamia/no-white-outline-20261017T081915Z",
+      "previousSource": "art-workbench/sprite/Lamia/no-white-outline-20261017T081915Z",
       "playbackContract": "shared-v1"
     },
     "sourceVideosIn": "sprite.json animations: sourceVideo, sourceVideoSha256, sourceFrames, sourceFps, sourceFrameIndices",
@@ -189,8 +189,8 @@
     }
   },
   "warrior": {
-    "source": "art-workbench/sprites/source-512-20261021T054544Z/warrior",
-    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/warrior",
+    "source": "art-workbench/sprite/source-512-20261021T054544Z/warrior",
+    "previousSource": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/warrior",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -204,7 +204,7 @@
     "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
     "displaySize": 256,
     "previousRecord": {
-      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/warrior",
+      "source": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/warrior",
       "previousSource": null,
       "facing": "right",
       "animations": [
@@ -227,8 +227,8 @@
     }
   },
   "wizard": {
-    "source": "art-workbench/sprites/source-512-20261021T054544Z/wizard",
-    "previousSource": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/wizard",
+    "source": "art-workbench/sprite/source-512-20261021T054544Z/wizard",
+    "previousSource": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/wizard",
     "facing": "right",
     "animations": [
       "Front_Idle",
@@ -242,7 +242,7 @@
     "normalization": "entire 544x544 source frame resized to 512x512; no crop, translation or per-frame alignment",
     "displaySize": 256,
     "previousRecord": {
-      "source": "art-workbench/sprites/playback-contract-v1-20261017T092525Z/wizard",
+      "source": "art-workbench/sprite/playback-contract-v1-20261017T092525Z/wizard",
       "previousSource": null,
       "facing": "right",
       "animations": [
@@ -263,5 +263,58 @@
       "report": "public/assets/lossless-webp-manifest.json",
       "runtimeDirectory": "public/assets/character/wizard"
     }
+  },
+  "dragonkin": {
+    "source": "art-workbench/sprite/Dragonkin/animations-20261023T041752Z",
+    "previousSource": "art-workbench/sprite/Dragonkin/animations-20261023T020046Z",
+    "facing": "right",
+    "playbackContract": "shared-v2-512",
+    "inputScale": 1,
+    "encoding": {
+      "rgbQuality": 90,
+      "alphaQuality": 100,
+      "alphaLosslessVerified": true
+    },
+    "review": "art-workbench/sprite/Dragonkin/animations-20261023T041752Z/motion-review.json"
+  },
+  "werwolf": {
+    "source": "art-workbench/sprite/Werwolf/animations-20261023T044705Z",
+    "facing": "left",
+    "playbackContract": "shared-v2-512",
+    "inputScale": 1,
+    "inputSize": [
+      1318,
+      1318
+    ],
+    "inputOffset": [
+      32,
+      32
+    ],
+    "encoding": {
+      "rgbQuality": 90,
+      "alphaQuality": 100,
+      "alphaLosslessVerified": true
+    },
+    "review": "art-workbench/sprite/Werwolf/animations-20261023T044705Z/motion-review.json"
+  },
+  "android": {
+    "source": "art-workbench/sprite/Android/animations-20261023T052717Z",
+    "facing": "left",
+    "playbackContract": "shared-v2-512",
+    "inputScale": 1,
+    "inputSize": [
+      1318,
+      1318
+    ],
+    "inputOffset": [
+      32,
+      32
+    ],
+    "encoding": {
+      "rgbQuality": 90,
+      "alphaQuality": 100,
+      "alphaLosslessVerified": true
+    },
+    "review": "art-workbench/sprite/Android/animations-20261023T052717Z/motion-review.json"
   }
 }

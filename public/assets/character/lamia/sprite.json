@@ -84,7 +84,7 @@
         132,
         135
       ],
-      "sourceVideo": "art-workbench/sprites/Lamia/animations-20261017T055539Z/video/Front_Idle.mp4",
+      "sourceVideo": "art-workbench/sprite/Lamia/animations-20261017T055539Z/video/Front_Idle.mp4",
       "sourceVideoSha256": "a761c5c341d72fa9a36db663e65ada8188ac244aad3be155e39a867cba619aef",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -155,7 +155,7 @@
         127,
         137
       ],
-      "sourceVideo": "art-workbench/sprites/Lamia/animations-20261017T055539Z/video/Front_Victory.mp4",
+      "sourceVideo": "art-workbench/sprite/Lamia/animations-20261017T055539Z/video/Front_Victory.mp4",
       "sourceVideoSha256": "f12972de13cadb57a61bf9ebf59cc14ca1bfcb61211fd5b91201b58f3225f481",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -226,7 +226,7 @@
         125,
         129
       ],
-      "sourceVideo": "art-workbench/sprites/Lamia/animations-20261017T055539Z/video/Side_Walk.mp4",
+      "sourceVideo": "art-workbench/sprite/Lamia/animations-20261017T055539Z/video/Side_Walk.mp4",
       "sourceVideoSha256": "af8de9fcfd3a12e4938e35f4186bb7c803e989b30f05680208e7615c8c617df8",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -297,7 +297,7 @@
         97,
         104
       ],
-      "sourceVideo": "art-workbench/sprites/Lamia/animations-20261017T055539Z/video/Side_Attack.mp4",
+      "sourceVideo": "art-workbench/sprite/Lamia/animations-20261017T055539Z/video/Side_Attack.mp4",
       "sourceVideoSha256": "959c16f776aba1a4499392fb84b671a17a5c3bcd92e75f50e00629ba26403f92",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -368,7 +368,7 @@
         100,
         110
       ],
-      "sourceVideo": "art-workbench/sprites/Lamia/animations-20261017T055539Z/video/Side_Down.mp4",
+      "sourceVideo": "art-workbench/sprite/Lamia/animations-20261017T055539Z/video/Side_Down.mp4",
       "sourceVideoSha256": "635536343df06affda0eb6835467c72875d74a378a279b6de54d29438e17c742",
       "sourceFrames": 145,
       "sourceFps": 24.0,
@@ -439,7 +439,7 @@
         101,
         110
       ],
-      "sourceVideo": "art-workbench/sprites/Lamia/animations-20261017T055539Z/video/Side_Hit.mp4",
+      "sourceVideo": "art-workbench/sprite/Lamia/animations-20261017T055539Z/video/Side_Hit.mp4",
       "sourceVideoSha256": "706ced3e630403793cd624d039233efd80e1a6d9abf422fb9fc91d4757652f3b",
       "sourceFrames": 145,
       "sourceFps": 24.0,

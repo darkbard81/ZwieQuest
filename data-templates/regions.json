@@ -8,7 +8,6 @@
     "depth": 10,
     "minLevel": 1,
     "maxLevel": 5,
-    "excludedDamageTypes": [],
     "deadEnds": 5,
     "exits": [
       "volcano",
@@ -27,14 +26,17 @@
     "route": "/assets/maps/volcano-route-v1.png",
     "depth": 10,
     "minLevel": 5,
-    "maxLevel": 20,
-    "excludedDamageTypes": [
-      "cold"
-    ],
+    "maxLevel": 10,
     "bossDamageType": "fire",
     "deadEnds": 0,
     "exits": [],
-    "boss": "잿불의 군주"
+    "boss": "잿불의 군주",
+    "allowedDamageTypes": [
+      "fire"
+    ],
+    "excludedDamageTypes": [
+      "cold"
+    ]
   },
   "snow": {
     "name": "백야 설원",
@@ -44,14 +46,17 @@
     "route": "/assets/maps/snow-route-v1.png",
     "depth": 10,
     "minLevel": 5,
-    "maxLevel": 20,
-    "excludedDamageTypes": [
-      "fire"
-    ],
+    "maxLevel": 10,
     "bossDamageType": "cold",
     "deadEnds": 0,
     "exits": [],
-    "boss": "서리 왕관"
+    "boss": "서리 왕관",
+    "allowedDamageTypes": [
+      "cold"
+    ],
+    "excludedDamageTypes": [
+      "fire"
+    ]
   },
   "desert": {
     "name": "산성 호수",
@@ -61,14 +66,17 @@
     "route": "/assets/maps/desert-route-v1.png",
     "depth": 10,
     "minLevel": 5,
-    "maxLevel": 20,
-    "excludedDamageTypes": [
-      "lightning"
-    ],
+    "maxLevel": 10,
     "bossDamageType": "corrosion",
     "deadEnds": 0,
     "exits": [],
-    "boss": "사막의 파수꾼"
+    "boss": "사막의 파수꾼",
+    "allowedDamageTypes": [
+      "corrosion"
+    ],
+    "excludedDamageTypes": [
+      "lightning"
+    ]
   },
   "beach": {
     "name": "낙뢰 고원",
@@ -78,14 +86,17 @@
     "route": "/assets/maps/beach-route-v1.png",
     "depth": 10,
     "minLevel": 5,
-    "maxLevel": 20,
-    "excludedDamageTypes": [
-      "corrosion"
-    ],
+    "maxLevel": 10,
     "bossDamageType": "lightning",
     "deadEnds": 0,
     "exits": [],
-    "boss": "밀물의 수호자"
+    "boss": "밀물의 수호자",
+    "allowedDamageTypes": [
+      "lightning"
+    ],
+    "excludedDamageTypes": [
+      "corrosion"
+    ]
   },
   "old_forest": {
     "name": "오래된 숲",
@@ -94,9 +105,8 @@
     "canvas": "/assets/old-forest.webp",
     "route": "/assets/maps/old-forest-route-v1.png",
     "depth": 10,
-    "minLevel": 5,
-    "maxLevel": 20,
-    "excludedDamageTypes": [],
+    "minLevel": 10,
+    "maxLevel": 15,
     "bossDamageType": "corrosion",
     "bossMonsterId": "arachne",
     "deadEnds": 0,

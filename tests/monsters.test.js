@@ -13,18 +13,18 @@ const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)))
 const make=()=>{const g=new Game(config,null,()=>0);g.create({name:'도감 검사',appearanceId:'warrior'});g.state.risk=0;return g;};
 const rngFor=(variation=0,level=0,grade=0,attribute=0)=>{let call=0;return n=>[variation,level,grade][call++]??attribute;};
 
-test('each region has inclusive level bounds and excludes any matching damage type',()=>{
- const bans={village:null,volcano:'cold',snow:'fire',desert:'lightning',beach:'corrosion'};
+test('each region has inclusive level bounds and only permits its configured damage type',()=>{
+ const bans={village:null,volcano:'fire',snow:'cold',desert:'corrosion',beach:'lightning'};
  for(const [map,ban] of Object.entries(bans)){
-  const pool=eligibleVariations(map);assert.equal(pool.length,ban?24:28);
-  assert.ok(pool.every(({variation:v})=>!v.weapon.damageTypes.includes(ban)));
+  const pool=eligibleVariations(map);assert.equal(pool.length,ban?4:28);
+  assert.ok(pool.every(({variation:v})=>!ban || v.weapon.damageTypes.every(type=>type===ban)));
   for(let i=0;i<pool.length;i++)for(const edge of [0,ENCOUNTER_CONFIG.regions[map].maxLevel-ENCOUNTER_CONFIG.regions[map].minLevel]){
    const e=generateMonster(map,rngFor(i,edge));assert.equal(e.variationId,pool[i].variation.id);assert.equal(e.level,edge+ENCOUNTER_CONFIG.regions[map].minLevel);
   }
  }
  const c=structuredClone(MONSTER_CATALOG);c.find(m=>m.id==='slime').variation[0].weapon.damageTypes=['slash','cold'];assert.ok(!eligibleVariations('volcano',c).some(({variation:v})=>v.id==='slash_slime'));
  assert.throws(()=>generateMonster('missing',()=>0),/Unknown/);
- const empty=structuredClone(ENCOUNTER_CONFIG);empty.regions.village.excludedDamageTypes=Object.keys(EQUIPMENT_CATALOG.damageTypes);
+ const empty=structuredClone(ENCOUNTER_CONFIG);empty.regions.village.allowedDamageTypes=['raw'];
  assert.throws(()=>validateMonsters(MONSTER_CATALOG,empty),/No eligible/);assert.throws(()=>generateMonster('village',()=>0,MONSTER_CATALOG,empty),/No eligible/);
 });
 test('grades share equipment bonuses and exact weights, normal omits name prefix, no affixes',()=>{
