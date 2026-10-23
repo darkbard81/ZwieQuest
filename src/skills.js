@@ -28,6 +28,7 @@ export function validateSkillCatalog(catalog) {
       const e=s.effect, categories=e.equipmentSlot==='weapon'?EQUIPMENT_CATALOG.weaponCategories:e.equipmentSlot==='armor'?EQUIPMENT_CATALOG.armorCategories:null;
       if (!categories?.[e.category] || e.category==='natural') fail(`${s.id}: invalid mastery category`);
       if (!Number.isInteger(e.accuracyBonus) || Math.abs(e.accuracyBonus)>20 || ['actionSpeedRate','damageRate'].some(k=>!Number.isFinite(e[k]) || e[k]<-.5 || e[k]>1)) fail(`${s.id}: invalid mastery bonus`);
+      if (e.defenseBonus !== undefined && (!Number.isInteger(e.defenseBonus) || Math.abs(e.defenseBonus) > 20)) fail(`${s.id}: invalid mastery defense bonus`);
       if (s.useContexts.length!==2 || !s.useContexts.includes('combat') || !s.useContexts.includes('nonCombat') || s.perBattleLimit!==null || s.toggleConsumesCycle!==false) fail(`${s.id}: invalid mastery activation`);
     } else if (s.activationMode === 'direct' && ['attack','status','mirror','cleanse','dispel'].includes(s.effect?.type)) {
       if (['attack','status','mirror'].includes(s.effect.type) && !(Number.isFinite(s.effect.durationMs) && s.effect.durationMs > 0)) fail(`${s.id}: invalid duration`);
@@ -61,7 +62,29 @@ const owner = state => state.characters ? activeCharacter(state) : state;
 const learned = state => state.characters ? owner(state)?.skills || [] : state.inventory;
 // Equipment mastery preferences belong to the character, including outside battle.
 const toggleOwner = (state, def) => def?.effect.type === 'equipmentMastery' ? owner(state) : state.phase === 'BATTLE' ? state.battle : null;
+const retiredSkillIds = new Set(['purify', 'dispel']);
+function removeRetiredSkills(state) {
+  const characters = state.characters || [state];
+  const removedItems = new Set();
+  for (const list of [state.sharedSkills, ...characters.map(c => state.characters ? c.skills : c.inventory)]) {
+    if (!Array.isArray(list)) continue;
+    for (let i = list.length - 1; i >= 0; i--) if (list[i].slot === 'skill' && retiredSkillIds.has(list[i].templateId)) {
+      removedItems.add(list[i].id); list.splice(i, 1);
+    }
+  }
+  for (const c of characters) {
+    if (c.skillSlots) c.skillSlots = c.skillSlots.map(id => removedItems.has(id) ? null : id);
+    if (c.skillGrants) c.skillGrants = c.skillGrants.filter(id => !retiredSkillIds.has(id));
+    for (const id of retiredSkillIds) if (c.skillToggles) delete c.skillToggles[id];
+  }
+  if (retiredSkillIds.has(state.battle?.pendingSkill?.skillId) || removedItems.has(state.battle?.pendingSkill?.itemId)) delete state.battle.pendingSkill;
+  for (const counts of [state.battle?.skillUseCounts, state.battle?.enemySkillUseCounts, state.battle?.skillToggles]) {
+    if (counts) for (const id of retiredSkillIds) delete counts[id];
+  }
+  if (state.enemy?.skills) state.enemy.skills = state.enemy.skills.filter(id => !retiredSkillIds.has(id));
+}
 export function initializeSkills(state, catalog = SKILL_CATALOG) {
+  removeRetiredSkills(state);
   if (!owner(state)) return;
   owner(state).skillSlots ||= Array(catalog.maxEquipped).fill(null);
   owner(state).autoSkills = owner(state).autoSkills === true;
@@ -102,6 +125,7 @@ export function initializeSkills(state, catalog = SKILL_CATALOG) {
 // Merge old per-character discoveries without changing independent loadouts. Keep
 // character.skills as a compatibility view of the account library in memory.
 export function initializeSharedSkills(state, catalog = SKILL_CATALOG) {
+  removeRetiredSkills(state);
   const byTemplate = new Map(), aliases = new Map();
   const sources = [...(state.sharedSkills || []), ...state.characters.flatMap(c => c.skills || [])];
   for (const item of sources) {
@@ -289,7 +313,7 @@ export function maintainedSkillBonuses(state, catalog = SKILL_CATALOG) {
     const def = skillDefinition(item?.templateId, catalog);
     if (!def?.enabled || def.activationMode !== 'toggle' || !def.useContexts.includes(state.phase === 'BATTLE' ? 'combat' : 'nonCombat') || !toggleOwner(state, def)?.skillToggles?.[def.id] || applied.has(def.id)) continue;
     applied.add(def.id);
-    if (def.effect.type==='equipmentMastery' && masteryMatches(state,def.effect)) { bonus.ACC+=def.effect.accuracyBonus; bonus.actionSpeedRate=(bonus.actionSpeedRate||0)+def.effect.actionSpeedRate; bonus.damageRate=(bonus.damageRate||0)+def.effect.damageRate; }
+    if (def.effect.type==='equipmentMastery' && masteryMatches(state,def.effect)) { bonus.ACC+=def.effect.accuracyBonus; if (def.effect.defenseBonus) bonus.DEF=(bonus.DEF||0)+def.effect.defenseBonus; bonus.actionSpeedRate=(bonus.actionSpeedRate||0)+def.effect.actionSpeedRate; bonus.damageRate=(bonus.damageRate||0)+def.effect.damageRate; }
     if (def.effect.type === 'accuracyBonus' && def.effect.weaponCategories.includes(weapon?.templateId)) bonus.ACC += def.effect.amount;
   }
   return bonus;

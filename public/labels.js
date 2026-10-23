@@ -9,6 +9,7 @@ export function defenseTooltip(key, detail) {
   const terms = [`${detail.equipment ? '기본·상시' : '기본값'}(${detail.base + (detail.equipment || 0)})`, ...detail.attributes.map(a => `${statNames[a.key]}(${a.value})${(a.multiplier ?? 1) === 1 ? '' : ` × ${a.multiplier}`}`)];
   if (detail.levelBonus) terms.push(`레벨 보너스(${detail.levelBonus})`);
   if (detail.status) terms.push(`상태 보정(${detail.status})`);
+  if (detail.equipmentMastery) terms.push(`장비 숙련(${detail.equipmentMastery})`);
   if (detail.mastery) terms.push(`직업 숙련(${detail.mastery.value})`);
   return `${terms.join(' + ')} = ${detail.total}`;
 }

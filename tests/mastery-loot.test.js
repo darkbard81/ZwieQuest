@@ -7,6 +7,7 @@ import {stats,attack} from '../src/combat.js';
 import {generateEquipment,EQUIPMENT_CATALOG} from '../src/equipment.js';
 import {SKILL_CATALOG,maintainedSkillBonuses,validateSkillCatalog} from '../src/skills.js';
 import {DEFAULT_PROBABILITIES,DROP_WEIGHTS,ProbabilitySettings,validateProbabilities,rollDropSlot} from '../src/probabilities.js';
+import {defenseTooltip} from '../public/labels.js';
 import {skillDescription,skillAvailability} from '../public/skills-view.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
 const masteries=SKILL_CATALOG.skills.filter(d=>d.effect.type==='equipmentMastery');
@@ -19,7 +20,7 @@ test('all 12 mastery categories apply exact bonuses, match equipment, preserve p
  assert.equal(masteries.length,12);assert.equal(new Set(masteries.map(d=>d.effect.equipmentSlot+':'+d.effect.category)).size,12);
  for(const d of masteries){const g=make(),e=d.effect;equip(g,e.equipmentSlot,e.category);const item=learn(g,d),base=stats(g.state,g.config);g.state.battle.combatants.hero.readiness=.4;toggle(g,item);
   assert.equal(g.state.battle.combatants.hero.readiness,.4);assert.equal(g.state.battle.skillUsed,false);assert.equal(g.state.battle.pendingSkill,undefined);
-  for(let i=0;i<3;i++){toggle(g,item);const v=g.snapshot();assert.equal(v.combatStats.ACC,base.ACC+e.accuracyBonus);close(v.combatStats.actionSpeed,base.actionSpeed*(1+e.actionSpeedRate));close(v.stats.actionIntervalMs,base.actionIntervalMs/(1+e.actionSpeedRate));assert.equal(v.inventory.find(i=>i.id===item.id).masteryMatches,true);assert.doesNotMatch(skillDescription(v.inventory.find(i=>i.id===item.id)),/undefined/);}
+  for(let i=0;i<3;i++){toggle(g,item);const v=g.snapshot();assert.equal(v.combatStats.ACC,base.ACC+e.accuracyBonus);assert.equal(v.stats.DEF,base.DEF+(e.defenseBonus||0));assert.equal(v.defenseBreakdown.DEF.total,v.stats.DEF);close(v.combatStats.actionSpeed,base.actionSpeed*(1+e.actionSpeedRate));close(v.stats.actionIntervalMs,base.actionIntervalMs/(1+e.actionSpeedRate));assert.equal(v.inventory.find(i=>i.id===item.id).masteryMatches,true);assert.doesNotMatch(skillDescription(v.inventory.find(i=>i.id===item.id)),/undefined/);}
   assert.equal(g.state.battle.skillUseCounts[d.id],1);
   const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)),()=>0);assert.deepEqual(restored.snapshot().combatStats,g.snapshot().combatStats);
   toggle(g,item,false);assert.deepEqual(stats(g.state,g.config),base);assert.equal(g.snapshot().combatStats.ACC,base.ACC);
@@ -29,8 +30,8 @@ test('all 12 mastery categories apply exact bonuses, match equipment, preserve p
 });
 test('weapon/armor mastery sums rates; actual attacks record mastery separately, skill damage multiplies, raw stays fixed',()=>{
  const g=make();equip(g,'weapon','light');equip(g,'armor','light');const defs=['light-weapon-mastery','light-armor-mastery'].map(id=>masteries.find(d=>d.id===id));const before=stats(g.state,g.config);defs.forEach((d,i)=>toggle(g,learn(g,d,i+1)));
- const bonus=maintainedSkillBonuses(g.state);assert.equal(bonus.ACC,2);close(bonus.actionSpeedRate,.25);close(bonus.damageRate,-.2);close(stats(g.state,g.config).actionSpeed,before.actionSpeed*1.25);
- g.rng=n=>n-1;g.battleAction('hero');const hit=g.state.battle.lastHit;assert.equal(hit.calculation.acc,before.ACC+2);close(hit.calculation.factors.mastery,.8);
+ const bonus=maintainedSkillBonuses(g.state);assert.equal(bonus.ACC,2);close(bonus.actionSpeedRate,.2);close(bonus.damageRate,-.1);close(stats(g.state,g.config).actionSpeed,before.actionSpeed*1.2);
+ g.rng=n=>n-1;g.battleAction('hero');const hit=g.state.battle.lastHit;assert.equal(hit.calculation.acc,before.ACC+2);close(hit.calculation.factors.mastery,.9);
  const x={roll:15,acc:10,defense:10,str:0,base:100,pen:0,ar:0,skillDamageMultiplier:1.25,masteryDamageRate:-.2};assert.equal(attack(x).damage,100);assert.equal(attack({...x,damageTypes:['raw'],fixedDamage:17}).damage,17);
  g.character.hp=0;assert.deepEqual(maintainedSkillBonuses(g.state),{ACC:0});
 });
@@ -57,7 +58,7 @@ test('legacy probability settings keep configured encounter/drop rates and gain 
  const c=structuredClone(SKILL_CATALOG);c.skills.find(d=>d.effect.type==='equipmentMastery').effect.category='unknown';assert.throws(()=>validateSkillCatalog(c));
 });
 test('an exhausted skill pool never rerolls another category or grants duplicates',()=>{
- for(const kind of ['victory','boss','treasure']){const g=make();g.character.skills=SKILL_CATALOG.skills.filter(d=>d.enabled).map(d=>({id:d.id,templateId:d.id,slot:'skill',name:d.name,stats:{}}));g.config.probabilities={...DEFAULT_PROBABILITIES,dropPercent:100,weaponWeight:0,armorWeight:0,charmWeight:0,skillWeight:1};const inventory=g.state.inventory.length,calls=[];g.rng=n=>{calls.push(n);return 0;};g.reward(kind);assert.equal(g.character.skills.length,30);assert.equal(g.state.inventory.length,inventory);assert.equal(g.state.lastReward.skillId,null);assert.equal(g.state.lastReward.itemId,null);assert.equal(g.state.lastReward.dropSlot,'skill');assert.deepEqual(calls,[10000,1]);}
+ for(const kind of ['victory','boss','treasure']){const g=make();g.character.skills=SKILL_CATALOG.skills.filter(d=>d.enabled).map(d=>({id:d.id,templateId:d.id,slot:'skill',name:d.name,stats:{}}));g.config.probabilities={...DEFAULT_PROBABILITIES,dropPercent:100,weaponWeight:0,armorWeight:0,charmWeight:0,skillWeight:1};const inventory=g.state.inventory.length,calls=[];g.rng=n=>{calls.push(n);return 0;};g.reward(kind);assert.equal(g.character.skills.length,28);assert.equal(g.state.inventory.length,inventory);assert.equal(g.state.lastReward.skillId,null);assert.equal(g.state.lastReward.itemId,null);assert.equal(g.state.lastReward.dropSlot,'skill');assert.deepEqual(calls,[10000,1]);}
 });
 
 test('mastery names and descriptions enumerate actual equipment; all twelve toggle outside combat and persist',()=>{
@@ -72,6 +73,7 @@ test('mastery names and descriptions enumerate actual equipment; all twelve togg
   assert.equal(skillAvailability(before,before.inventory.find(i=>i.id===item.id),0).ready,true);
   toggle(g,item);toggle(g,item);assert.equal(g.character.skillToggles[d.id],true);
   assert.equal(g.snapshot().combatStats.ACC,before.combatStats.ACC+e.accuracyBonus);
+  assert.equal(g.snapshot().stats.DEF,before.stats.DEF+(e.defenseBonus||0));
   close(g.snapshot().stats.actionSpeed,before.stats.actionSpeed*(1+e.actionSpeedRate));
   assert.equal(g.state.battle,null);assert.equal(g.snapshot().inventory.find(i=>i.id===item.id).toggleOn,true);
   const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)),()=>0);
@@ -101,4 +103,26 @@ test('noncombat toggles keep stale battle, foreign character and death guards',(
  assert.throws(()=>g.command({...command,battleId:battle.id,heroActionSeq:0}),/행동 주기/);
  assert.throws(()=>g.command({...command,characterId:'someone-else'}),/캐릭터/);
  g.character.hp=0;assert.throws(()=>g.command(command),/지금은/);assert.deepEqual(g.character.skillToggles,{});
+});
+
+
+test('cloth mastery adds only DEF to actual incoming attacks and displayed breakdown, without stacking',()=>{
+ const g=make();equip(g,'armor','cloth');const d=masteries.find(d=>d.id==='cloth-armor-mastery'),item=learn(g,d),base=g.snapshot();
+ toggle(g,item);const on=g.snapshot();
+ assert.deepEqual(on.stats,{...base.stats,DEF:base.stats.DEF+5});
+ assert.equal(on.combatStats.ACC,base.combatStats.ACC);
+ assert.equal(on.defenseBreakdown.DEF.equipmentMastery,5);
+ assert.match(defenseTooltip('DEF',on.defenseBreakdown.DEF),/장비 숙련\(5\)/);
+ assert.match(skillDescription(on.inventory.find(i=>i.id===item.id)),/DEF \+5/);
+ g.character.skillSlots[2]=item.id;assert.equal(g.snapshot().stats.DEF,base.stats.DEF+5);
+ g.rng=()=>0;g.battleAction('enemy');assert.equal(g.state.battle.lastHit.calculation.defense,base.stats.DEF+5);
+ toggle(g,item,false);g.battleAction('enemy');assert.equal(g.state.battle.lastHit.calculation.defense,base.stats.DEF);
+ assert.doesNotMatch(defenseTooltip('DEF',g.snapshot().defenseBreakdown.DEF),/장비 숙련/);
+ toggle(g,item);equip(g,'armor','light');const mismatch=g.snapshot();toggle(g,item,false);assert.deepEqual(g.snapshot().stats,mismatch.stats);
+});
+test('mastery DEF bonus is optional for existing templates and rejects invalid values',()=>{
+ const c=structuredClone(SKILL_CATALOG),e=c.skills.find(d=>d.id==='cloth-armor-mastery').effect;
+ delete e.defenseBonus;assert.doesNotThrow(()=>validateSkillCatalog(c));
+ for(const value of [null,'5',.5,NaN,Infinity,21,-21]){e.defenseBonus=value;assert.throws(()=>validateSkillCatalog(c),/mastery defense bonus/);}
+ e.defenseBonus=5;assert.doesNotThrow(()=>validateSkillCatalog(c));
 });

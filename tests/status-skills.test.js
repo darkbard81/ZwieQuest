@@ -19,11 +19,11 @@ const ids=(g,actor)=>g.state.battle.statuses[actor].map(s=>s.id);
 function drain(g,total,steps=[total],rate=1){let i=0;while(total>0){const step=Math.min(total,steps[i++%steps.length]);g.tick(step/rate,rate);total-=step;}for(let n=0;g.state.pendingGameMs>0||g.state.remaining<=1e-7;n++){assert.ok(n<1000,'bounded drain');g.tick(0);}return g;}
 const records=g=>g.events.filter(e=>['hit','skill','status'].includes(e.type)).map(e=>[e.type,e.hit?.actor||e.actor,e.hit?.skillId||e.skillId,Math.round(e.hit?.combatTimeMs??e.combatTimeMs),e.hit?.damage??e.healed]);
 
-test('30 enabled skills including 12 equipment masteries: two attacks for each defense, six inspirations, four utilities and real opaque icons',()=>{
- const enabled=SKILL_CATALOG.skills.filter(d=>d.enabled);assert.equal(enabled.length,30);assert.equal(enabled.filter(d=>d.effect.type==='status').length,6);
+test('28 enabled skills including 12 equipment masteries: two attacks for each defense, six inspirations, two utilities and real opaque icons',()=>{
+ const enabled=SKILL_CATALOG.skills.filter(d=>d.enabled);assert.equal(enabled.length,28);assert.equal(enabled.filter(d=>d.effect.type==='status').length,6);
  for(const target of ['DEF','REF','FOR','WIL'])assert.equal(enabled.filter(d=>d.effect.statusDefense===target).length,2);
  for(const d of enabled){assert.equal(d.cooldown,undefined);assert.ok(existsSync(new URL(`../public${d.iconPath}`,import.meta.url)));assert.equal(d.perBattleLimit,d.activationMode==='toggle'?null:d.id==='heal'?2:1);}
- assert.deepEqual(enabled.filter(d=>['heal','mirror','cleanse','dispel'].includes(d.effect.type)).map(d=>d.effect.type).sort(),['cleanse','dispel','heal','mirror']);
+ assert.deepEqual(enabled.filter(d=>['heal','mirror','cleanse','dispel'].includes(d.effect.type)).map(d=>d.effect.type).sort(),['heal','mirror']);
 });
 test('all 36 definitions apply exact one attribute +/-5, with no tier multiplication, and expose all derived modifiers',()=>{
  assert.equal(STATUS_CATALOG.statuses.length,36);assert.equal(new Set(STATUS_CATALOG.statuses.map(s=>s.id)).size,36);
@@ -69,15 +69,10 @@ test('all six inspiration skills apply at next action, INT uses pre-cast stats; 
  for(const def of SKILL_CATALOG.skills.filter(s=>s.effect.type==='status')){const g=make();g.character.attributes.INT=4;learn(g,def.id);g.command(cmd(g,def.id));assert.deepEqual(ids(g,'hero'),[]);g.battleAction('hero');assert.ok(ids(g,'hero').includes(def.effect.statusId));assert.equal(g.state.battle.statuses.hero[0].remainingMs,36000);assert.equal(g.events.filter(e=>e.type==='hit').length,0);}
  const g=make();learn(g,'resolve-inspiration');learn(g,'intellect-inspiration',2);g.command(cmd(g,'resolve-inspiration'));g.battleAction('hero');g.command(cmd(g,'intellect-inspiration'));g.battleAction('hero');assert.ok(ids(g,'hero').includes('brilliant'));
 });
-test('mirror lasts INT-adjusted time, loses ten only on incoming hit/crit, and can be dispelled',()=>{
+test('mirror lasts INT-adjusted time, loses ten only on incoming hit/crit, and expires after three incoming hits',()=>{
  const g=make();g.character.attributes.INT=4;learn(g,'mirrored-image');g.command(cmd(g,'mirrored-image'));g.battleAction('hero');assert.equal(stats(g.state,g.config).DEF,40);assert.equal(g.state.battle.statuses.hero[0].remainingMs,72000);
  g.battleAction('enemy');assert.equal(stats(g.state,g.config).DEF,40);g.state.enemy.ACC=100;g.rng=n=>n-1;
  for(const value of [30,20,10]){g.battleAction('enemy');assert.equal(stats(g.state,g.config).DEF,value);}assert.deepEqual(ids(g,'hero'),[]);
- applyMirror(g.state.battle,'enemy',60000,{INT:0});learn(g,'dispel',2);g.command(cmd(g,'dispel'));g.battleAction('hero');assert.deepEqual(ids(g,'enemy'),[]);
-});
-test('cleanse/dispel require a relevant target at both reservation and execution, and clear all relevant attributes',()=>{
- const g=make();learn(g,'purify');learn(g,'dispel',2);assert.throws(()=>g.command(cmd(g,'purify')),/제거할/);put(g,'hero','hobbled');put(g,'hero','sickened');g.command(cmd(g,'purify'));g.battleAction('hero');assert.deepEqual(ids(g,'hero'),[]);assert.equal(g.state.battle.skillUseCounts.purify,1);
- put(g,'enemy','hardy');g.command(cmd(g,'dispel'));clearStatuses(g.state.battle,'enemy','buff');g.battleAction('hero');assert.equal(g.state.battle.skillUseCounts.dispel,undefined);assert.equal(g.events.at(-1).type,'hit');
 });
 test('charm cancels queued skill with no cost and rejects manual character controls; domination attacks self only',()=>{
  const g=make();g.command(cmd(g,'heal'));put(g,'hero','charmed');assert.throws(()=>g.command(cmd(g,'heal')),/매혹/);assert.throws(()=>g.command({type:'ALLOCATE_STAT',characterId:g.character.id,stat:'STR'}),/매혹/);g.battleAction('hero');assert.equal(g.state.battle.skillUseCounts.heal,undefined);assert.equal(g.state.battle.lastHit.targetActor,'enemy');assert.equal(g.state.battle.pendingSkill,undefined);
@@ -112,17 +107,17 @@ test('battle exit, death and restored ended battle discard statuses and pending 
 });
 test('skill-category treasure grants every unlearned skill exactly once to the account, no sale or implicit equip; all learned falls back to gold',()=>{
  const g=make();g.config.probabilities={dropPercent:100,weaponWeight:0,armorWeight:0,charmWeight:0,skillWeight:1};g.phase('HOME',1000);const other=g.create({name:'다른 모험가',appearanceId:'warrior'});g.selectCharacter(g.state.characters[0].id);const slots=structuredClone(g.character.skillSlots);
- for(let i=0;i<29;i++){g.reward('treasure');assert.ok(g.state.lastReward.skillId);assert.equal(g.state.lastReward.goldOnly,false);}
- assert.equal(g.character.skills.length,30);assert.equal(new Set(g.character.skills.map(i=>i.templateId)).size,30);assert.deepEqual(g.character.skillSlots,slots);assert.equal(other.skills.length,30);assert.deepEqual(other.skills,g.character.skills);
- const gold=g.state.gold;g.reward('treasure');assert.equal(g.state.lastReward.goldOnly,true);assert.equal(g.character.skills.length,30);assert.ok(g.state.gold>gold);const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skills.length,30);
+ for(let i=0;i<27;i++){g.reward('treasure');assert.ok(g.state.lastReward.skillId);assert.equal(g.state.lastReward.goldOnly,false);}
+ assert.equal(g.character.skills.length,28);assert.equal(new Set(g.character.skills.map(i=>i.templateId )).size,28);assert.deepEqual(g.character.skillSlots,slots);assert.equal(other.skills.length,28);assert.deepEqual(other.skills,g.character.skills);
+ const gold=g.state.gold;g.reward('treasure');assert.equal(g.state.lastReward.goldOnly,true);assert.equal(g.character.skills.length,28);assert.ok(g.state.gold>gold);const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skills.length,28);
 });
 test('new monsters receive a limited skill, use it on third action, then return to basic attacks; saved old enemies are not granted abilities',()=>{
  const g=make();g.state.enemy.skills=['weakening-strike'];g.state.enemy.ACC=100;g.rng=n=>n-1;for(let i=0;i<4;i++)g.battleAction('enemy');const hits=g.events.filter(e=>e.type==='hit');assert.deepEqual(hits.map(e=>e.hit.skillId),[undefined,undefined,'weakening-strike',undefined]);assert.equal(g.state.battle.enemySkillUseCounts['weakening-strike'],1);assert.ok(ids(g,'hero').includes('weakened'));
  const h=make();delete h.state.enemy.skills;const saved=new Game(h.config,structuredClone(h.state));assert.equal(saved.state.enemy.skills,undefined);h.beginBattle();assert.ok(h.state.enemy.skills.length>0);
 });
-test('UI shows real icon and skill defense/duration, no cooldown, and disables controlled or empty cleanse actions',()=>{
- const g=make();learn(g,'hamstring');learn(g,'purify',2);let s=g.snapshot(),item=s.inventory.find(i=>i.templateId==='hamstring');assert.match(skillDescription(item),/FOR/);assert.match(skillDescription(item),/15.0초\(INT\)/);assert.doesNotMatch(skillDescription(item),/재사용|undefined/);assert.match(skillIconHTML(item),/<img src="\/assets\/skills\/hamstring-v1.webp"/);
- assert.equal(skillAvailability(s,s.inventory.find(i=>i.templateId==='purify'),0).ready,false);put(g,'hero','charmed');s=g.snapshot();assert.equal(skillAvailability(s,item,0).ready,false);
+test('UI shows real icon and skill defense/duration, no cooldown, and disables controlled actions',()=>{
+ const g=make();learn(g,'hamstring');let s=g.snapshot(),item=s.inventory.find(i=>i.templateId==='hamstring');assert.match(skillDescription(item),/FOR/);assert.match(skillDescription(item),/15.0초\(INT\)/);assert.doesNotMatch(skillDescription(item),/재사용|undefined/);assert.match(skillIconHTML(item),/<img src="\/assets\/skills\/hamstring-v1.webp"/);
+ put(g,'hero','charmed');s=g.snapshot();assert.equal(skillAvailability(s,item,0).ready,false);
 });
 
 

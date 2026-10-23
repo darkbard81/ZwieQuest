@@ -57,11 +57,12 @@ export function statDetails(state, config, character = activeCharacter(state)) {
   const e = key => gear.reduce((sum, i) => sum + (key === 'DEX' && i.slot === 'armor' ? 0 : i.stats[key] || 0), 0);
   const m = state.phase === 'BATTLE' && character.id === state.activeCharacterId ? modifiers(state.battle, 'hero') : {};
   const b = Object.fromEntries(BASE_STATS.map(key => [key, character.attributes[key] + e(key) + (m[key] || 0)]));
+  const mastery=character.id===state.activeCharacterId?maintainedSkillBonuses(state):{};
   const levelBonus = levelCombatBonus(character.level);
   const defenses = Object.fromEntries(Object.entries(DEFENSE_RULES).map(([key, rule]) => {
     const attributes = Object.entries(rule.attributes).map(([key, multiplier]) => ({ key, base: character.attributes[key], equipment: e(key), status: m[key] || 0, value: b[key], multiplier, contribution: b[key] * multiplier }));
-    const detail = { base: cls.B[key], attributes, level: character.level, levelBonus, equipment: e(key), status: m[key] || 0, mastery: null };
-    detail.total = detail.base + levelBonus + attributes.reduce((sum, a) => sum + a.contribution, 0) + detail.equipment + detail.status;
+    const detail = { base: cls.B[key], attributes, level: character.level, levelBonus, equipment: e(key), status: m[key] || 0, mastery: null, equipmentMastery: key === 'DEF' ? mastery.DEF || 0 : 0 };
+    detail.total = detail.base + levelBonus + attributes.reduce((sum, a) => sum + a.contribution, 0) + detail.equipment + detail.status + detail.equipmentMastery;
     return [key, detail];
   }));
   const values = {
@@ -73,7 +74,6 @@ export function statDetails(state, config, character = activeCharacter(state)) {
     ...actionSpeed(b.DEX, gear.find(i => i.slot === 'armor')?.actionSpeedPenaltyRate || 0, config, gear.find(i => i.slot === 'weapon')?.actionSpeedPenaltyRate || 0),
     typeModifiers: { ...(gear.find(i => i.slot === 'armor')?.typeModifiers || {}) }
   };
-  const mastery=character.id===state.activeCharacterId?maintainedSkillBonuses(state):{};
   const speedRate=Math.max(.1,1+(mastery.actionSpeedRate||0));
   values.actionSpeed*=speedRate; values.actionIntervalMs/=speedRate;
   values.actionIntervalMs *= m.actionTimeMultiplier || 1; values.actionSpeed /= m.actionTimeMultiplier || 1;
