@@ -4,7 +4,6 @@ import { readFileSync } from 'node:fs';
 import { Game } from '../src/game.js';
 import { REGIONS } from '../src/regions.js';
 import { eligibleVariations, eligibleBossVariations, generateMonster, MONSTER_CATALOG, ENCOUNTER_CONFIG, validateMonsters } from '../src/monsters.js';
-import { modifiers } from '../src/status-effects.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
 test('old forest is reachable, unlocks an inn start and supplies seven stronger arachne variations',()=>{
  const g=new Game(config,null,()=>0);g.create({name:'숲 테스트',appearanceId:'warrior'});
@@ -39,13 +38,4 @@ test('existing account gains forest without losing nodes, edges, battle or explo
  for(const key of ['enemy','battle','characters','inventory','currentNodeId','path','checkpointHistory'])assert.deepEqual(restored.state[key],saved[key],key);
  for(const [id,known] of Object.entries(saved.exploredNodes))assert.deepEqual(restored.state.exploredNodes[id],known);
  const again=new Game(config,structuredClone(restored.state),()=>{throw Error('should not regenerate');});assert.deepEqual(again.state,restored.state);
-});
-test('arachne executes its attack skill and applies the DEX debuff through the combat engine',()=>{
- const g=new Game(config,null,()=>0);g.create({name:'스킬 테스트',appearanceId:'warrior'});g.enterRegion('old_forest');g.beginBattle(true);
- assert.equal(g.state.enemy.monsterId,'arachne');g.character.hp=100000;g.character.attributes.RES=0;
- g.state.enemy.ACC=1000;g.state.enemy.weapon.damageMin=0;g.state.enemy.weapon.damageMax=0;
- g.state.battle.combatants.enemy.actionSeq=2;g.rng=n=>n===20?19:0;g.battleAction('enemy');
- assert.equal(g.state.battle.enemySkillUseCounts['binding-strike'],1);
- assert.equal(g.state.battle.lastHit.statusCheck.target,'REF');assert.equal(modifiers(g.state.battle,'hero').DEX,-5);
- const count=g.state.battle.enemySkillUseCounts['binding-strike'];g.battleAction('enemy');assert.equal(g.state.battle.enemySkillUseCounts['binding-strike'],count);
 });

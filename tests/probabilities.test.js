@@ -9,9 +9,11 @@ import { Game } from '../src/game.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
 const settings=(battlePercent,treasurePercent,dropPercent=25)=>({...DEFAULT_PROBABILITIES,battlePercent,treasurePercent,passPercent:100-battlePercent-treasurePercent,dropPercent});
 test('exclusive encounter thresholds cover all rolls including zero and full segments',()=>{
- for(const p of [DEFAULT_PROBABILITIES,settings(0,0),settings(100,0),settings(0,100),settings(30,40),settings(1,99)]){
-  const counts={battle:0,treasure:0,pass:0};for(let n=0;n<10000;n++)counts[rollEncounter(()=>n,p)]++;
-  assert.deepEqual(counts,{battle:p.battlePercent*100,treasure:p.treasurePercent*100,pass:p.passPercent*100});
+ for(const p of [undefined,settings(0,0),settings(100,0),settings(0,100),settings(30,40),settings(1,99)]){
+  const expected=p??DEFAULT_PROBABILITIES;
+  if(!p)assert.deepEqual([expected.battlePercent,expected.treasurePercent,expected.passPercent],[20,5,75]);
+  const counts={battle:0,treasure:0,pass:0};for(let n=0;n<10000;n++)counts[rollEncounter(size=>{assert.equal(size,10000);return n;},p)]++;
+  assert.deepEqual(counts,{battle:expected.battlePercent*100,treasure:expected.treasurePercent*100,pass:expected.passPercent*100});
  }
 });
 test('shared runtime settings govern existing games and all-level loot and chest rewards',()=>{

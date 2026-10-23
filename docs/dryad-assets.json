@@ -1,0 +1,248 @@
+{
+  "version": 2,
+  "originalUnmodified": true,
+  "note": "2026-10-23 최신 사용자 링크 순서. 기존 source-manifest.json 및 기존 파일명 보존. 새 링크가 이전 중복 링크를 대체함.",
+  "duplicateLinks": [],
+  "duplicateFiles": [],
+  "duplicatePixels": [],
+  "originals": [
+    {
+      "inputIndex": 1,
+      "shareUrl": "https://chatgpt.com/s/m_6adb10d098e081919b04fbfa700966fc",
+      "file": "01-dryad-red.png",
+      "mime": "image/png",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 2331876,
+      "sha256": "87fdc11797764e326a0f4cc151d53312992bd22fbb283611e70bef80b55a8a82",
+      "rgbaSha256": "37446754e25bec58ef614688f5c69b3ceceeed0de5a8a334a649183bd8c19773",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "damageType": "slash",
+      "visualEvidence": "빨강 · 붉은 칼날",
+      "runtime": [
+        {
+          "path": "public/assets/monster/dryad/slash-dryad.webp",
+          "width": 512,
+          "height": 512,
+          "sha256": "6df948816e4119834047a88c35aa3decdfadb0b4ec7e8d06568e6fc46c389f19",
+          "bytes": 326532
+        },
+        {
+          "path": "public/assets/monster/dryad/icons/slash-dryad.webp",
+          "width": 128,
+          "height": 128,
+          "sha256": "30aceca8e25fc74751ee25e5e8eab2817d86c50d94368906bc22c6fcc5b7c379",
+          "bytes": 32072
+        }
+      ]
+    },
+    {
+      "inputIndex": 2,
+      "shareUrl": "https://chatgpt.com/s/m_6adb10db82b48191b088b55b4442ec1e",
+      "file": "04-dryad-fire-orange.png",
+      "mime": "image/png",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 2064278,
+      "sha256": "2d91037461fc8c110dc47565d1cd640596c54521b7e9a99e9d6df77d9f56c239",
+      "rgbaSha256": "09fc47995c8015a7969ea9933a68559cbc54d5d5a33536d0b54882fe756327b7",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "damageType": "fire",
+      "visualEvidence": "주황 · 불꽃",
+      "runtime": [
+        {
+          "path": "public/assets/monster/dryad/fire-dryad.webp",
+          "width": 512,
+          "height": 512,
+          "sha256": "77b0dc732f801bd4314a36e3950487028b3a2705a5eb0a4506408f653c28c66c",
+          "bytes": 321096
+        },
+        {
+          "path": "public/assets/monster/dryad/icons/fire-dryad.webp",
+          "width": 128,
+          "height": 128,
+          "sha256": "55a393d6d34677223d3bcb037e660da67d87a7949ebcf42e160e3978c1ea7a1e",
+          "bytes": 34082
+        }
+      ]
+    },
+    {
+      "inputIndex": 3,
+      "shareUrl": "https://chatgpt.com/s/m_6adb10c547fc8191ab074b901113b166",
+      "file": "02-dryad-purple.png",
+      "mime": "image/png",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 2215236,
+      "sha256": "0b7931fc0bc6ace8078e240cb37fca36ab64f522e1228561ebc3519f8177926a",
+      "rgbaSha256": "5c67e5fe2637bffdad5a2c3462a30d050b1c966c905f16d9ce7589b5f6fe42f5",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "damageType": "pierce",
+      "visualEvidence": "보라 · 창",
+      "runtime": [
+        {
+          "path": "public/assets/monster/dryad/pierce-dryad.webp",
+          "width": 512,
+          "height": 512,
+          "sha256": "55fe690d5df84197562233f49b181caaee621ffb63904167cd93351bd3906751",
+          "bytes": 307328
+        },
+        {
+          "path": "public/assets/monster/dryad/icons/pierce-dryad.webp",
+          "width": 128,
+          "height": 128,
+          "sha256": "0631d66d76521f5d3d613af709bae3bf6d367d2d91d293ac21e5e01da2de5cdb",
+          "bytes": 30450
+        }
+      ]
+    },
+    {
+      "inputIndex": 4,
+      "shareUrl": "https://chatgpt.com/s/m_6adb13056bfc8191acb610fe75507a3e",
+      "file": "05-dryad-brown.png",
+      "mime": "image/png",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 2506270,
+      "sha256": "5a8e88a30464ba0759934ed30bb5c405ede1a36e012edeb7e2e2f8c47e772f33",
+      "rgbaSha256": "e84f67a846ba08d43bb4f44965a8fd91c372e155bd71a236161d02f975c7a8a9",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "damageType": "blunt",
+      "visualEvidence": "갈색·황토색 · 나무 망치",
+      "runtime": [
+        {
+          "path": "public/assets/monster/dryad/blunt-dryad.webp",
+          "width": 512,
+          "height": 512,
+          "sha256": "66113df50429e780e42c290c7b63b8ab571d248d995a2540d94f7d96b93c6804",
+          "bytes": 336058
+        },
+        {
+          "path": "public/assets/monster/dryad/icons/blunt-dryad.webp",
+          "width": 128,
+          "height": 128,
+          "sha256": "620da5d0c3467068d064aa2418d7ae420c216d1082b4ac23b112118473228602",
+          "bytes": 32074
+        }
+      ]
+    },
+    {
+      "inputIndex": 5,
+      "shareUrl": "https://chatgpt.com/s/m_6adb10b2275881918a0718b1bb65d450",
+      "file": "03-dryad-ice-blue.png",
+      "mime": "image/png",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 2792548,
+      "sha256": "f6acfc51c58933cf47aa9be38959ed7b19bd2612cccd37429aee9905245b877f",
+      "rgbaSha256": "411cf5e8a5c22fd025b6c19156f340a4b307e778e8b47b1c85e2bcef75f48eba",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "damageType": "cold",
+      "visualEvidence": "하늘색 · 얼음",
+      "runtime": [
+        {
+          "path": "public/assets/monster/dryad/cold-dryad.webp",
+          "width": 512,
+          "height": 512,
+          "sha256": "b5f490a4416d6667262cf6110bbfe413b4bda847e4b5cb0acfa6d8b3d29d689d",
+          "bytes": 381280
+        },
+        {
+          "path": "public/assets/monster/dryad/icons/cold-dryad.webp",
+          "width": 128,
+          "height": 128,
+          "sha256": "933a4f3e05f7afb7f8718936a8b1c10f0b61b6657163da9925c5470ca5e5fe13",
+          "bytes": 35032
+        }
+      ]
+    },
+    {
+      "inputIndex": 6,
+      "shareUrl": "https://chatgpt.com/s/m_6adb10a9af388191ad5d9d8c44dbd1b1",
+      "file": "06-dryad-original.png",
+      "mime": "image/png",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 2212058,
+      "sha256": "da3912ea7926c87f754094269c75870fb286ad2f1df1c12505e42f3b285adcc8",
+      "rgbaSha256": "ddb4f80165f4cc02a0d94ed40621d194f8aaf98386f3530efc1e0262621fb1a1",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "damageType": "lightning",
+      "visualEvidence": "노랑 · 번개",
+      "runtime": [
+        {
+          "path": "public/assets/monster/dryad/lightning-dryad.webp",
+          "width": 512,
+          "height": 512,
+          "sha256": "3d29752977c2a70d0f7eae26a53af0c0615262fb98fc711b169d5671a52bac40",
+          "bytes": 332456
+        },
+        {
+          "path": "public/assets/monster/dryad/icons/lightning-dryad.webp",
+          "width": 128,
+          "height": 128,
+          "sha256": "9d0893f867551c0c1395bfc5daa49f36ca9a7317277265a2b3da80c54155da0f",
+          "bytes": 31078
+        }
+      ]
+    },
+    {
+      "inputIndex": 7,
+      "shareUrl": "https://chatgpt.com/s/m_6adb10ee06088191bbdb215dc389af95",
+      "file": "07-dryad-original.png",
+      "mime": "image/png",
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA",
+      "bytes": 2731770,
+      "sha256": "d77db590c0693fb4d5eba56f9947140deca6f0bf1f5525b64772eb1012f76e38",
+      "rgbaSha256": "ad9975d28080ea815fe079b5ae97b1b725f9e320a826e9218439a65527b66b34",
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "damageType": "corrosion",
+      "visualEvidence": "초록 · 수액",
+      "runtime": [
+        {
+          "path": "public/assets/monster/dryad/corrosion-dryad.webp",
+          "width": 512,
+          "height": 512,
+          "sha256": "bb438cbc0935610352d5d0fdd51018f505bcc55a9378762d4955d6fcdad4892f",
+          "bytes": 364374
+        },
+        {
+          "path": "public/assets/monster/dryad/icons/corrosion-dryad.webp",
+          "width": 128,
+          "height": 128,
+          "sha256": "f609ff927f75e3737b30c6427a642eb46ac7248df7a9420ab51a86ec4e228b81",
+          "bytes": 35166
+        }
+      ]
+    }
+  ]
+}

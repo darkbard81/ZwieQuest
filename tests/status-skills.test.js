@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync,existsSync } from 'node:fs';
 import { Game } from '../src/game.js';
+import { eligibleVariations, generateMonster, generateBoss } from '../src/monsters.js';
 import { stats,attack,hitResult } from '../src/combat.js';
 import { SKILL_CATALOG,skillDefinition,grantTreasureSkill } from '../src/skills.js';
 import { STATUS_CATALOG,statusDefinition,initializeStatuses,applyStatus,modifiers,durationMs,clearStatuses,applyMirror,convertHit,advanceStatuses,resolveStatusEvents,nextStatusEvent,effectiveEnemy } from '../src/status-effects.js';
@@ -111,8 +112,29 @@ test('skill-category treasure grants every unlearned skill exactly once to the a
  assert.equal(g.character.skills.length,28);assert.equal(new Set(g.character.skills.map(i=>i.templateId )).size,28);assert.deepEqual(g.character.skillSlots,slots);assert.equal(other.skills.length,28);assert.deepEqual(other.skills,g.character.skills);
  const gold=g.state.gold;g.reward('treasure');assert.equal(g.state.lastReward.goldOnly,true);assert.equal(g.character.skills.length,28);assert.ok(g.state.gold>gold);const restored=new Game(g.config,JSON.parse(JSON.stringify(g.state)));assert.equal(restored.character.skills.length,28);
 });
-test('new monsters receive a limited skill, use it on third action, then return to basic attacks; saved old enemies are not granted abilities',()=>{
- const g=make();g.state.enemy.skills=['weakening-strike'];g.state.enemy.ACC=100;g.rng=n=>n-1;for(let i=0;i<4;i++)g.battleAction('enemy');const hits=g.events.filter(e=>e.type==='hit');assert.deepEqual(hits.map(e=>e.hit.skillId),[undefined,undefined,'weakening-strike',undefined]);assert.equal(g.state.battle.enemySkillUseCounts['weakening-strike'],1);assert.ok(ids(g,'hero').includes('weakened'));
+test('generated forest monsters use their configured attack skill on action three once; legacy enemies keep no skills',()=>{
+ const pool=eligibleVariations('old_forest');
+ for(const [id,skillId,defense,attribute,boss] of [
+  ['arachne','binding-strike','REF','DEX',true],
+  ['werewolf','weakening-strike','FOR','CON',false],
+  ['dryad','dread-whisper','WIL','RES',false]
+ ]){
+  const g=make();let draw=0;
+  g.state.enemy=boss?generateBoss('old_forest',10,()=>0):generateMonster('old_forest',()=>draw++===0?pool.findIndex(p=>p.monster.id===id):0);
+  assert.equal(g.state.enemy.monsterId,id);assert.deepEqual(g.state.enemy.skills,[skillId]);
+  const def=skillDefinition(skillId);assert.equal(def.effect.type,'attack');assert.equal(def.effect.damageMultiplier,1.25);assert.equal(def.effect.durationMs,15000);
+  g.character.hp=100000;g.character.attributes.RES=0;g.state.enemy.ACC=1000;
+  g.state.enemy.weapon.damageMin=g.state.enemy.weapon.damageMax=0;g.rng=n=>n===20?19:0;
+  g.battleAction('enemy');g.battleAction('enemy');assert.equal(g.state.battle.enemySkillUseCounts[skillId],undefined);
+  g.battleAction('enemy');const hit=g.state.battle.lastHit;
+  assert.equal(hit.target,'DEF');assert.equal(hit.statusCheck.target,defense);assert.equal(hit.statusResult.applied,true);
+  assert.equal(modifiers(g.state.battle,'hero')[attribute],-5);
+  if(id==='werewolf')assert.equal(modifiers(g.state.battle,'hero').healingReceived,.5);
+  if(id==='dryad')assert.equal(modifiers(g.state.battle,'hero').buffDecayRate,2);
+  g.battleAction('enemy');
+  assert.deepEqual(g.events.filter(e=>e.type==='hit').map(e=>e.hit.skillId),[undefined,undefined,skillId,undefined]);
+  assert.equal(g.state.battle.enemySkillUseCounts[skillId],1);
+ }
  const h=make();delete h.state.enemy.skills;const saved=new Game(h.config,structuredClone(h.state));assert.equal(saved.state.enemy.skills,undefined);h.beginBattle();assert.ok(h.state.enemy.skills.length>0);
 });
 test('UI shows real icon and skill defense/duration, no cooldown, and disables controlled actions',()=>{

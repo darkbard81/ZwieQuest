@@ -5,7 +5,6 @@ import { Game } from '../src/game.js';
 import { prepareAdminGame, resetGameProgress, regenerateAdminMaps } from '../src/account-progress.js';
 import { routeTo, nodeLabels } from '../public/map-navigation.js';
 import { mapSVG } from '../public/map-view.js';
-import { rollEncounter } from '../src/encounters.js';
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
 const quiet = n => n === 10000 ? 9999 : Math.min(11, n - 1);
 function make() { const g = new Game(config, null, quiet); g.create({name: '모험가', appearanceId: 'warrior'});g.state.homePaused=false; return g; }
@@ -87,12 +86,6 @@ test('labels use depth and stable left-to-right indexes for paths and dead ends 
  assert.doesNotMatch(svg,/>보물<|>전투<|>갈림길<|>막다른 길</);
  const before=labels[targetAt(map,3)];g.state.exploredNodes.village=[root.id];assert.equal(nodeLabels(map)[targetAt(map,3)],before);
  assert.match(mapSVG(g.snapshot()),/role="button" tabindex="0" aria-label="미탐험까지 자동 이동"/);
-});
-
-test('exclusive encounter roll covers exactly 20% battle, 5% treasure and 75% pass', () => {
- const counts={battle:0,treasure:0,pass:0};
- for(let roll=0;roll<10000;roll++) counts[rollEncounter(n=>{assert.equal(n,10000);return roll;})]++;
- assert.deepEqual(counts,{battle:2000,treasure:500,pass:7500});
 });
 
 test('every map rolls on arrival, ignores old fixed assignments, and never rerolls a saved encounter on reload', () => {

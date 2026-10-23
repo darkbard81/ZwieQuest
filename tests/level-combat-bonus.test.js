@@ -13,7 +13,7 @@ test('level bonus applies once to only accuracy and four defenses, stacks with s
  for(const level of [1,2,3,4,5,10,11,40]){
   g.character.level=level;const b=g.snapshot();for(const key of keys)assert.equal(b.stats[key]-a.stats[key],3*Math.floor(level/2));
   for(const key of ['STR','CON','DEX','PER','INT','RES','PEN','AR','actionSpeed','actionIntervalMs'])assert.equal(b.stats[key],a.stats[key]);
-  assert.deepEqual(b.attackDamage,a.attackDamage);
+  assert.deepEqual(b.attackDamage,a.attackDamage);assert.equal(b.stats.LB,undefined);
   for(const key of ['DEF','REF','FOR','WIL']){assert.equal(b.defenseBreakdown[key].levelBonus,levelCombatBonus(level));const text=defenseTooltip(key,b.defenseBreakdown[key]);if(level>1)assert.ok(text.includes(`레벨 보너스(${3*Math.floor(level/2)})`));assert.doesNotMatch(text,/레벨 보너스\([^)]*[×÷]/);}
  }
 });

@@ -11,14 +11,17 @@ test('normal and boss pools intersect regional elements with monster region arra
    assert.ok(pool.every(p=>p.variation.weapon.damageTypes.every(t=>t===type)));
   }
  }
- assert.equal(eligibleVariations('village').length,28);assert.equal(eligibleVariations('old_forest').length,42);
- for(const id of ['arachne','werewolf'])assert.deepEqual(MONSTER_CATALOG.find(m=>m.id===id).regions,['old_forest']);
+ assert.equal(eligibleVariations('village').length,28);assert.equal(eligibleVariations('old_forest').length,49);
+ for(const id of ['arachne','werewolf','dryad']){
+  assert.deepEqual(MONSTER_CATALOG.find(m=>m.id===id).regions,['old_forest']);
+  for(const region of Object.keys(ENCOUNTER_CONFIG.regions).filter(r=>r!=='old_forest'))assert.ok(eligibleVariations(region).every(p=>p.monster.id!==id));
+ }
  const catalog=structuredClone(MONSTER_CATALOG);
  catalog.find(m=>m.id==='werewolf').regions.push('volcano');
  assert.deepEqual(eligibleVariations('volcano',catalog).filter(p=>p.monster.id==='werewolf').map(p=>p.variation.id),['fire_werewolf']);
  assert.equal(eligibleVariations('old_forest',catalog).filter(p=>p.monster.id==='werewolf').length,7);
  const restricted=structuredClone(ENCOUNTER_CONFIG);restricted.regions.old_forest.allowedDamageTypes=['cold'];
- assert.equal(eligibleVariations('old_forest',catalog,restricted).length,6);
+ assert.equal(eligibleVariations('old_forest',catalog,restricted).length,7);
  assert.ok(eligibleVariations('old_forest',catalog,restricted).every(p=>p.variation.weapon.damageTypes[0]==='cold'));
  assert.throws(()=>validateMonsters(catalog,restricted),/Invalid regional boss/);
 });

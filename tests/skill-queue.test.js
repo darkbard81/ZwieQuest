@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { Game } from '../src/game.js';
 import { stats } from '../src/combat.js';
 import { generateEquipment } from '../src/equipment.js';
-import { SKILL_CATALOG } from '../src/skills.js';
+import { SKILL_CATALOG, useSkill } from '../src/skills.js';
 import { skillAvailability } from '../public/skills-view.js';
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
 function make(dex = 0, budget = 500) {
@@ -26,9 +26,16 @@ test('request reserves without costs; next DEX action heals once instead of roll
   for (const dex of [0, 20]) {
     const g = make(dex), command = cmd(g), interval = stats(g.state, g.config).actionIntervalMs;
     g.tick(interval / 2); const before = structuredClone(g.state.battle.combatants);
-    g.command(command); assert.deepEqual(g.state.battle.combatants, before);
-    assert.equal(g.character.hp, 1); assert.deepEqual(g.character.skillCooldowns, {}); assert.deepEqual(g.state.battle.skillUseCounts, {});
+    const remaining=g.state.remaining;
+    g.command(command); assert.deepEqual(g.state.battle.combatants, before);assert.equal(g.state.remaining,remaining);
     assert.throws(() => g.command(command), /이미/);
+    const alternate={...g.character.skills.find(i=>i.id===command.itemId),id:'second',templateId:'second-heal'};
+    g.character.skills.push(alternate);g.character.skillSlots[1]=alternate.id;
+    const catalog=structuredClone(SKILL_CATALOG);catalog.skills.push({...catalog.skills[0],id:alternate.templateId});
+    assert.throws(()=>useSkill(g.state,alternate,stats(g.state,g.config),{...command,itemId:alternate.id},now,catalog),/이미/);
+    for(const type of ['UNEQUIP','EQUIP'])g.command({type,characterId:g.character.id,itemId:command.itemId});
+    assert.throws(()=>g.command(command),/이미/);
+    assert.equal(g.character.hp, 1); assert.deepEqual(g.character.skillCooldowns, {}); assert.deepEqual(g.state.battle.skillUseCounts, {});
     let s = g.snapshot(), item = s.inventory.find(i => i.id === command.itemId);
     assert.equal(skillAvailability(s, item, now).kind, 'queued'); assert.equal(item.remainingUses, 2);
     assert.equal(skillAvailability(s, { ...item, id: 'another' }, now).ready, false);
@@ -112,7 +119,8 @@ function run(g, total, pattern, rate = 1) {
 }
 test('JSON restoration, offline speed, irregular ticks and event budgets resolve the same queue exactly once', t => {
   t.mock.method(Date, 'now', () => 50000);
-  const base = make(20); base.command(cmd(base)); const saved = JSON.parse(JSON.stringify(base.state));
+  const base = make(20),command=cmd(base); base.command(command); const saved = JSON.parse(JSON.stringify(base.state));
+  const restored=new Game(base.config,structuredClone(saved),()=>0);assert.throws(()=>restored.command(command),/이미/);
   const games = [[50], [200], [13, 701, 122, 19, 2450], [8800]].map(pattern => run(new Game(base.config, structuredClone(saved), () => 0), 8800, pattern));
   games.push(run(new Game(base.config, structuredClone(saved), () => 0), 8800, [200], 2));
   const c = structuredClone(base.config); c.actionSpeed.maxEventsPerTick = 1;

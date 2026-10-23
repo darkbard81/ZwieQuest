@@ -1,0 +1,281 @@
+{
+  "dryad": {
+    "codexOrder": 70,
+    "hp": 50,
+    "hpGrowth": 10,
+    "hpConPercent": 5,
+    "A": {
+      "STR": 2,
+      "CON": 6,
+      "DEX": 2,
+      "PER": 2,
+      "INT": 2,
+      "RES": 6
+    },
+    "B": {
+      "ACC": 12,
+      "DEF": 12,
+      "REF": 12,
+      "FOR": 12,
+      "WIL": 12
+    },
+    "description": "오래된 숲의 고목과 함께 살아가는 숲의 정령. 높은 체질과 결의로 버티며 공포의 속삭임을 담은 공격으로 상대의 결의를 약화한다.",
+    "variation": [
+      {
+        "codexOrder": 10,
+        "id": "slash_dryad",
+        "name": "드라이어드(베기)",
+        "img_path": "public/assets/monster/dryad/slash-dryad.webp",
+        "skills": [
+          "dread-whisper"
+        ],
+        "weapon": {
+          "id": "slash_dryad_weapon",
+          "name": "붉은 잎날",
+          "slot": "weapon",
+          "damageTypes": [
+            "slash"
+          ],
+          "damageMin": 8,
+          "damageMax": 16,
+          "ACC": 1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "slash_dryad_armor",
+          "name": "드라이어드(베기) 나무껍질",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "pierce": -2,
+            "blunt": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/dryad/icons/slash-dryad.webp",
+        "attackName": "붉은 잎날"
+      },
+      {
+        "codexOrder": 20,
+        "id": "pierce_dryad",
+        "name": "드라이어드(관통)",
+        "img_path": "public/assets/monster/dryad/pierce-dryad.webp",
+        "skills": [
+          "dread-whisper"
+        ],
+        "weapon": {
+          "id": "pierce_dryad_weapon",
+          "name": "가시 창",
+          "slot": "weapon",
+          "damageTypes": [
+            "pierce"
+          ],
+          "damageMin": 8,
+          "damageMax": 16,
+          "ACC": 1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "pierce_dryad_armor",
+          "name": "드라이어드(관통) 나무껍질",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "slash": -2,
+            "blunt": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/dryad/icons/pierce-dryad.webp",
+        "attackName": "가시 창"
+      },
+      {
+        "codexOrder": 30,
+        "id": "blunt_dryad",
+        "name": "드라이어드(부수기)",
+        "img_path": "public/assets/monster/dryad/blunt-dryad.webp",
+        "skills": [
+          "dread-whisper"
+        ],
+        "weapon": {
+          "id": "blunt_dryad_weapon",
+          "name": "고목 망치",
+          "slot": "weapon",
+          "damageTypes": [
+            "blunt"
+          ],
+          "damageMin": 8,
+          "damageMax": 16,
+          "ACC": 1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "blunt_dryad_armor",
+          "name": "드라이어드(부수기) 나무껍질",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "slash": -2,
+            "pierce": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/dryad/icons/blunt-dryad.webp",
+        "attackName": "고목 망치"
+      },
+      {
+        "codexOrder": 40,
+        "id": "fire_dryad",
+        "name": "드라이어드(소각)",
+        "img_path": "public/assets/monster/dryad/fire-dryad.webp",
+        "skills": [
+          "dread-whisper"
+        ],
+        "weapon": {
+          "id": "fire_dryad_weapon",
+          "name": "화염 덩굴",
+          "slot": "weapon",
+          "damageTypes": [
+            "fire"
+          ],
+          "damageMin": 8,
+          "damageMax": 16,
+          "ACC": 1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "fire_dryad_armor",
+          "name": "드라이어드(소각) 나무껍질",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "cold": -2,
+            "corrosion": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/dryad/icons/fire-dryad.webp",
+        "attackName": "화염 덩굴"
+      },
+      {
+        "codexOrder": 50,
+        "id": "cold_dryad",
+        "name": "드라이어드(동결)",
+        "img_path": "public/assets/monster/dryad/cold-dryad.webp",
+        "skills": [
+          "dread-whisper"
+        ],
+        "weapon": {
+          "id": "cold_dryad_weapon",
+          "name": "서리 가지",
+          "slot": "weapon",
+          "damageTypes": [
+            "cold"
+          ],
+          "damageMin": 8,
+          "damageMax": 16,
+          "ACC": 1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "cold_dryad_armor",
+          "name": "드라이어드(동결) 나무껍질",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "fire": -2,
+            "lightning": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/dryad/icons/cold-dryad.webp",
+        "attackName": "서리 가지"
+      },
+      {
+        "codexOrder": 60,
+        "id": "lightning_dryad",
+        "name": "드라이어드(충격)",
+        "img_path": "public/assets/monster/dryad/lightning-dryad.webp",
+        "skills": [
+          "dread-whisper"
+        ],
+        "weapon": {
+          "id": "lightning_dryad_weapon",
+          "name": "번개 가지",
+          "slot": "weapon",
+          "damageTypes": [
+            "lightning"
+          ],
+          "damageMin": 8,
+          "damageMax": 16,
+          "ACC": 1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "lightning_dryad_armor",
+          "name": "드라이어드(충격) 나무껍질",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "fire": -2,
+            "corrosion": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/dryad/icons/lightning-dryad.webp",
+        "attackName": "번개 가지"
+      },
+      {
+        "codexOrder": 70,
+        "id": "corrosion_dryad",
+        "name": "드라이어드(부식)",
+        "img_path": "public/assets/monster/dryad/corrosion-dryad.webp",
+        "skills": [
+          "dread-whisper"
+        ],
+        "weapon": {
+          "id": "corrosion_dryad_weapon",
+          "name": "산성 수액",
+          "slot": "weapon",
+          "damageTypes": [
+            "corrosion"
+          ],
+          "damageMin": 8,
+          "damageMax": 16,
+          "ACC": 1,
+          "PEN": 5,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "corrosion_dryad_armor",
+          "name": "드라이어드(부식) 나무껍질",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "cold": -2,
+            "lightning": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/dryad/icons/corrosion-dryad.webp",
+        "attackName": "산성 수액"
+      }
+    ],
+    "regions": [
+      "old_forest"
+    ]
+  }
+}

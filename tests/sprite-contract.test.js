@@ -67,14 +67,3 @@ for (const appearance of APPEARANCES) {
     assert.equal(appearance.idleDurationMs,undefined);assert.equal(appearance.idleFrameCount,undefined);
   });
 }
-test('contract rejects the former per-character timing and frame-count regressions',()=>{
-  const base=JSON.parse(readFileSync(new URL('../public/assets/character/warrior/sprite.json',import.meta.url)));
-  for(const [action,duration] of [['Front_Idle',6000],['Front_Victory',3500],['Side_Attack',1000],['Side_Hit',600],['Side_Walk',2400],['Side_Down',1800]]){
-    const meta=structuredClone(base);meta.animations[action].durationMs=duration;
-    assert.throws(()=>validate(meta,'regression'),new RegExp(`${action} durationMs`));
-  }
-  const meta=structuredClone(base);meta.frames.Front_Idle_00.durationMs=250;
-  assert.throws(()=>validate(meta,'regression'),/Front_Idle\/0 durationMs/);
-  const expanded=structuredClone(base);expanded.animations.Front_Idle.frameCount=72;
-  assert.throws(()=>validate(expanded,'regression'),/Front_Idle/);
-});

@@ -42,7 +42,8 @@ test('region data has one file source and encounter compatibility uses the same 
 });
 
 test('different regional depths retain all destinations and valid trees across seeds and extreme draws', () => {
-  for (const depth of [4, 5, 6, 8, 10, 12, 20]) {
+  // Default depth 10, the same seeds and extreme draws are covered in maps.test.js.
+  for (const depth of [4, 5, 6, 8, 12, 20]) {
     const regions = structuredClone(REGIONS);
     for (const region of Object.values(regions)) region.depth = depth;
     const defs = mapDefinitions(regions);

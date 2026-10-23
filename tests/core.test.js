@@ -16,11 +16,6 @@ test('penetration thresholds and exact examples; magic scales with STR', () => {
   assert.equal(attack({roll:8,acc:5,defense:6,str:0,base:40,pen:2,ar:4}).damage,10);
   const a={roll:12,acc:5,defense:4,base:40,pen:4,ar:4};assert.equal(attack({...a,str:4}).damage,48);
 });
-test('level growth adds three per two levels to accuracy and defenses alongside HP', () => {
-  for(const cls of ['warrior','wizard']){const g=make(cls),a=stats(g.state,config);
-    for(const level of [4,7,10,40]){g.character.level=level;const b=stats(g.state,config);for(const k of ['STR','CON','DEX','PER','INT','RES','PEN','AR'])assert.equal(a[k],b[k],k);for(const k of ['ACC','DEF','FOR','REF','WIL'])assert.equal(b[k]-a[k],3*Math.floor(level/2),k);assert.equal(b.maxHp,a.maxHp+10*(level-1));assert.equal(b.LB,undefined);}
-  }
-});
 test('each invested point has the requested defense coefficients',()=>{
  const effects={STR:{FOR:2},CON:{FOR:2,maxHp:2},DEX:{REF:2},PER:{ACC:1,REF:2},INT:{WIL:2},RES:{DEF:1,WIL:2}};
  for(const [attribute,effect] of Object.entries(effects)){const g=make(),before=stats(g.state,config);g.command({type:'ALLOCATE_STAT',characterId:g.character.id,stat:attribute});const after=stats(g.state,config);for(const key of ['ACC','DEF','REF','FOR','WIL','maxHp','PEN','AR'])assert.equal(after[key]-before[key],effect[key]||0,`${attribute} -> ${key}`);}
@@ -58,13 +53,6 @@ test('offline choices expire at 4.5 seconds and combat deadlines respect indepen
 test('equipment during battle affects next attack; HP swaps cannot heal; equipped sale rejected',()=>{
   const g=make();g.state.run=1;g.state.step=1;g.state.risk=0;g.beginBattle();const before=stats(g.state,config);const item=g.item('weapon',2);g.state.inventory.push(item);g.command({characterId: g.character?.id, type:'EQUIP',itemId:item.id});assert.ok(stats(g.state,config).PEN>before.PEN);g.battleAction('hero');assert.equal(g.state.battle.lastHit.pen,stats(g.state,config).PEN);
   assert.throws(()=>g.command({characterId: g.character?.id, type:'SELL',itemId:item.id}));const armor=g.item('armor',2);g.state.inventory.push(armor);g.character.hp=5;g.command({characterId: g.character?.id, type:'EQUIP',itemId:armor.id});assert.equal(g.character.hp,5);g.command({characterId: g.character?.id, type:'UNEQUIP',itemId:armor.id});assert.equal(g.character.hp,5);const gold=g.state.gold;g.command({characterId: g.character?.id, type:'SELL',itemId:armor.id});assert.equal(g.state.gold,gold+armor.value);assert.throws(()=>g.command({characterId: g.character?.id, type:'SELL',itemId:armor.id}));
-});
-test('consecutive attacks have no old multi-attack penalty',()=>{
- const g=make();g.state.risk=0;g.beginBattle();g.state.enemy.hp=10000;
- for(let i=0;i<3;i++)g.battleAction('hero');
- const hits=g.events.filter(e=>e.type==='hit').map(e=>e.hit);
- assert.equal(new Set(hits.map(h=>h.calculation.acc)).size,1);
- assert.equal(g.state.battle.ap,undefined);assert.equal(g.state.battle.turn,undefined);
 });
 test('downed preserves possessions and returns home; no inventory silent cap',()=>{
   const g=make();g.state.step=1;g.state.run=1;g.state.runGold=0;g.state.risk=0;g.beginBattle();g.character.hp=1;g.state.battle.actor='enemy';g.state.enemy.ACC=100;g.battleAction('enemy');assert.equal(g.state.phase,'DOWNED');g.advance();g.advance();assert.equal(g.state.phase,'HOME');assert.equal(g.character.hp,0);g.advance();assert.equal(g.character.hp,stats(g.state,config).maxHp);

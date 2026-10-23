@@ -94,53 +94,36 @@ test('bestiary groups by encountered variation, records grade/level/history and 
  const saved=JSON.parse(JSON.stringify(g.state)),restored=new Game(config,structuredClone(saved),()=>{throw Error('reload must not reroll');});assert.deepEqual(restored.state.enemy,{...saved.enemy,...actionSpeed(saved.enemy.DEX)});assert.deepEqual(restored.state.bestiary,saved.bestiary);
  restored.rng=()=>9999;restored.reward('victory');assert.equal(restored.state.bestiary[secondId].defeats,1);assert.equal(restored.state.bestiary[firstId].defeats,0);
  assert.equal(first.maxHp,50);assert.deepEqual(make().state.bestiary,{});assert.deepEqual(resetGameProgress(restored,false).state.bestiary,{});
+ const forest=eligibleVariations('old_forest');
+ for(const monster of MONSTER_CATALOG){
+  const v=monster.variation[monster.id==='dryad'?2:0],sample=make();sample.enterRegion('old_forest');
+  sample.rng=rngFor(forest.findIndex(p=>p.variation.id===v.id));sample.beginBattle();
+  assert.equal(sample.state.enemy.monsterId,monster.id);assert.equal(sample.state.enemy.variationId,v.id);
+  for(const key of ['img_path','icon_path'])assert.equal(sample.state.enemy[key],v[key],`${v.id}/${key}`);
+  assert.ok(sample.state.enemy.skills.length>0,`${v.id}/skills`);
+  const savedSample=JSON.parse(JSON.stringify(sample.state));
+  const loaded=new Game(config,structuredClone(savedSample),()=>{throw Error('reload must not reroll');});
+  assert.deepEqual(loaded.state.enemy,savedSample.enemy);assert.deepEqual(loaded.state.bestiary,savedSample.bestiary);
+ }
 });
 test('generated bosses enter the bestiary, keep boss rewards, and old in-flight enemies preserve stats while adopting DEF',()=>{
  const g=make();g.state.mapId='volcano';g.beginBattle(true);assert.equal(g.state.enemy.generationVersion,1);const id=g.state.enemy.variationId;assert.equal(g.state.bestiary[id].encounters,1);g.reward('boss');assert.equal(g.state.lastReward.xp,config.balance.bossXP);assert.equal(g.state.bestiary[id].defeats,1);
  g.state.enemy={name:'old',hp:7,maxHp:12,DEX:1,base:9};const h=new Game(config,structuredClone(g.state));assert.deepEqual(h.state.enemy,{...g.state.enemy,hitDefense:'DEF',...actionSpeed(g.state.enemy.DEX)});assert.deepEqual(h.state.bestiary,g.state.bestiary);
 });
 
-test('all seven harpy attacks use Deflection in generated combat and retain their names',()=>{
- const pool=eligibleVariations('village'),harpies=pool.filter(({monster})=>monster.id==='harpy');
- assert.equal(harpies.length,7);
- assert.equal(new Set(harpies.flatMap(({variation})=>variation.weapon.damageTypes)).size,7);
- for(const {variation:v} of harpies){
-  const g=make();g.character.attributes.DEX=7;g.character.attributes.RES=1;
-  g.rng=rngFor(pool.findIndex(({variation})=>variation.id===v.id));g.beginBattle();
-  assert.equal(g.state.enemy.monsterId,'harpy');assert.equal(g.state.enemy.hitDefense,'DEF');assert.equal(g.state.enemy.weapon.hitDefense,'DEF');
-  assert.match(g.state.enemy.name,/하피/);assert.equal(g.state.enemy.attackName,v.weapon.name);
-  const hero=stats(g.state,config);assert.notEqual(hero.REF,hero.DEF);
-  g.rng=()=>0;g.battleAction('enemy');
-  assert.equal(g.state.battle.lastHit.target,'DEF');assert.equal(g.state.battle.lastHit.calculation.defense,hero.DEF);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
- }
-});
-
-test('all seven golem attacks use Deflection in generated combat and retain their names',()=>{
- const pool=eligibleVariations('village'),golems=pool.filter(({monster})=>monster.id==='golem');
- assert.equal(golems.length,7);
- assert.equal(new Set(golems.flatMap(({variation})=>variation.weapon.damageTypes)).size,7);
- for(const {variation:v} of golems){
-  const g=make();g.character.attributes.STR=7;g.character.attributes.RES=1;
-  g.rng=rngFor(pool.findIndex(({variation})=>variation.id===v.id));g.beginBattle();
-  assert.equal(g.state.enemy.monsterId,'golem');assert.equal(g.state.enemy.hitDefense,'DEF');assert.equal(g.state.enemy.weapon.hitDefense,'DEF');
-  assert.match(g.state.enemy.name,/골렘/);assert.equal(g.state.enemy.attackName,v.weapon.name);
-  const hero=stats(g.state,config);assert.notEqual(hero.FOR,hero.DEF);
-  g.rng=()=>0;g.battleAction('enemy');
-  assert.equal(g.state.battle.lastHit.target,'DEF');assert.equal(g.state.battle.lastHit.calculation.defense,hero.DEF);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
- }
-});
-
-test('all seven ghost attacks use Deflection in generated combat and retain their names',()=>{
- const pool=eligibleVariations('village'),ghosts=pool.filter(({monster})=>monster.id==='ghost');
- assert.equal(ghosts.length,7);
- assert.equal(new Set(ghosts.flatMap(({variation})=>variation.weapon.damageTypes)).size,7);
- for(const {variation:v} of ghosts){
-  const g=make();g.character.attributes.INT=7;g.character.attributes.RES=1;
-  g.rng=rngFor(pool.findIndex(({variation})=>variation.id===v.id));g.beginBattle();
-  assert.equal(g.state.enemy.monsterId,'ghost');assert.equal(g.state.enemy.hitDefense,'DEF');assert.equal(g.state.enemy.weapon.hitDefense,'DEF');
-  assert.match(g.state.enemy.name,/유령/);assert.equal(g.state.enemy.attackName,v.weapon.name);
-  const hero=stats(g.state,config);assert.notEqual(hero.WIL,hero.DEF);
-  g.rng=()=>0;g.battleAction('enemy');
-  assert.equal(g.state.battle.lastHit.target,'DEF');assert.equal(g.state.battle.lastHit.calculation.defense,hero.DEF);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
+test('harpy, golem and ghost variants target DEF and preserve their attack names',()=>{
+ const pool=eligibleVariations('village');
+ for(const [id,name,attribute,otherDefense] of [['harpy','하피','DEX','REF'],['golem','골렘','STR','FOR'],['ghost','유령','INT','WIL']]){
+  const variants=pool.filter(p=>p.monster.id===id);assert.equal(variants.length,7);
+  assert.equal(new Set(variants.flatMap(p=>p.variation.weapon.damageTypes)).size,7);
+  for(const {variation:v} of variants){
+   const g=make();g.character.attributes[attribute]=7;g.character.attributes.RES=1;
+   g.rng=rngFor(pool.findIndex(p=>p.variation.id===v.id));g.beginBattle();
+   assert.equal(g.state.enemy.monsterId,id);assert.equal(g.state.enemy.hitDefense,'DEF');assert.equal(g.state.enemy.weapon.hitDefense,'DEF');
+   assert.ok(g.state.enemy.name.includes(name));assert.equal(g.state.enemy.attackName,v.weapon.name);
+   const hero=stats(g.state,config);assert.notEqual(hero[otherDefense],hero.DEF);
+   g.rng=()=>0;g.battleAction('enemy');
+   assert.equal(g.state.battle.lastHit.target,'DEF');assert.equal(g.state.battle.lastHit.calculation.defense,hero.DEF);assert.equal(g.state.battle.lastHit.ability,v.weapon.name);
+  }
  }
 });

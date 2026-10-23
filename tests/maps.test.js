@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { generateMap, MAP_DEFS, MAP_VERSION, MAP_GENERATION_VERSION, reachable, upgradeMap } from '../src/maps.js';
+import { generateMap, MAP_DEFS, MAP_VERSION, MAP_GENERATION_VERSION, reachable, upgradeMap, maxNodes } from '../src/maps.js';
 import { Game } from '../src/game.js';
 import { generateLegacyMap } from './fixtures/maps-v1.js';
 import { generatePreviousMap } from './fixtures/maps-v2.js';
@@ -53,11 +53,13 @@ test('version-1 and version-2 saves preserve in-flight phase, timer, choices, co
  }
 });
 test('all six maps over 100 seeds share full early branching, tapering depth caps including dead ends, and reachable depth-10 destinations',()=>{
- for(let seed=1;seed<=100;seed++)for(const id of Object.keys(MAP_DEFS)){
+ for(const id of Object.keys(MAP_DEFS)){
+  const shapes=new Set();
+  for(let seed=1;seed<=100;seed++){
   const map=generateMap(id,rng(seed)),all=Object.values(map.nodes),final=all.filter(n=>n.depth===10),seen=reachable(map);
   assert.equal(seen.size,all.length);assert.equal(map.depth,10);assert.equal(final.length,id==='village'?10:2);assert.equal(map.version,MAP_VERSION);assert.equal(map.generationVersion,MAP_GENERATION_VERSION);assert.ok(all.every(n=>!Object.hasOwn(n,'event')));
   for(let d=0;d<=10;d++){
-   const row=all.filter(n=>n.depth===d);
+   const row=all.filter(n=>n.depth===d);assert.ok(row.length<=maxNodes(d,10,final.length));
    if(d<=4)assert.equal(row.length,depthCaps[d]);
    if(d<=3){assert.equal(row.length,2**d);assert.ok(row.every(n=>n.edges),`${id}/${seed}: early dead end at ${d}`);}
    else assert.ok(row.length>0&&row.length<=depthCaps[d],`${id}/${seed}: ${row.length} total nodes at ${d}`);
@@ -67,19 +69,16 @@ test('all six maps over 100 seeds share full early branching, tapering depth cap
   if(id==='village'){assert.equal(final.filter(n=>n.kind==='deadend').length,5);assert.deepEqual(final.filter(n=>n.kind==='exit').map(n=>n.region).sort(),['beach','desert','old_forest','snow','volcano']);}else assert.equal(final.filter(n=>n.kind==='boss').length,1);
   for(const node of all){if(node.edges){assert.deepEqual(Object.keys(node.edges).sort(),['left','right']);for(const to of Object.values(node.edges)){assert.equal(map.nodes[to].depth,node.depth+1);assert.ok(seen.has(to));}}else assert.ok(['deadend','exit','boss'].includes(node.kind));}
   assertTree(map);
- }
-});
-test('seed changes branch counts as well as placement; same seed reproduces maps and extreme RNG values respect caps',()=>{
- for(const id of Object.keys(MAP_DEFS)){
-  const shapes=new Set();
-  for(let seed=1;seed<=30;seed++){
-   const map=generateMap(id,rng(seed));assert.deepEqual(generateMap(id,rng(seed)),map);
-   shapes.add(Array.from({length:11},(_,d)=>Object.values(map.nodes).filter(n=>n.depth===d).length).join(','));
+  if(seed<=30){assert.deepEqual(generateMap(id,rng(seed)),map);shapes.add(Array.from({length:11},(_,d)=>all.filter(n=>n.depth===d).length).join(','));}
   }
   assert.ok(shapes.size>1,`${id} always generates the same layer widths`);
+ }
+});
+test('extreme RNG values respect default depth caps and terminal destinations',()=>{
+ for(const id of Object.keys(MAP_DEFS)){
   for(const random of [()=>0,n=>n-1]){
    const map=generateMap(id,random);assertTree(map);
-   for(let d=1;d<=10;d++)assert.ok(Object.values(map.nodes).filter(n=>n.depth===d).length<=depthCaps[d]);
+   for(let d=1;d<=10;d++){const count=Object.values(map.nodes).filter(n=>n.depth===d).length;assert.ok(count<=depthCaps[d]);assert.ok(count<=maxNodes(d,10,id==='village'?10:2));}
    assert.equal(Object.values(map.nodes).filter(n=>n.kind===(id==='village'?'exit':'boss')).length,id==='village'?5:1);
   }
  }

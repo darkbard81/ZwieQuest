@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { MONSTER_CATALOG, ENCOUNTER_CONFIG, validateMonsters, sortedBestiaryEntries, eligibleVariations, generateMonster, recordMonsterEncounter } from '../src/monsters.js';
 import { Game } from '../src/game.js';
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
-const types = ['slime', 'harpy', 'golem', 'ghost'];
+const types = ['slime', 'harpy', 'golem', 'ghost', 'arachne', 'werewolf', 'dryad'];
 const variants = ['slash', 'pierce', 'blunt', 'fire', 'cold', 'lightning', 'corrosion'];
 const expected = types.flatMap(type => variants.map(v => `${v}_${type}`));
 const clone = () => structuredClone(MONSTER_CATALOG);
@@ -17,7 +17,9 @@ test('catalog assigns requested tens without changing RNG candidate order', () =
   }
   const original = ['ghost','golem','harpy','slime'].flatMap(type => variants.map(v => `${v}_${type}`));
   assert.deepEqual(eligibleVariations('village').map(({variation}) => variation.id), original);
-  assert.deepEqual(sortedBestiaryEntries(Object.fromEntries(original.map(id => [id, {}]))).map(([id]) => id), expected);
+  assert.deepEqual(sortedBestiaryEntries(Object.fromEntries(original.map(id => [id, {}]))).map(([id]) => id), expected.slice(0,28));
+  const forest=eligibleVariations('old_forest').map(p=>p.variation.id);
+  assert.deepEqual(sortedBestiaryEntries(Object.fromEntries(forest.map(id=>[id,{}]))).map(([id])=>id),expected);
   assert.deepEqual(eligibleVariations('village').map(({variation}) => variation.id), original);
 });
 test('duplicate type numbers fail validation; variation numbers repeat across types', () => {
@@ -42,10 +44,10 @@ test('missing and invalid orders fail at both levels, while intermediate integer
 });
 test('old saved discovery order is preserved while snapshots use latest template order', () => {
   const game = new Game(config, null, () => 0); game.create({name:'도감 정렬',appearanceId:'warrior'});
-  const pool = eligibleVariations('village');
+  const pool = eligibleVariations('old_forest');
   for (const id of [...expected].reverse()) {
     let call = 0; const index = pool.findIndex(({variation}) => variation.id === id);
-    recordMonsterEncounter(game.state, generateMonster('village', () => call++ === 0 ? index : 0));
+    recordMonsterEncounter(game.state, generateMonster('old_forest', () => call++ === 0 ? index : 0));
   }
   const saved = structuredClone(game.state);
   const restored = new Game(config, structuredClone(saved), () => 0);
