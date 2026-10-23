@@ -7,12 +7,12 @@ import { MAP_GENERATION_VERSION } from '../src/maps.js';
 import { stats } from '../src/combat.js';
 import { generatePreviousMap } from './fixtures/maps-v2.js';
 const config=JSON.parse(readFileSync(new URL('../config.json',import.meta.url)));
-test('administrator gets every node and four checkpoints exactly once without an automatic character',()=>{
+test('administrator gets every node and five checkpoints exactly once without an automatic character',()=>{
  const g=new Game(config);prepareAdminGame(g);
  assert.equal(g.character,null);assert.equal(g.state.characters.length,0);assert.equal(g.state.gold,0);
  assert.equal(g.state.inventory.length,0);assert.equal(g.state.phase,'HOME');
  for(const [id,map] of Object.entries(g.state.maps))assert.deepEqual(new Set(g.state.exploredNodes[id]),new Set(Object.keys(map.nodes)));
- assert.deepEqual(g.state.checkpointHistory.map(c=>c.mapId).sort(),['beach','desert','snow','volcano']);
+ assert.deepEqual(g.state.checkpointHistory.map(c=>c.mapId).sort(),['beach','desert','old_forest','snow','volcano']);
  const saved=structuredClone(g.state);prepareAdminGame(g);assert.deepEqual(g.state,saved);
  g.tick(30000,1);assert.equal(g.state.phase,'HOME');
 });

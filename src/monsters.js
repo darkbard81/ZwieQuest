@@ -15,14 +15,15 @@ const safePath = path => typeof path === 'string' && /^public\/assets\/monster\/
 export function eligibleVariations(mapId, catalog = MONSTER_CATALOG, rules = ENCOUNTER_CONFIG) {
   const region = rules.regions[mapId];
   if (!region) throw Error(`Unknown monster region: ${mapId}`);
-  return catalog.flatMap(monster => monster.variation
+  return catalog.filter(monster => !monster.regions || monster.regions.includes(mapId)).flatMap(monster => monster.variation
     .filter(variation => !variation.weapon.damageTypes.some(type => region.excludedDamageTypes.includes(type)))
     .map(variation => ({ monster, variation })));
 }
 export function eligibleBossVariations(mapId, catalog = MONSTER_CATALOG, rules = ENCOUNTER_CONFIG) {
   const type = rules.regions[mapId]?.bossDamageType;
   if (!type) throw Error(`No regional boss configured for ${mapId}`);
-  return eligibleVariations(mapId, catalog, rules).filter(({ variation }) => variation.weapon.damageTypes.includes(type));
+  const monsterId = rules.regions[mapId].bossMonsterId;
+  return eligibleVariations(mapId, catalog, rules).filter(({ monster, variation }) => (!monsterId || monster.id === monsterId) && variation.weapon.damageTypes.includes(type));
 }
 export function validateMonsters(catalog, rules) {
   const typeOrders = new Set(), ids = new Set(), types = new Set(Object.keys(EQUIPMENT_CATALOG.damageTypes));
@@ -31,6 +32,7 @@ export function validateMonsters(catalog, rules) {
     if (!Number.isSafeInteger(monster.codexOrder) || monster.codexOrder <= 0) throw Error(`Invalid monster codexOrder: ${monster.id}`);
     if (typeOrders.has(monster.codexOrder)) throw Error(`duplicate monster codexOrder: ${monster.codexOrder}`);
     typeOrders.add(monster.codexOrder);
+    if (monster.regions !== undefined && (!Array.isArray(monster.regions) || !monster.regions.length || new Set(monster.regions).size !== monster.regions.length || monster.regions.some(id => !Object.hasOwn(rules.regions, id)))) throw Error(`Invalid monster regions: ${monster.id}`);
     const variationOrders = new Set();
     if (!/^[a-z0-9_-]+$/.test(monster.id) || !Number.isInteger(monster.hp) || monster.hp < 1 || !Number.isInteger(monster.hpGrowth) || monster.hpGrowth < 0 || !Number.isFinite(monster.hpConPercent) || monster.hpConPercent < 0 || typeof monster.description !== 'string') throw Error('Invalid monster base');
     for (const key of BASE_STATS) if (!Number.isInteger(monster.A?.[key]) || monster.A[key] < 0) throw Error('Invalid monster attribute');

@@ -52,7 +52,7 @@ test('version-1 and version-2 saves preserve in-flight phase, timer, choices, co
   const again=new Game(config,structuredClone(restored.state),()=>{throw Error('Unexpected reroll');});assert.deepEqual(again.state,restored.state);
  }
 });
-test('all five maps over 100 seeds share full early branching, tapering depth caps including dead ends, and reachable depth-10 destinations',()=>{
+test('all six maps over 100 seeds share full early branching, tapering depth caps including dead ends, and reachable depth-10 destinations',()=>{
  for(let seed=1;seed<=100;seed++)for(const id of Object.keys(MAP_DEFS)){
   const map=generateMap(id,rng(seed)),all=Object.values(map.nodes),final=all.filter(n=>n.depth===10),seen=reachable(map);
   assert.equal(seen.size,all.length);assert.equal(map.depth,10);assert.equal(final.length,id==='village'?10:2);assert.equal(map.version,MAP_VERSION);assert.equal(map.generationVersion,MAP_GENERATION_VERSION);assert.ok(all.every(n=>!Object.hasOwn(n,'event')));
@@ -64,7 +64,7 @@ test('all five maps over 100 seeds share full early branching, tapering depth ca
   }
   assert.ok(all.some(n=>n.kind==='deadend'&&n.depth>=4&&n.depth<10));
   assert.ok(all.filter(n=>n.kind==='exit'||n.kind==='boss').every(n=>n.depth===10));
-  if(id==='village'){assert.equal(final.filter(n=>n.kind==='deadend').length,6);assert.deepEqual(final.filter(n=>n.kind==='exit').map(n=>n.region).sort(),['beach','desert','snow','volcano']);}else assert.equal(final.filter(n=>n.kind==='boss').length,1);
+  if(id==='village'){assert.equal(final.filter(n=>n.kind==='deadend').length,5);assert.deepEqual(final.filter(n=>n.kind==='exit').map(n=>n.region).sort(),['beach','desert','old_forest','snow','volcano']);}else assert.equal(final.filter(n=>n.kind==='boss').length,1);
   for(const node of all){if(node.edges){assert.deepEqual(Object.keys(node.edges).sort(),['left','right']);for(const to of Object.values(node.edges)){assert.equal(map.nodes[to].depth,node.depth+1);assert.ok(seen.has(to));}}else assert.ok(['deadend','exit','boss'].includes(node.kind));}
   assertTree(map);
  }
@@ -80,7 +80,7 @@ test('seed changes branch counts as well as placement; same seed reproduces maps
   for(const random of [()=>0,n=>n-1]){
    const map=generateMap(id,random);assertTree(map);
    for(let d=1;d<=10;d++)assert.ok(Object.values(map.nodes).filter(n=>n.depth===d).length<=depthCaps[d]);
-   assert.equal(Object.values(map.nodes).filter(n=>n.kind===(id==='village'?'exit':'boss')).length,id==='village'?4:1);
+   assert.equal(Object.values(map.nodes).filter(n=>n.kind===(id==='village'?'exit':'boss')).length,id==='village'?5:1);
   }
  }
 });
@@ -138,7 +138,7 @@ test('saved regional HOME resumes without resting or starting another journey; v
 });
 test('early and depth-10 dead ends return HOME without removing saved maps',()=>{
  const g=new Game(config,null,rng(1));g.create({name: '모험가', appearanceId: 'warrior'});g.state.homePaused=false;g.rng=n=>n===10000?9999:Math.min(11,n-1);const map=g.state.maps.village;const dead=Object.values(map.nodes).find(n=>n.sideBranch)||map.nodes[map.terminalIds[0]];
- traverse(g,route(map,dead.id));assert.equal(g.state.phase,'RETURN_HOME');g.advance();assert.equal(g.state.currentNodeId,map.rootId);assert.equal(Object.keys(g.state.maps).length,5);
+ traverse(g,route(map,dead.id));assert.equal(g.state.phase,'RETURN_HOME');g.advance();assert.equal(g.state.currentNodeId,map.rootId);assert.equal(Object.keys(g.state.maps).length,6);
 });
 test('every region dead end returns HOME and passage history is unique and non-functional',()=>{
  for(const region of ['volcano','snow','desert','beach']){const g=new Game(config,null,rng(1));g.create({name: '모험가', appearanceId: 'warrior'});g.state.homePaused=false;g.rng=n=>n===10000?9999:Math.min(11,n-1);g.enterRegion(region);const record=structuredClone(g.state.checkpointHistory);g.enterRegion(region);assert.deepEqual(g.state.checkpointHistory,record);const map=g.state.maps[region],dead=Object.values(map.nodes).find(n=>n.kind==='deadend');assert.ok(dead);traverse(g,route(map,dead.id));assert.equal(g.state.phase,'RETURN_HOME');g.advance();assert.equal(g.state.mapId,'village');assert.equal(g.state.currentNodeId,g.state.maps.village.rootId);assert.deepEqual(g.state.checkpointHistory,record);}

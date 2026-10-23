@@ -1,0 +1,281 @@
+{
+  "arachne": {
+    "codexOrder": 50,
+    "hp": 50,
+    "hpGrowth": 10,
+    "hpConPercent": 5,
+    "A": {
+      "STR": 2,
+      "CON": 3,
+      "DEX": 6,
+      "PER": 3,
+      "INT": 1,
+      "RES": 2
+    },
+    "B": {
+      "ACC": 12,
+      "DEF": 12,
+      "REF": 12,
+      "FOR": 12,
+      "WIL": 12
+    },
+    "description": "오래된 숲의 고목과 거미줄 사이에 숨어 사냥하는 거미형 몬스터. 빠른 다리와 단단한 외피로 공격하며 상대의 발목을 묶는다.",
+    "variation": [
+      {
+        "codexOrder": 10,
+        "id": "slash_arachne",
+        "name": "아라크네(베기)",
+        "img_path": "public/assets/monster/arachne/06-arachne-red.webp",
+        "skills": [
+          "binding-strike"
+        ],
+        "weapon": {
+          "id": "slash_arachne_weapon",
+          "name": "칼날 다리",
+          "slot": "weapon",
+          "damageTypes": [
+            "slash"
+          ],
+          "damageMin": 2,
+          "damageMax": 12,
+          "ACC": 1,
+          "PEN": 6,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "slash_arachne_armor",
+          "name": "아라크네(베기) 외피",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "pierce": -2,
+            "blunt": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/arachne/icons/06-arachne-red.webp",
+        "attackName": "칼날 다리"
+      },
+      {
+        "codexOrder": 20,
+        "id": "pierce_arachne",
+        "name": "아라크네(관통)",
+        "img_path": "public/assets/monster/arachne/05-arachne-purple.webp",
+        "skills": [
+          "binding-strike"
+        ],
+        "weapon": {
+          "id": "pierce_arachne_weapon",
+          "name": "송곳 다리",
+          "slot": "weapon",
+          "damageTypes": [
+            "pierce"
+          ],
+          "damageMin": 2,
+          "damageMax": 12,
+          "ACC": 1,
+          "PEN": 6,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "pierce_arachne_armor",
+          "name": "아라크네(관통) 외피",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "slash": -2,
+            "blunt": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/arachne/icons/05-arachne-purple.webp",
+        "attackName": "송곳 다리"
+      },
+      {
+        "codexOrder": 30,
+        "id": "blunt_arachne",
+        "name": "아라크네(부수기)",
+        "img_path": "public/assets/monster/arachne/03-arachne-amber.webp",
+        "skills": [
+          "binding-strike"
+        ],
+        "weapon": {
+          "id": "blunt_arachne_weapon",
+          "name": "외골격 강타",
+          "slot": "weapon",
+          "damageTypes": [
+            "blunt"
+          ],
+          "damageMin": 2,
+          "damageMax": 12,
+          "ACC": 1,
+          "PEN": 6,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "blunt_arachne_armor",
+          "name": "아라크네(부수기) 외피",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "slash": -2,
+            "pierce": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/arachne/icons/03-arachne-amber.webp",
+        "attackName": "외골격 강타"
+      },
+      {
+        "codexOrder": 40,
+        "id": "fire_arachne",
+        "name": "아라크네(소각)",
+        "img_path": "public/assets/monster/arachne/07-arachne-fire.webp",
+        "skills": [
+          "binding-strike"
+        ],
+        "weapon": {
+          "id": "fire_arachne_weapon",
+          "name": "불꽃 다리",
+          "slot": "weapon",
+          "damageTypes": [
+            "fire"
+          ],
+          "damageMin": 2,
+          "damageMax": 12,
+          "ACC": 1,
+          "PEN": 6,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "fire_arachne_armor",
+          "name": "아라크네(소각) 외피",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "cold": -2,
+            "corrosion": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/arachne/icons/07-arachne-fire.webp",
+        "attackName": "불꽃 다리"
+      },
+      {
+        "codexOrder": 50,
+        "id": "cold_arachne",
+        "name": "아라크네(동결)",
+        "img_path": "public/assets/monster/arachne/01-arachne-ice.webp",
+        "skills": [
+          "binding-strike"
+        ],
+        "weapon": {
+          "id": "cold_arachne_weapon",
+          "name": "서리 다리",
+          "slot": "weapon",
+          "damageTypes": [
+            "cold"
+          ],
+          "damageMin": 2,
+          "damageMax": 12,
+          "ACC": 1,
+          "PEN": 6,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "cold_arachne_armor",
+          "name": "아라크네(동결) 외피",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "fire": -2,
+            "lightning": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/arachne/icons/01-arachne-ice.webp",
+        "attackName": "서리 다리"
+      },
+      {
+        "codexOrder": 60,
+        "id": "lightning_arachne",
+        "name": "아라크네(충격)",
+        "img_path": "public/assets/monster/arachne/02-arachne-lightning.webp",
+        "skills": [
+          "binding-strike"
+        ],
+        "weapon": {
+          "id": "lightning_arachne_weapon",
+          "name": "번개 다리",
+          "slot": "weapon",
+          "damageTypes": [
+            "lightning"
+          ],
+          "damageMin": 2,
+          "damageMax": 12,
+          "ACC": 1,
+          "PEN": 6,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "lightning_arachne_armor",
+          "name": "아라크네(충격) 외피",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "fire": -2,
+            "corrosion": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/arachne/icons/02-arachne-lightning.webp",
+        "attackName": "번개 다리"
+      },
+      {
+        "codexOrder": 70,
+        "id": "corrosion_arachne",
+        "name": "아라크네(부식)",
+        "img_path": "public/assets/monster/arachne/04-arachne-poison-green.webp",
+        "skills": [
+          "binding-strike"
+        ],
+        "weapon": {
+          "id": "corrosion_arachne_weapon",
+          "name": "부식 독니",
+          "slot": "weapon",
+          "damageTypes": [
+            "corrosion"
+          ],
+          "damageMin": 2,
+          "damageMax": 12,
+          "ACC": 1,
+          "PEN": 6,
+          "hitDefense": "DEF"
+        },
+        "armor": {
+          "id": "corrosion_arachne_armor",
+          "name": "아라크네(부식) 외피",
+          "slot": "armor",
+          "AR": 4,
+          "typeModifiers": {
+            "cold": -2,
+            "lightning": -2
+          },
+          "armorCategory": "natural",
+          "actionSpeedPenaltyRate": 0
+        },
+        "icon_path": "public/assets/monster/arachne/icons/04-arachne-poison-green.webp",
+        "attackName": "부식 독니"
+      }
+    ],
+    "regions": [
+      "old_forest"
+    ]
+  }
+}

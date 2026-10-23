@@ -10,6 +10,7 @@ export function validateRegions(regions) {
     if (!Number.isSafeInteger(region.deadEnds) || region.deadEnds < 0) throw Error(`Invalid region deadEnds: ${id}`);
     if (!Array.isArray(region.exits) || new Set(region.exits).size !== region.exits.length || region.exits.some(target => !Object.hasOwn(regions, target) || target === id)) throw Error(`Invalid region exits: ${id}`);
     if (region.boss !== null && (typeof region.boss !== 'string' || !region.boss.trim())) throw Error(`Invalid region boss: ${id}`);
+    if (region.bossMonsterId !== undefined && (!region.boss || typeof region.bossMonsterId !== 'string' || !/^[a-z0-9_-]+$/.test(region.bossMonsterId))) throw Error(`Invalid region bossMonsterId: ${id}`);
     const terminals = region.deadEnds + region.exits.length + (region.boss ? 1 : 0);
     if (!terminals || region.depth < Math.ceil(Math.log2(terminals + terminals % 2))) throw Error(`Region depth cannot fit destinations: ${id}`);
     if (!Number.isSafeInteger(region.minLevel) || !Number.isSafeInteger(region.maxLevel) || region.minLevel < 1 || region.maxLevel < region.minLevel || !Array.isArray(region.excludedDamageTypes)) throw Error(`Invalid region levels or damage types: ${id}`);

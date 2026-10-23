@@ -9,12 +9,13 @@
     "minLevel": 1,
     "maxLevel": 5,
     "excludedDamageTypes": [],
-    "deadEnds": 6,
+    "deadEnds": 5,
     "exits": [
       "volcano",
       "snow",
       "desert",
-      "beach"
+      "beach",
+      "old_forest"
     ],
     "boss": null
   },
@@ -85,5 +86,21 @@
     "deadEnds": 0,
     "exits": [],
     "boss": "밀물의 수호자"
+  },
+  "old_forest": {
+    "name": "오래된 숲",
+    "subtitle": "고목과 거미줄 사이로 이어지는 오래된 길",
+    "tag": "OLD FOREST",
+    "canvas": "/assets/old-forest.webp",
+    "route": "/assets/maps/old-forest-route-v1.png",
+    "depth": 10,
+    "minLevel": 5,
+    "maxLevel": 20,
+    "excludedDamageTypes": [],
+    "bossDamageType": "corrosion",
+    "bossMonsterId": "arachne",
+    "deadEnds": 0,
+    "exits": [],
+    "boss": "숲을 지키는 아라크네"
   }
 }

@@ -137,7 +137,7 @@ export async function createWorld(container) {
     if (object.visible) {
       const monsterTexture = monsterMotion ? monsterTextures.get(monsterAssetURL(monsterMotion.enemy.img_path)) : null;
       const theme = monsterMotion?.theme || s.theme;
-      object.texture = monsterTexture || cells[monsterMotion ? { village: 1, volcano: 2, beach: 3, desert: 2, snow: 3 }[theme] : 0];
+      object.texture = monsterTexture || cells[monsterMotion ? { village: 1, volcano: 2, beach: 3, desert: 2, snow: 3, old_forest: 1 }[theme] : 0];
       // Monsters share the hero's logical cell and anchor; treasure keeps its own size.
       const size = monsterMotion ? meta.displaySize : 84;
       object.anchor.set(.5, monsterMotion ? meta.anchor.y / meta.frameHeight : 1);

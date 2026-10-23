@@ -108,6 +108,19 @@ export function upgradeMap(map, preferredPath = []) {
   const { protectedEdges, ...rest } = map;
   return { ...rest, nodes, version: MAP_VERSION };
 }
+// Add the new forest without rerolling saved routes or changing node identities.
+export function installOldForest(state, rng) {
+  let changed = false;
+  if (!state.maps.old_forest) { state.maps.old_forest = generateMap('old_forest', rng); changed = true; }
+  const village = state.maps.village;
+  if (!Object.values(village.nodes).some(node => node.kind === 'exit' && node.region === 'old_forest')) {
+    const node = village.terminalIds.map(id => village.nodes[id]).find(node => node?.kind === 'deadend' && !node.edges);
+    if (!node) throw Error('오래된 숲 출구를 추가할 마을 끝 막다른 길이 없습니다.');
+    Object.assign(node, { kind: 'exit', region: 'old_forest', label: '오래된 숲 연결' });
+    changed = true;
+  }
+  return changed;
+}
 export function migrateMaps(state) {
   let changed = false;
   for (const [id, map] of Object.entries(state.maps)) {

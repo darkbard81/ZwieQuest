@@ -3,7 +3,7 @@ import { statusDefinition, initializeStatuses, modifiers, effectiveEnemy, applyS
 import { randomInt, randomUUID } from 'node:crypto';
 import { CHARACTER_VERSION, MAX_CHARACTERS, activeCharacter, newCharacter, migrateCharacters, equipmentUsers, remainingPoints, allocatePoint } from './characters.js';
 import { attack, stats, statDetails, basicAttackRange, hitResult } from './combat.js';
-import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames } from './maps.js';
+import { MAP_DEFS, createMaps, migrateMaps, refreshMapNames, installOldForest } from './maps.js';
 import { REGIONS } from './regions.js';
 import { availableStarts, navigationPosition, routeTo, visibleTarget, initializeReservedRoute, navigationGoal } from './navigation.js';
 import { rollDropSlot } from './probabilities.js';
@@ -23,6 +23,7 @@ export class Game {
       state.bestiary ||= {};
       if (state.enemy?.generationVersion === 1 && !state.bestiary[state.enemy.variationId]) recordMonsterEncounter(state, state.enemy);
       if (migrateMaps(state)) this.log('map', '경로 지도를 합류 없는 트리로 정리했습니다. 현재 위치와 진행 중인 모험은 유지됩니다.');
+      if (installOldForest(state, this.rng)) this.log('map', '새싹마을 끝의 막다른 길 하나가 오래된 숲으로 연결되었습니다. 기존 탐험 기록은 유지됩니다.');
       for (const map of Object.values(state.maps)) refreshMapNames(map);
       this.rememberExploration();
       if (!availableStarts(state).includes(state.departureMapId)) state.departureMapId = 'village';

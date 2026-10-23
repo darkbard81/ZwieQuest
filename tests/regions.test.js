@@ -6,8 +6,8 @@ import { REGIONS } from '../src/regions.js';
 import { Game, THEMES } from '../src/game.js';
 
 const config = JSON.parse(readFileSync(new URL('../config.json', import.meta.url)));
-const names = { village: '새싹마을', volcano: '홍련 분화구', snow: '백야 설원', desert: '산성 호수', beach: '낙뢰 고원' };
-const oldNames = { village: '바람꽃 마을', volcano: '잿불 화산', snow: '별빛 설원', desert: '황금빛 사막', beach: '푸른달 해변' };
+const names = { village: '새싹마을', volcano: '홍련 분화구', snow: '백야 설원', desert: '산성 호수', beach: '낙뢰 고원', old_forest: '오래된 숲' };
+const oldNames = { village: '바람꽃 마을', volcano: '잿불 화산', snow: '별빛 설원', desert: '황금빛 사막', beach: '푸른달 해변', old_forest: '오래된 숲' };
 
 test('region rename preserves every saved route and in-flight progress without regeneration', () => {
   const game = new Game(config, null, n => n - 1); game.create({name: '모험가', appearanceId: 'warrior'});game.state.homePaused=false;

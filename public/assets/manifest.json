@@ -120,6 +120,274 @@
       "source": "built-in image_gen.imagegen",
       "runtime": true,
       "prompt": "ASSET-PROMPTS.md#region-refresh-20261018"
+    },
+    {
+      "file": "monster/arachne/06-arachne-red.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "34adc0219791f15fa7f1c628bd7f917c9fb4b13e7353856d62efb163e1abab15",
+      "source": "art-workbench/monsters/arachne/06-arachne-red.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/icons/06-arachne-red.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "1f6d1237a0eb3ce64b6ece2712ec47fdec14f04bf5ee2e066768c33628015d0a",
+      "source": "art-workbench/monsters/arachne/06-arachne-red.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/05-arachne-purple.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "8438f9cea49b44efb3cb57f30529eb0f9884156c0c81ba99b5b07a1bd49896e1",
+      "source": "art-workbench/monsters/arachne/05-arachne-purple.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/icons/05-arachne-purple.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "b2304950751df8cc7074e3446ef3627b736b3d8af5443a024347c73398012783",
+      "source": "art-workbench/monsters/arachne/05-arachne-purple.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/03-arachne-amber.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "cbf9d7a42f5626f2a230bad2756a94eb7f41326f70a3fea1edb5be23c19de77f",
+      "source": "art-workbench/monsters/arachne/03-arachne-amber.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/icons/03-arachne-amber.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "08a698b5d16051302b345ad5c602f572d07ba2a2220b1453f99657ca30bf511a",
+      "source": "art-workbench/monsters/arachne/03-arachne-amber.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/07-arachne-fire.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "0683e1fd35c9d9579972227260f0853c79097e9d623cb7f9e90ea3410566c493",
+      "source": "art-workbench/monsters/arachne/07-arachne-fire.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/icons/07-arachne-fire.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "49aa92a955ee144dcca42cad4456c722c4c9262b2de7f3cb5d6acef6fd5c582e",
+      "source": "art-workbench/monsters/arachne/07-arachne-fire.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/01-arachne-ice.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "a705b4390042b589fcadd8ad435fff308468c72b1c88562d089f73e91c44c38d",
+      "source": "art-workbench/monsters/arachne/01-arachne-ice.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/icons/01-arachne-ice.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "0e5b353f4ad39b975542011f818de488351865068dbbaa953937ef28f137e79b",
+      "source": "art-workbench/monsters/arachne/01-arachne-ice.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/02-arachne-lightning.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "c2b1c8fdcfff9bdeabd384b019ed420c645d31db7691b68870d70f649a66f5db",
+      "source": "art-workbench/monsters/arachne/02-arachne-lightning.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/icons/02-arachne-lightning.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "c64b836c0563dae592b86f72803157e7b2804fd9bbf1f986f0efa3698d594b75",
+      "source": "art-workbench/monsters/arachne/02-arachne-lightning.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/04-arachne-poison-green.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "83eee5ac49020abdc27eda9606b39773ad499b4cfc7bb2127d459eb650b8312a",
+      "source": "art-workbench/monsters/arachne/04-arachne-poison-green.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "monster/arachne/icons/04-arachne-poison-green.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "8c288acdd0d4df6e02ffdeab40172cb793cdbc50c2d326c307c52ece9afc20d2",
+      "source": "art-workbench/monsters/arachne/04-arachne-poison-green.png",
+      "runtime": true,
+      "encoding": "lossless WebP"
+    },
+    {
+      "file": "old-forest.webp",
+      "width": 1672,
+      "height": 941,
+      "sha256": "8228283a5fb8f263dc61d5b4149479aee2e9f57beeb769f82fb4eafd0644d617",
+      "source": "public/assets/forest.png (existing forest artwork)",
+      "runtime": true
+    },
+    {
+      "file": "maps/old-forest-route-v1.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "810904d6375857a0106ad09f89186ee800003b7de6d9e978bd4bf084944b5249",
+      "source": "public/assets/forest.png (existing forest artwork)",
+      "runtime": true
+    },
+    {
+      "file": "monster/werewolf/01-werewolf-slash.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "cb0459c05675de06011a08103862e7eee5846a3994eaf3f54e4f4cfee1d51608",
+      "source": "art-workbench/monsters/werewolf/01-werewolf-slash.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/icons/01-werewolf-slash.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "c83ff8666a20422ea0925af3d6e4b29b78a225a508c38390c1fb77b20a8524e1",
+      "source": "art-workbench/monsters/werewolf/01-werewolf-slash.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/02-werewolf-lightning.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "630bc244125979657ba57d10d1c5698bb78b9506dfcb6e2acc9f5de03f4e24da",
+      "source": "art-workbench/monsters/werewolf/02-werewolf-lightning.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/icons/02-werewolf-lightning.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "b5e54bdb246b1db85e6c240a26dae346003273fabd0ca5b0c38467fa424023d4",
+      "source": "art-workbench/monsters/werewolf/02-werewolf-lightning.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/03-werewolf-corrosion.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "566d8dd2aec019f5e66a1745966eac9243698adbdb368ecab6d3f005b04ea9c9",
+      "source": "art-workbench/monsters/werewolf/03-werewolf-corrosion.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/icons/03-werewolf-corrosion.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "46896e0296ad3e362c201439f915c2c16ee00f320bf807df1b8cd9ae8e03eed1",
+      "source": "art-workbench/monsters/werewolf/03-werewolf-corrosion.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/04-werewolf-cold.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "9ad7641d1a86afab3bf444b2d0d969bb927ec2fd487bb11611341ff9c8ae2c89",
+      "source": "art-workbench/monsters/werewolf/04-werewolf-cold.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/icons/04-werewolf-cold.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "9f90545da6e57a46ba7924876381d67b5fad39a212e95c66f97dfb81ed780b7b",
+      "source": "art-workbench/monsters/werewolf/04-werewolf-cold.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/05-werewolf-fire.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "cbadd6347422cde0f6ad209489692d2fb7ea5b806c51521d078f615088c1236e",
+      "source": "art-workbench/monsters/werewolf/05-werewolf-fire.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/icons/05-werewolf-fire.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "015404fdb1807e21152f3d389d98e55b99520f78b0fd4ab0152fbad802545d43",
+      "source": "art-workbench/monsters/werewolf/05-werewolf-fire.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/06-werewolf-blunt.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "06d2e935e3571fca910dd27b4a95d75a17f982cf99059daaa0c498349d0d90d8",
+      "source": "art-workbench/monsters/werewolf/06-werewolf-blunt.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/icons/06-werewolf-blunt.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "6d602805a5950cc0c6a3142b307c35cb188d5c39089fe33bb6648810f6fdd0fb",
+      "source": "art-workbench/monsters/werewolf/06-werewolf-blunt.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/07-werewolf-pierce.webp",
+      "width": 512,
+      "height": 512,
+      "sha256": "8b5db40de7e2c876930ac70e02c72ac49aff909b04e55a7e735c495449dff363",
+      "source": "art-workbench/monsters/werewolf/07-werewolf-pierce.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
+    },
+    {
+      "file": "monster/werewolf/icons/07-werewolf-pierce.webp",
+      "width": 128,
+      "height": 128,
+      "sha256": "0ef6e7505f5387dfa34da9e3b9415c2bf85e48cce5b138903ab5b323e239bf22",
+      "source": "art-workbench/monsters/werewolf/07-werewolf-pierce.png",
+      "runtime": true,
+      "encoding": "lossless WebP; resized RGBA exact"
     }
   ],
   "renderer": {

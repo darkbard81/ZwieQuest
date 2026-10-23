@@ -27,7 +27,7 @@ test('HTTP admin provisioning, reset authorization/rollback/retry, stale command
   await start();
   const a=await req('/api/auth/login',{username:admin.username,password:'123456'}),p=await req('/api/auth/login',{username:player.username,password:'123456'}),o=await req('/api/auth/login',{username:other.username,password:'123456'});
   let state=(await req('/api/state',undefined,a.cookie)).body.state;
-  assert.equal(state.characters.length,0);assert.equal(state.inventory.length,0);assert.equal(state.checkpointHistory.length,4);assert.equal(state.exploredNodes.village.length,Object.keys(state.mapGraph.nodes).length);
+  assert.equal(state.characters.length,0);assert.equal(state.inventory.length,0);assert.equal(state.checkpointHistory.length,5);assert.equal(state.exploredNodes.village.length,Object.keys(state.mapGraph.nodes).length);
   const normal=await req('/api/command',{type:'CREATE_CHARACTER',name:'모험가',appearanceId:'warrior',isAdmin:true,requestId:randomUUID()},o.cookie);assert.equal(normal.status,200);assert.equal(normal.body.state.checkpointHistory.length,0);assert.equal(normal.body.state.exploredNodes.village.length,1);
   assert.equal((await command(o.cookie,normal.body.state,'ADMIN_REVEAL_MAP',{userId:admin.id})).status,403);
   const reset={userId:player.id,confirmUsername:player.username,requestId:randomUUID()};
@@ -49,8 +49,8 @@ test('HTTP admin provisioning, reset authorization/rollback/retry, stale command
   assert.equal((await req('/api/auth/me',undefined,p.cookie)).body.user.id,player.id);assert.equal((await req('/api/state',undefined,o.cookie)).body.state.progressId,normal.body.state.progressId);
   const self=await req('/api/admin/reset-account',{userId:admin.id,confirmUsername:admin.username,requestId:randomUUID()},a.cookie);assert.equal(self.status,200);assert.equal(self.body.state.gold,0);assert.deepEqual(self.body.state.checkpointHistory,[]);assert.equal(self.body.state.exploredNodes.village.length,1);
   await stop();await start();state=(await req('/api/state',undefined,a.cookie)).body.state;assert.deepEqual(state.checkpointHistory,[]);assert.equal(state.exploredNodes.village.length,1);assert.equal((await req('/api/auth/me',undefined,a.cookie)).body.user.isAdmin,true);
-  const reveal={type:'ADMIN_REVEAL_MAP',progressId:state.progressId,requestId:randomUUID()};const shown=await req('/api/command',reveal,a.cookie);assert.equal(shown.status,200);assert.equal(shown.body.state.checkpointHistory.length,4);assert.equal(shown.body.state.exploredNodes.village.length,Object.keys(shown.body.state.mapGraph.nodes).length);assert.equal((await req('/api/command',reveal,a.cookie)).body.duplicate,true);
-  await stop();await start();state=(await req('/api/state',undefined,a.cookie)).body.state;assert.equal(state.checkpointHistory.length,4);assert.equal(state.progressId,self.body.state.progressId);
+  const reveal={type:'ADMIN_REVEAL_MAP',progressId:state.progressId,requestId:randomUUID()};const shown=await req('/api/command',reveal,a.cookie);assert.equal(shown.status,200);assert.equal(shown.body.state.checkpointHistory.length,5);assert.equal(shown.body.state.exploredNodes.village.length,Object.keys(shown.body.state.mapGraph.nodes).length);assert.equal((await req('/api/command',reveal,a.cookie)).body.duplicate,true);
+  await stop();await start();state=(await req('/api/state',undefined,a.cookie)).body.state;assert.equal(state.checkpointHistory.length,5);assert.equal(state.progressId,self.body.state.progressId);
 
   const created=await command(a.cookie,state,'CREATE_CHARACTER',{name:'지도 관리자',appearanceId:'cat'});assert.equal(created.status,200);state=created.body.state;
   const mapsBefore=JSON.parse(db.prepare('SELECT body FROM account_state WHERE user_id=?').get(admin.id).body).maps;
